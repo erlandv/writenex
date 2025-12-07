@@ -1,6 +1,6 @@
 # Writenex Monorepo Migration Plan
 
-> **Status:** Phase 4 In Progress - Dev server tested, ready for staging deployment
+> **Status:** Phase 4 Complete - Staging tested, ready for production
 > **Branch:** `monorepo-migration`
 > **Backup:** `pre-monorepo-backup` branch, `v1.0.0-pre-monorepo` tag
 > **Last Updated:** December 7, 2025
@@ -324,12 +324,12 @@ writenex/
 - [x] Delete old src/ directory
 - [x] Verify `pnpm build` passes
 
-### Phase 4: Verify
+### Phase 4: Verify ✅
 - [x] Local build works (`pnpm build` passes)
-- [x] Local dev works (`pnpm --filter writenex dev`) ✅
-- [ ] Deploy to staging (Vercel preview)
-- [ ] Full feature testing
-- [ ] Production deployment
+- [x] Local dev works (`pnpm --filter writenex dev`)
+- [x] Deploy to staging (Vercel preview) ✅
+- [x] Full feature testing - all pages and editor features working
+- [ ] Production deployment (merge to main)
 
 ### Phase 5: Future - Writenex Astro
 - [ ] Create `apps/writenex-astro`
@@ -410,10 +410,23 @@ cd packages/editor && pnpm type-check
 ### Next Steps (Phase 4 Remaining)
 
 1. ~~Test `pnpm dev` works correctly~~ ✅ Verified: `pnpm --filter writenex dev`
-2. Create Vercel project configuration for apps/writenex
-3. Deploy to preview/staging
-4. Full manual testing of all features
-5. Production deployment
+2. ~~Create Vercel project configuration for apps/writenex~~ ✅
+3. ~~Deploy to preview/staging~~ ✅
+4. ~~Full manual testing of all features~~ ✅
+5. Production deployment ← **NEXT**
+
+### Vercel Configuration (Monorepo)
+
+**Dashboard Settings:**
+- **Root Directory:** `apps/writenex/`
+- **Include files outside root directory:** Enabled (required for packages/)
+- **Framework:** Next.js (auto-detected)
+- **Install Command:** `pnpm install` (default)
+- **Build Command:** Uses `vercel.json` in app directory
+
+**Important Files:**
+- `/vercel.json` - Root config (optional, for reference)
+- `/apps/writenex/vercel.json` - App-specific config with headers
 
 ### Dev Server Command
 
