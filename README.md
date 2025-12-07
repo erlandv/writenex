@@ -153,58 +153,63 @@
 
 ## Project Structure
 
+This is a monorepo managed with pnpm workspaces and Turborepo.
+
 ```
 writenex/
-├── public/                 # Static assets (fonts, PWA files)
-├── src/
-│   ├── app/                # Next.js App Router
-│   │   ├── page.tsx        # Landing page
-│   │   ├── layout.tsx      # Root layout with theme provider
-│   │   ├── globals.css     # Global styles entry point
-│   │   ├── editor/         # Editor application
-│   │   │   ├── page.tsx    # Main editor page
-│   │   │   └── layout.tsx  # Editor layout
-│   │   ├── privacy/        # Privacy policy page
-│   │   ├── terms/          # Terms of service page
-│   │   ├── robots.ts       # SEO robots.txt generation
-│   │   └── sitemap.ts      # SEO sitemap generation
-│   ├── components/
-│   │   ├── editor/         # Editor-specific components
-│   │   │   ├── MarkdownEditor.tsx    # Main MDXEditor wrapper
-│   │   │   ├── dialogs/              # Modal dialogs (clear, delete, shortcuts, etc.)
-│   │   │   ├── panels/               # Sidebar panels (ToC, version history, search)
-│   │   │   ├── toolbar/              # Header, document tabs, status bar
-│   │   │   └── indicators/           # Notifications (offline, storage, backup)
-│   │   ├── landing/        # Landing page components
-│   │   ├── ui/             # Reusable UI primitives (shadcn/ui style)
-│   │   └── ThemeProvider.tsx
-│   ├── hooks/              # Custom React hooks
-│   │   ├── useAutoSave.ts            # Auto-save and version management
-│   │   ├── useKeyboardShortcuts.ts   # Global keyboard shortcuts
-│   │   └── useTableOfContents.ts     # ToC extraction and navigation
-│   ├── lib/                # Utilities and core logic
-│   │   ├── db.ts           # Dexie/IndexedDB persistence layer
-│   │   ├── constants.ts    # Application constants
-│   │   ├── exportHtml.ts   # HTML export utilities
-│   │   └── utils.ts        # Helper functions
-│   ├── store/
-│   │   └── editorStore.ts  # Zustand global state management
-│   ├── styles/             # Modular CSS architecture
-│   │   ├── index.css       # CSS entry point (imported by globals.css)
-│   │   ├── base/           # Foundation (variables, reset, utilities)
-│   │   ├── components/     # Component-specific styles (prose, tables)
-│   │   └── vendor/         # Third-party overrides (MDXEditor theming)
-│   └── types/              # TypeScript type definitions
-│       ├── document.ts     # Database entity types
-│       └── editor.ts       # Editor state types
+├── apps/
+│   └── writenex/                  # Main Next.js application
+│       ├── app/                   # Next.js App Router
+│       │   ├── page.tsx           # Landing page
+│       │   ├── layout.tsx         # Root layout with theme provider
+│       │   ├── globals.css        # Global styles entry point
+│       │   ├── editor/            # Editor application
+│       │   ├── privacy/           # Privacy policy page
+│       │   ├── terms/             # Terms of service page
+│       │   ├── components/        # App-specific components
+│       │   │   ├── ThemeProvider.tsx
+│       │   │   └── landing/       # Landing page components
+│       │   └── lib/               # App-specific utilities
+│       │       └── jsonld.ts      # SEO structured data
+│       ├── public/                # Static assets (fonts, PWA files)
+│       ├── package.json
+│       ├── next.config.mjs
+│       └── vercel.json
 │
-├── package.json
-├── tsconfig.json
-├── next.config.mjs
-├── postcss.config.mjs
-├── eslint.config.mjs
-├── .prettierrc
-└── vercel.json
+├── packages/
+│   ├── editor/                    # @writenex/editor - Editor components
+│   │   └── src/
+│   │       ├── MarkdownEditor.tsx # Main MDXEditor wrapper
+│   │       ├── dialogs/           # Modal dialogs
+│   │       ├── panels/            # Sidebar panels (ToC, history, search)
+│   │       ├── toolbar/           # Header, tabs, status bar
+│   │       ├── indicators/        # Notifications (offline, storage)
+│   │       └── styles/            # Editor CSS modules
+│   │
+│   ├── ui/                        # @writenex/ui - UI primitives
+│   │   └── src/                   # Button, Dialog, Tooltip, etc.
+│   │
+│   ├── hooks/                     # @writenex/hooks - React hooks
+│   │   └── src/                   # useAutoSave, useKeyboardShortcuts, etc.
+│   │
+│   ├── store/                     # @writenex/store - Zustand state
+│   │   └── src/                   # editorStore, types
+│   │
+│   ├── db/                        # @writenex/db - IndexedDB layer
+│   │   └── src/                   # Dexie database, types
+│   │
+│   ├── utils/                     # @writenex/utils - Shared utilities
+│   │   └── src/                   # cn, constants, helpers
+│   │
+│   └── config/                    # Shared configurations
+│       ├── typescript/            # @writenex/tsconfig
+│       ├── eslint/                # @writenex/eslint-config
+│       └── tailwind/              # @writenex/tailwind-config
+│
+├── package.json                   # Root workspace config
+├── pnpm-workspace.yaml            # Workspace definition
+├── turbo.json                     # Turborepo config
+└── vercel.json                    # Vercel deployment config
 ```
 
 ## Getting Started
@@ -212,7 +217,7 @@ writenex/
 ### Prerequisites
 
 - Node.js 18+
-- npm or yarn
+- pnpm 10+ (required for monorepo)
 
 ### Installation
 
@@ -226,24 +231,46 @@ cd writenex
 2. Install dependencies:
 
 ```bash
-npm install --legacy-peer-deps
+pnpm install
 ```
 
 3. Run the development server:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
    - Landing page: `http://localhost:3000`
    - Editor: `http://localhost:3000/editor`
 
+### Development Commands
+
+```bash
+# Start development server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Run linting
+pnpm lint
+
+# Type check all packages
+pnpm type-check
+
+# Format code
+pnpm format
+
+# Clean all build artifacts
+pnpm clean
+```
+
 ### Build for Production
 
 ```bash
-npm run build
-npm start
+pnpm build
+pnpm start
 ```
 
 ## Architecture

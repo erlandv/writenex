@@ -1,5 +1,5 @@
 # dependencies
-/node_modules
+node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -9,14 +9,15 @@
 !.yarn/versions
 
 # testing
-/coverage
+coverage/
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # production
-/build
+build/
+dist/
 
 # misc
 .DS_Store
@@ -38,14 +39,20 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# turbo
+.turbo
+
 # Personal AI Agents
 .github/copilot-instructions.md
 AGENTS.md
 
-# PWA - generated service worker files
-public/sw.js
-public/sw.js.map
-public/workbox-*.js
-public/workbox-*.js.map
-public/swe-worker-*.js
-public/fallback-*.js
+# PWA - generated service worker files (monorepo paths)
+apps/*/public/sw.js
+apps/*/public/sw.js.map
+apps/*/public/workbox-*.js
+apps/*/public/workbox-*.js.map
+apps/*/public/swe-worker-*.js
+apps/*/public/fallback-*.js
+
+# Backup files
+*.backup

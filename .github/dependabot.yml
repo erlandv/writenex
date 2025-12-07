@@ -1,7 +1,27 @@
 version: 2
 updates:
+  # Root workspace dependencies
   - package-ecosystem: "npm"
     directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Jakarta"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      # Group Turborepo & build tools
+      build-tools:
+        patterns:
+          - "turbo"
+          - "prettier"
+          - "prettier-plugin-*"
+
+  # Main app dependencies
+  - package-ecosystem: "npm"
+    directory: "/apps/writenex"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -23,6 +43,39 @@ updates:
           - "next"
           - "eslint-config-next"
           - "@ducanh2912/next-pwa"
+      # Group Tailwind updates
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+      # Group development tools
+      dev-tools:
+        patterns:
+          - "eslint"
+          - "@eslint/*"
+          - "typescript"
+          - "@types/*"
+    ignore:
+      # Ignore major version updates for core frameworks (review manually)
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+
+  # @writenex/editor package
+  - package-ecosystem: "npm"
+    directory: "/packages/editor"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Jakarta"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
       # Group MDXEditor updates
       mdxeditor:
         patterns:
@@ -32,16 +85,6 @@ updates:
         patterns:
           - "lexical"
           - "@lexical/*"
-      # Group Radix UI updates
-      radix-ui:
-        patterns:
-          - "@radix-ui/*"
-      # Group Tailwind updates
-      tailwind:
-        patterns:
-          - "tailwindcss"
-          - "@tailwindcss/*"
-          - "tailwind-merge"
       # Group remark/unified ecosystem
       unified:
         patterns:
@@ -53,38 +96,92 @@ updates:
       ui-utils:
         patterns:
           - "lucide-react"
+          - "react-diff-viewer-continued"
+
+  # @writenex/ui package
+  - package-ecosystem: "npm"
+    directory: "/packages/ui"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Jakarta"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      # Group Radix UI updates
+      radix-ui:
+        patterns:
+          - "@radix-ui/*"
+      # Group UI utilities
+      ui-utils:
+        patterns:
           - "class-variance-authority"
           - "clsx"
-          - "react-diff-viewer-continued"
-      # Group database & storage updates
+          - "tailwind-merge"
+          - "lucide-react"
+
+  # @writenex/db package
+  - package-ecosystem: "npm"
+    directory: "/packages/db"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Jakarta"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
       database:
         patterns:
           - "dexie"
-      # Group state management updates (future-proof for jotai, valtio, etc.)
+
+  # @writenex/store package
+  - package-ecosystem: "npm"
+    directory: "/packages/store"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Jakarta"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
       state:
         patterns:
           - "zustand"
-      # Group development tools
-      dev-tools:
+
+  # @writenex/hooks package
+  - package-ecosystem: "npm"
+    directory: "/packages/hooks"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Jakarta"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(deps)"
+
+  # @writenex/utils package
+  - package-ecosystem: "npm"
+    directory: "/packages/utils"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Jakarta"
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      utils:
         patterns:
-          - "eslint"
-          - "@eslint/*"
-          - "prettier"
-          - "eslint-config-prettier"
-          - "prettier-plugin-tailwindcss"
-      # Group TypeScript & types
-      typescript:
-        patterns:
-          - "typescript"
-          - "@types/*"
-    ignore:
-      # Ignore major version updates for core frameworks (review manually)
-      - dependency-name: "next"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "react"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "react-dom"
-        update-types: ["version-update:semver-major"]
+          - "clsx"
+          - "tailwind-merge"
 
   - package-ecosystem: "github-actions"
     directory: "/"

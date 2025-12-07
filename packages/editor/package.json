@@ -1,0 +1,54 @@
+{
+  "name": "@writenex/editor",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Markdown editor components for Writenex",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./styles": {
+      "default": "./src/styles/index.css"
+    }
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@writenex/db": "workspace:*",
+    "@writenex/hooks": "workspace:*",
+    "@writenex/store": "workspace:*",
+    "@writenex/ui": "workspace:*",
+    "@writenex/utils": "workspace:*",
+    "@lexical/list": "^0.35.0",
+    "@lexical/react": "^0.35.0",
+    "@lexical/rich-text": "^0.35.0",
+    "@lexical/selection": "^0.35.0",
+    "@mdxeditor/editor": "^3.50.0",
+    "lexical": "^0.35.0",
+    "lucide-react": "^0.556.0",
+    "marked": "^17.0.1",
+    "react-diff-viewer-continued": "^3.4.0",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "shiki": "^3.17.0",
+    "unified": "^11.0.5"
+  },
+  "peerDependencies": {
+    "next": "^15.0.0 || ^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@writenex/tsconfig": "workspace:*",
+    "@types/node": "^22.15.32",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "next": "^16.0.7",
+    "typescript": "^5.8.3"
+  }
+}
