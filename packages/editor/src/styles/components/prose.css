@@ -1,0 +1,65 @@
+/**
+ * Prose Typography Styles
+ * 
+ * Custom prose styling for markdown content rendering.
+ * Includes light and dark mode configurations.
+ */
+
+/* Prose styles for light mode - Custom overrides for better contrast */
+.prose {
+  --tw-prose-body: #334155; /* Slate-700: Darker, more legible gray */
+  --tw-prose-headings: #1e293b; /* Slate-800: Matches app foreground, softer than black */
+  --tw-prose-bold: #1e293b; /* Slate-800 */
+  --tw-prose-links: #335dff; /* Brand Blue */
+  --tw-prose-quotes: #334155; /* Slate-700 */
+  --tw-prose-code: #1e293b; /* Slate-800 */
+  --tw-prose-hr: #e2e8f0; /* Slate-200 */
+  --tw-prose-th-borders: #e2e8f0; /* Slate-200 */
+  --tw-prose-td-borders: #e2e8f0; /* Slate-200 */
+}
+
+/* Prose styles for dark mode */
+.dark .prose {
+  --tw-prose-body: #e2e8f0;
+  --tw-prose-headings: #fafafa;
+  --tw-prose-lead: #a1a1aa;
+  --tw-prose-links: #5c7cff;
+  --tw-prose-bold: #fafafa;
+  --tw-prose-counters: #a1a1aa;
+  --tw-prose-bullets: #71717a;
+  --tw-prose-hr: #3f3f46;
+  --tw-prose-quotes: #e4e4e7;
+  --tw-prose-quote-borders: #3f3f46;
+  --tw-prose-captions: #a1a1aa;
+  --tw-prose-code: #fafafa;
+  --tw-prose-pre-code: #e4e4e7;
+  --tw-prose-pre-bg: #18181b;
+  --tw-prose-th-borders: #3f3f46;
+  --tw-prose-td-borders: #27272a;
+}
+
+/* Blockquote styling */
+blockquote {
+  border-left: 4px solid #335dff;
+  background-color: #f8fafc;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 0 0.375rem 0.375rem 0;
+}
+
+.dark blockquote {
+  background-color: #18181b;
+  border-left-color: #5c7cff;
+}
+
+/* Remove backticks from inline code (Tailwind typography default) */
+.prose code::before,
+.prose code::after {
+  content: none;
+}
+
+/* Inline code styling - normal weight, subtle background */
+.prose code:not(pre code) {
+  font-weight: 400;
+  font-size: 1rem;
+}

@@ -1,0 +1,491 @@
+/**
+ * MDXEditor Theme Customizations
+ * 
+ * Complete theme overrides for MDXEditor components including:
+ * - Custom fonts (Plus Jakarta Sans, Agave Nerd Font)
+ * - Light mode adjustments
+ * - Dark mode theme
+ * 
+ * This file MUST be imported AFTER @mdxeditor/editor/style.css
+ * to ensure our customizations take precedence.
+ * 
+ * All colors are defined as CSS variables for easy maintenance.
+ * To change colors, modify the variables in sections 0-1.
+ * 
+ * Sections:
+ * 0. Fonts & Toolbar Pointer Cursor
+ * 1. Light Mode - CSS Variables & Base
+ * 2. Dark Mode - CSS Variables & Base
+ * 3. Dark Mode - Toolbar
+ * 4. Dark Mode - Dropdowns & Popovers
+ * 5. Dark Mode - Dialogs
+ * 6. Dark Mode - Code Blocks & Inline Code
+ * 7. Dark Mode - Source/Diff Mode
+ * 8. Dark Mode - Checklist
+ * 9. Tooltip Styling
+ */
+
+/* ============================================================================
+   0. FONTS
+   ============================================================================ */
+
+/*
+ * Override MDXEditor font variables with our custom fonts.
+ * We use --font-plus-jakarta and --font-agave directly from next/font
+ * because --font-sans and --font-mono may conflict with MDXEditor's own variables.
+ */
+
+.mdxeditor {
+  --font-body:
+    var(--font-plus-jakarta), system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif !important;
+  --font-mono:
+    var(--font-agave), ui-monospace, "Cascadia Code", Menlo, Consolas,
+    "Courier New", monospace !important;
+}
+
+/* Ensure the content editable area uses our font */
+.mdxeditor [data-lexical-editor="true"] {
+  font-family:
+    var(--font-plus-jakarta),
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif !important;
+}
+
+/* Inline code must use mono font */
+.mdxeditor code:not(pre code),
+.mdxeditor [data-lexical-editor="true"] code {
+  font-family:
+    var(--font-agave), ui-monospace, "Cascadia Code", Menlo, Consolas,
+    "Courier New", monospace !important;
+}
+
+/* ============================================================================
+   0.5. TOOLBAR POINTER CURSOR
+   ============================================================================ */
+
+/*
+ * Make all toolbar buttons use pointer cursor for consistency with
+ * the custom header toolbar buttons.
+ */
+.mdxeditor [class*="_toolbarRoot_"] button,
+.mdxeditor [class*="_toolbar_"] button,
+.mdxeditor [class*="_selectTrigger_"],
+.mdxeditor [class*="_toolbarModeSwitch_"] button,
+.mdxeditor [class*="_codeMirrorToolbar_"] button,
+[class*="_selectItem_"] {
+  cursor: pointer !important;
+}
+
+/* ============================================================================
+   1. LIGHT MODE - CSS VARIABLES & BASE
+   ============================================================================ */
+
+.mdxeditor {
+  /* Light mode text - darker than default for better readability */
+  --baseTextContrast: #18181b; /* zinc-900 */
+}
+
+.mdxeditor [data-lexical-editor] {
+  color: #27272a; /* zinc-800 */
+}
+
+/* ============================================================================
+   2. DARK MODE - CSS VARIABLES & BASE
+   ============================================================================ */
+
+.dark .mdxeditor {
+  /* Background colors */
+  --baseBg: #18181b; /* zinc-900 - main background */
+  --baseBgSubtle: #27272a; /* zinc-800 - subtle background */
+  --baseBgHover: rgba(255, 255, 255, 0.1); /* hover state */
+  --baseBgActive: rgba(255, 255, 255, 0.15); /* active state */
+  --basePageBg: #09090b; /* zinc-950 - page background */
+
+  /* Border colors */
+  --baseBorder: #3f3f46; /* zinc-700 - primary border */
+  --baseBorderSubtle: #52525b; /* zinc-600 - subtle border */
+
+  /* Text colors */
+  --baseText: #a1a1aa; /* zinc-400 - secondary text */
+  --baseTextContrast: #d4d4d8; /* zinc-300 - primary text (optimized for reading) */
+  --baseTextMuted: #71717a; /* zinc-500 - muted text */
+  --baseTextSubtle: #52525b; /* zinc-600 - very muted text */
+
+  /* Accent colors */
+  --accentColor: #5c7cff; /* brand blue */
+  --accentColorHover: rgba(92, 124, 255, 0.2); /* brand blue transparent */
+
+  /* Semantic colors */
+  --dangerColor: #f87171; /* red-400 */
+  --dangerBgHover: rgba(239, 68, 68, 0.2); /* red transparent */
+  --successBg: rgba(46, 160, 67, 0.15); /* green for diff additions */
+  --successBgStrong: rgba(46, 160, 67, 0.4);
+  --errorBg: rgba(248, 81, 73, 0.15); /* red for diff deletions */
+
+  /* Selection */
+  --selectionBg: rgba(99, 102, 241, 0.3); /* indigo selection */
+
+  /* Diff mode (GitHub-style) */
+  --diffBg: #0d1117;
+  --diffGutterBg: #161b22;
+  --diffBorder: #30363d;
+  --diffGutterText: #6e7681;
+  --diffActiveGutterBg: #1f2937;
+  --diffActiveGutterText: #9ca3af;
+}
+
+/* Editor content text color */
+.dark .mdxeditor [data-lexical-editor] {
+  color: var(--baseTextContrast);
+}
+
+/* Placeholder text */
+.dark .mdxeditor .editor-placeholder {
+  color: var(--baseTextSubtle) !important;
+}
+
+/* ============================================================================
+   3. DARK MODE - TOOLBAR
+   ============================================================================ */
+
+.dark .mdxeditor [class*="_toolbarRoot_"],
+.dark .mdxeditor [class*="_toolbar_"] {
+  background-color: var(--baseBgSubtle) !important;
+  border-color: var(--baseBorder) !important;
+}
+
+.dark .mdxeditor [class*="_selectTrigger_"] {
+  background-color: var(--baseBgHover) !important;
+  border-color: var(--baseBorder) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+.dark .mdxeditor [class*="_selectTrigger_"]:hover {
+  background-color: var(--baseBgHover) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+/* ============================================================================
+   4. DARK MODE - DROPDOWNS & POPOVERS
+   ============================================================================ */
+
+/* Dropdown containers (rendered via portal, so no .mdxeditor prefix) */
+.dark [class*="_selectContainer_"],
+.dark [class*="_toolbarNodeKindSelectContainer_"],
+.dark [class*="_toolbarButtonDropdownContainer_"] {
+  background-color: var(--baseBgSubtle, #27272a) !important;
+  border: 1px solid var(--baseBorder, #3f3f46) !important;
+  color: var(--baseTextContrast, #d4d4d8) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Dropdown items */
+.dark [class*="_selectItem_"] {
+  color: var(--baseTextContrast, #d4d4d8) !important;
+  background-color: transparent !important;
+}
+
+.dark [class*="_selectItem_"]:hover,
+.dark [class*="_selectItem_"][data-highlighted],
+.dark [class*="_selectItem_"][data-state="checked"] {
+  background-color: var(--baseBorder, #3f3f46) !important;
+  color: var(--baseTextContrast, #d4d4d8) !important;
+}
+
+/* Diff source toggle */
+.dark [class*="_diffSourceToggle_"],
+.dark [class*="_toolbarModeSwitch_"] {
+  background-color: var(--baseBgSubtle, #27272a) !important;
+  border-color: var(--baseBorder, #3f3f46) !important;
+}
+
+/* Popover content */
+.dark .mdxeditor .mdxeditor-popup-container {
+  background-color: var(--baseBg);
+  color: var(--baseTextContrast);
+  border: 1px solid var(--baseBorder);
+}
+
+/* ============================================================================
+   5. DARK MODE - DIALOGS
+   ============================================================================ */
+
+.dark .mdxeditor .mdxeditor-dialog-content {
+  background-color: var(--baseBg);
+  border: 1px solid var(--baseBorder);
+  color: var(--baseTextContrast);
+}
+
+.dark .mdxeditor .mdxeditor-dialog-content input,
+.dark .mdxeditor .mdxeditor-dialog-content textarea {
+  background-color: var(--baseBgSubtle);
+  border: 1px solid var(--baseBorder);
+  color: var(--baseTextContrast);
+}
+
+.dark .mdxeditor .mdxeditor-dialog-content input:focus,
+.dark .mdxeditor .mdxeditor-dialog-content textarea:focus {
+  border-color: var(--accentColor);
+  box-shadow: 0 0 0 2px var(--accentColorHover);
+}
+
+.dark .mdxeditor .mdxeditor-dialog-content label {
+  color: var(--baseText);
+}
+
+/* ============================================================================
+   6. DARK MODE - CODE BLOCKS & INLINE CODE
+   ============================================================================ */
+
+/* Code block container */
+.dark .mdxeditor [class*="_codeMirrorWrapper_"] {
+  border-color: var(--baseBorder) !important;
+  background-color: var(--baseBg) !important;
+  box-shadow: none !important;
+}
+
+/* Code block toolbar */
+.dark .mdxeditor [class*="_codeMirrorToolbar_"] {
+  background-color: var(--baseBgSubtle) !important;
+  border-bottom-color: var(--baseBorder) !important;
+}
+
+.dark .mdxeditor [class*="_codeMirrorToolbar_"] button,
+.dark .mdxeditor [class*="_codeMirrorToolbar_"] [class*="_selectTrigger_"] {
+  color: var(--baseText) !important;
+}
+
+.dark
+  .mdxeditor
+  [class*="_codeMirrorToolbar_"]
+  [class*="_selectTrigger_"]:hover {
+  background-color: var(--baseBorder) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+/* Delete button hover (red) */
+.dark .mdxeditor [class*="_codeMirrorToolbar_"] button:last-child:hover {
+  background-color: var(--dangerBgHover) !important;
+  color: var(--dangerColor) !important;
+}
+
+/* Code content & line numbers */
+.dark .mdxeditor [class*="_codeMirrorWrapper_"] .cm-content {
+  color: var(--baseTextContrast) !important;
+}
+
+.dark .mdxeditor [class*="_codeMirrorWrapper_"] .cm-gutters {
+  background-color: var(--baseBgSubtle) !important;
+  border-right: 1px solid var(--baseBorder) !important;
+  color: var(--baseTextSubtle) !important;
+}
+
+.dark .mdxeditor [class*="_codeMirrorWrapper_"] .cm-activeLineGutter {
+  background-color: var(--baseBorder) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+.dark .mdxeditor [class*="_codeMirrorWrapper_"] .cm-selectionBackground {
+  background-color: var(--selectionBg) !important;
+}
+
+.dark .mdxeditor [class*="_codeMirrorWrapper_"] .cm-cursor {
+  border-left-color: var(--baseTextContrast) !important;
+}
+
+/* Inline code */
+.dark .mdxeditor code:not(pre code) {
+  background-color: var(--baseBorder) !important;
+  color: var(--baseTextContrast) !important;
+  border: 1px solid var(--baseBorderSubtle) !important;
+}
+
+.dark .mdxeditor code:not(pre code) span {
+  background-color: transparent !important;
+  border: none !important;
+  color: inherit !important;
+}
+
+/* ============================================================================
+   7. DARK MODE - SOURCE/DIFF MODE
+   ============================================================================ */
+
+/* 
+ * Source editor overrides
+ * CodeMirror injects inline <style> with generated classes (like ͼo, ͼ16) 
+ * for theming and syntax highlighting. We need high specificity to override.
+ */
+
+/* Override CodeMirror's injected theme - base */
+.dark .mdxeditor .cm-editor {
+  background-color: var(--baseBg) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+.dark .mdxeditor .cm-editor .cm-scroller {
+  background-color: var(--baseBg) !important;
+}
+
+/* Override ALL CodeMirror syntax highlighting tokens */
+.dark .mdxeditor .cm-editor .cm-line span[class^="ͼ"],
+.dark .mdxeditor .cm-editor .cm-line span[class*=" ͼ"] {
+  color: inherit !important;
+}
+
+/* Source editor - base */
+.dark .mdxeditor [class*="_sourceEditor_"],
+.dark .mdxeditor [class*="_sourceEditor_"] .cm-editor {
+  background-color: var(--baseBg) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+.dark .mdxeditor [class*="_sourceEditor_"] .cm-scroller {
+  background-color: var(--baseBg) !important;
+}
+
+/* Source editor - text content (multiple selectors for specificity) */
+.dark .mdxeditor [class*="_sourceEditor_"] .cm-content {
+  color: var(--baseTextContrast) !important;
+  caret-color: var(--baseTextContrast) !important;
+}
+
+.dark .mdxeditor [class*="_sourceEditor_"] .cm-content .cm-line {
+  color: var(--baseTextContrast) !important;
+}
+
+/* Override CodeMirror generated syntax highlighting classes */
+.dark .mdxeditor [class*="_sourceEditor_"] .cm-content .cm-line span {
+  color: var(--baseTextContrast) !important;
+}
+
+.dark .mdxeditor [class*="_sourceEditor_"] .cm-line {
+  background-color: transparent !important;
+  color: var(--baseTextContrast) !important;
+}
+
+/* Source editor - gutters */
+.dark .mdxeditor [class*="_sourceEditor_"] .cm-gutters {
+  background-color: var(--baseBgSubtle) !important;
+  border-right: 1px solid var(--baseBorder) !important;
+  color: var(--baseTextMuted) !important;
+}
+
+.dark .mdxeditor [class*="_sourceEditor_"] .cm-activeLineGutter {
+  background-color: var(--baseBorder) !important;
+}
+
+.dark .mdxeditor [class*="_sourceEditor_"] .cm-activeLine {
+  background-color: var(--baseBgActive) !important;
+}
+
+/* Source editor - cursor and selection */
+.dark .mdxeditor [class*="_sourceEditor_"] .cm-cursor {
+  border-left-color: var(--baseTextContrast) !important;
+}
+
+.dark .mdxeditor [class*="_sourceEditor_"] .cm-selectionBackground {
+  background-color: var(--selectionBg) !important;
+}
+
+/* Diff mode - GitHub-style dark theme */
+.dark .mdxeditor [class*="_diffEditor_"],
+.dark .mdxeditor .cm-mergeView {
+  background-color: var(--diffBg) !important;
+}
+
+.dark .mdxeditor [class*="_diffEditor_"] .cm-editor,
+.dark .mdxeditor .cm-mergeView .cm-scroller {
+  background-color: var(--diffBg) !important;
+}
+
+.dark .mdxeditor [class*="_diffEditor_"] .cm-content {
+  color: var(--baseTextContrast) !important;
+}
+
+.dark .mdxeditor [class*="_diffEditor_"] .cm-gutters,
+.dark .mdxeditor .cm-mergeView .cm-gutters {
+  background-color: var(--diffGutterBg) !important;
+  border-right: 1px solid var(--diffBorder) !important;
+  color: var(--diffGutterText) !important;
+}
+
+.dark .mdxeditor [class*="_diffEditor_"] .cm-activeLineGutter,
+.dark .mdxeditor .cm-mergeView .cm-activeLineGutter {
+  background-color: var(--diffActiveGutterBg) !important;
+  color: var(--diffActiveGutterText) !important;
+}
+
+/* Diff highlighting */
+.dark .mdxeditor .cm-changedLine {
+  background-color: var(--successBg) !important;
+}
+
+.dark .mdxeditor .cm-changedText {
+  background-color: var(--successBgStrong) !important;
+}
+
+.dark .mdxeditor .cm-deletedChunk {
+  background-color: var(--errorBg) !important;
+}
+
+.dark .mdxeditor .cm-mergeViewGap {
+  background-color: var(--diffGutterBg) !important;
+  border-color: var(--diffBorder) !important;
+}
+
+/* ============================================================================
+   8. DARK MODE - CHECKLIST
+   ============================================================================ */
+
+.dark .mdxeditor li[role="checkbox"]::before {
+  background-color: var(--baseBgSubtle) !important;
+  border-color: var(--baseBorderSubtle) !important;
+}
+
+.dark .mdxeditor li[role="checkbox"][aria-checked="true"]::before {
+  background-color: var(--accentColor) !important;
+  border-color: var(--accentColor) !important;
+}
+
+.dark .mdxeditor li[role="checkbox"][aria-checked="true"]::after {
+  border-color: #ffffff !important;
+}
+
+.dark .mdxeditor li[role="checkbox"]:hover::before {
+  border-color: var(--accentColor) !important;
+}
+
+.dark .mdxeditor li[role="checkbox"][aria-checked="true"] {
+  color: var(--baseTextMuted) !important;
+}
+
+/* ============================================================================
+   9. TOOLTIP STYLING
+   Override MDXEditor tooltips to match our SimpleTooltip/shadcn styling.
+   Our tooltips use inverted colors (dark bg on light mode, light bg on dark mode).
+   ============================================================================ */
+
+/*
+ * Light Mode Tooltip
+ * Match: bg-zinc-900 (#18181b), text-zinc-50 (#fafafa)
+ * MDXEditor uses [data-radix-popper-content-wrapper] for tooltip container
+ */
+.mdxeditor [data-radix-popper-content-wrapper] [class*="tooltipContent"] {
+  background-color: #18181b !important; /* zinc-900 */
+  color: #fafafa !important; /* zinc-50 */
+}
+
+/*
+ * Dark Mode Tooltip  
+ * Match: bg-zinc-50 (#fafafa), text-zinc-900 (#18181b)
+ */
+.dark .mdxeditor [data-radix-popper-content-wrapper] [class*="tooltipContent"] {
+  background-color: #fafafa !important; /* zinc-50 */
+  color: #18181b !important; /* zinc-900 */
+}
