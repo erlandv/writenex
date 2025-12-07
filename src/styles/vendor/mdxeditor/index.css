@@ -1,0 +1,7 @@
+/**
+ * MDXEditor Vendor Styles - Entry Point
+ * 
+ * This file is kept for potential future use but is currently empty.
+ * All MDXEditor customizations (fonts, colors, dark mode) are in theme.css
+ * which is imported directly in MarkdownEditor.tsx AFTER @mdxeditor/editor/style.css
+ */

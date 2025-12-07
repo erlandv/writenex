@@ -1,0 +1,94 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Jakarta"
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      # Group React ecosystem updates
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react*"
+      # Group Next.js updates
+      nextjs:
+        patterns:
+          - "next"
+          - "eslint-config-next"
+          - "@ducanh2912/next-pwa"
+      # Group MDXEditor updates
+      mdxeditor:
+        patterns:
+          - "@mdxeditor/*"
+      # Group Lexical editor updates
+      lexical:
+        patterns:
+          - "lexical"
+          - "@lexical/*"
+      # Group Radix UI updates
+      radix-ui:
+        patterns:
+          - "@radix-ui/*"
+      # Group Tailwind updates
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "tailwind-merge"
+      # Group remark/unified ecosystem
+      unified:
+        patterns:
+          - "unified"
+          - "remark-*"
+          - "marked"
+          - "shiki"
+      # Group UI utilities
+      ui-utils:
+        patterns:
+          - "lucide-react"
+          - "class-variance-authority"
+          - "clsx"
+          - "react-diff-viewer-continued"
+      # Group database & storage updates
+      database:
+        patterns:
+          - "dexie"
+      # Group state management updates (future-proof for jotai, valtio, etc.)
+      state:
+        patterns:
+          - "zustand"
+      # Group development tools
+      dev-tools:
+        patterns:
+          - "eslint"
+          - "@eslint/*"
+          - "prettier"
+          - "eslint-config-prettier"
+          - "prettier-plugin-tailwindcss"
+      # Group TypeScript & types
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/*"
+    ignore:
+      # Ignore major version updates for core frameworks (review manually)
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "chore(ci)"

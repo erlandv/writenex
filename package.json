@@ -1,0 +1,72 @@
+{
+  "name": "writenex",
+  "version": "1.0",
+  "private": true,
+  "description": "modern WYSIWYG Markdown editor",
+  "keywords": [
+    "productivity",
+    "utilities",
+    "markdown",
+    "editor",
+    "wysiwyg"
+  ],
+  "author": "Erland <hello@erland.me>",
+  "license": "MIT",
+  "homepage": "https://writenex.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erlandv/writenex.git"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "validate": "npm run lint && npm run format:check"
+  },
+  "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
+    "@lexical/list": "^0.35.0",
+    "@lexical/react": "^0.35.0",
+    "@lexical/rich-text": "^0.35.0",
+    "@lexical/selection": "^0.35.0",
+    "@mdxeditor/editor": "^3.50.0",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-dropdown-menu": "^2.1.16",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-tooltip": "^1.2.8",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dexie": "^4.2.1",
+    "lexical": "^0.35.0",
+    "lucide-react": "^0.556.0",
+    "marked": "^17.0.1",
+    "next": "^16.0.7",
+    "react": "^19.2.1",
+    "react-diff-viewer-continued": "^3.4.0",
+    "react-dom": "^19.2.1",
+    "remark-parse": "^11.0.0",
+    "remark-stringify": "^11.0.0",
+    "shiki": "^3.17.0",
+    "tailwind-merge": "^3.4.0",
+    "unified": "^11.0.5",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "^16.0.7",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.7.4",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

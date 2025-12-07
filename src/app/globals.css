@@ -1,0 +1,30 @@
+/**
+ * Writenex Global Styles
+ * 
+ * Main entry point for all application styles.
+ * Imports Tailwind CSS and modular style files.
+ */
+
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@import "../styles/index.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 
+ * Custom font families
+ * 
+ * next/font injects --font-plus-jakarta and --font-agave via classes on <html>
+ * We define --font-sans and --font-mono for use with Tailwind's font-sans/font-mono classes
+ * 
+ * Note: MDXEditor has its own font variables (--font-body, --font-mono) which are
+ * overridden in src/styles/vendor/mdxeditor/font-override.css
+ */
+html {
+  --font-sans:
+    var(--font-plus-jakarta, system-ui), system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono:
+    var(--font-agave, ui-monospace), ui-monospace, "Cascadia Code", Menlo,
+    Consolas, "Courier New", monospace;
+}
