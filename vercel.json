@@ -1,5 +1,9 @@
 {
-  "buildCommand": "cd ../.. && pnpm --filter writenex build",
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm --filter writenex build",
+  "outputDirectory": "apps/writenex/.next",
   "headers": [
     {
       "source": "/sw.js",
