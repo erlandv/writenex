@@ -1,6 +1,6 @@
 # Writenex Monorepo Migration Plan
 
-> **Status:** Phase 3 Complete - App moved to apps/writenex, build passing
+> **Status:** Phase 4 In Progress - Dev server tested, ready for staging deployment
 > **Branch:** `monorepo-migration`
 > **Backup:** `pre-monorepo-backup` branch, `v1.0.0-pre-monorepo` tag
 > **Last Updated:** December 7, 2025
@@ -326,7 +326,7 @@ writenex/
 
 ### Phase 4: Verify
 - [x] Local build works (`pnpm build` passes)
-- [ ] Local dev works (`pnpm dev`)
+- [x] Local dev works (`pnpm --filter writenex dev`) ✅
 - [ ] Deploy to staging (Vercel preview)
 - [ ] Full feature testing
 - [ ] Production deployment
@@ -409,11 +409,20 @@ cd packages/editor && pnpm type-check
 
 ### Next Steps (Phase 4 Remaining)
 
-1. Test `pnpm dev` works correctly
+1. ~~Test `pnpm dev` works correctly~~ ✅ Verified: `pnpm --filter writenex dev`
 2. Create Vercel project configuration for apps/writenex
 3. Deploy to preview/staging
 4. Full manual testing of all features
 5. Production deployment
+
+### Dev Server Command
+
+```bash
+# Run dev server
+pnpm --filter writenex dev
+```
+
+Note: The package is named `writenex` (not `@writenex/app`), filter accordingly.
 
 ## Notes
 
