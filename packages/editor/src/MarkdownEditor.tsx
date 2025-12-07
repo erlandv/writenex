@@ -85,7 +85,7 @@ import {
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 // Import theme customizations AFTER MDXEditor styles to ensure our overrides take precedence
-import "@/styles/vendor/mdxeditor/theme.css";
+import "./styles/vendor/mdxeditor/theme.css";
 // Toolbar components
 import { StatusBar, DocumentTabs } from "./toolbar";
 // Dialog components

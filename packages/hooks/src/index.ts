@@ -39,6 +39,8 @@ export type { StorageInfo } from "./useStorageQuota";
 // Table of contents hook
 export {
   useTableOfContents,
+  useActiveHeading,
+  scrollToHeading,
   extractHeadings,
 } from "./useTableOfContents";
 export type { TocHeading } from "./useTableOfContents";

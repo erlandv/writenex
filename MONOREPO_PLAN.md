@@ -1,39 +1,49 @@
 # Writenex Monorepo Migration Plan
 
-> **Status:** Phase 2 In Progress - Extracting @writenex/db
+> **Status:** Phase 3 Complete - App moved to apps/writenex, build passing
 > **Branch:** `monorepo-migration`
 > **Backup:** `pre-monorepo-backup` branch, `v1.0.0-pre-monorepo` tag
+> **Last Updated:** December 7, 2025
 
 ## Goal
 
 Migrate single Next.js app to monorepo structure without production downtime.
 
-## Target Structure
+## Actual Structure (Post-Migration)
 
 ```
 writenex/
 ├── .github/
-│   └── workflows/
-│       ├── ci.yml
-│       └── deploy-writenex.yml
+│   └── copilot-instructions.md
 │
 ├── apps/
-│   ├── writenex/                  # Core editor (current app)
-│   │   ├── package.json
-│   │   ├── next.config.mjs
-│   │   ├── tsconfig.json
-│   │   ├── postcss.config.mjs
-│   │   ├── vercel.json
-│   │   ├── public/
-│   │   └── src/
-│   │       ├── app/
-│   │       ├── components/
-│   │       │   ├── landing/       # App-specific
-│   │       │   └── ThemeProvider.tsx
-│   │       └── styles/
-│   │
-│   └── writenex-astro/            # Future: Astro CMS version
-│       └── (to be created later)
+│   └── writenex/                  # Core editor app
+│       ├── package.json
+│       ├── next.config.mjs
+│       ├── tsconfig.json
+│       ├── postcss.config.mjs
+│       ├── vercel.json
+│       ├── public/
+│       │   ├── manifest.json
+│       │   ├── sw.js
+│       │   └── fonts/
+│       └── app/                   # Next.js App Router (source root)
+│           ├── globals.css
+│           ├── layout.tsx
+│           ├── page.tsx
+│           ├── not-found.tsx
+│           ├── robots.ts
+│           ├── sitemap.ts
+│           ├── editor/
+│           │   ├── layout.tsx
+│           │   └── page.tsx
+│           ├── privacy/
+│           ├── terms/
+│           ├── components/
+│           │   ├── ThemeProvider.tsx
+│           │   └── landing/
+│           └── lib/
+│               └── jsonld.ts
 │
 ├── packages/
 │   ├── utils/                     # @writenex/utils
@@ -42,9 +52,9 @@ writenex/
 │   │   └── src/
 │   │       ├── index.ts
 │   │       ├── cn.ts
+│   │       ├── helpers.ts
 │   │       ├── constants.ts
 │   │       ├── storage.ts
-│   │       ├── onboarding.ts
 │   │       └── keyboardShortcuts.ts
 │   │
 │   ├── ui/                        # @writenex/ui
@@ -67,8 +77,7 @@ writenex/
 │   │   └── src/
 │   │       ├── index.ts
 │   │       ├── db.ts
-│   │       └── types/
-│   │           └── document.ts
+│   │       └── types.ts
 │   │
 │   ├── store/                     # @writenex/store
 │   │   ├── package.json
@@ -76,8 +85,7 @@ writenex/
 │   │   └── src/
 │   │       ├── index.ts
 │   │       ├── editorStore.ts
-│   │       └── types/
-│   │           └── editor.ts
+│   │       └── types.ts
 │   │
 │   ├── hooks/                     # @writenex/hooks
 │   │   ├── package.json
@@ -101,33 +109,33 @@ writenex/
 │   │       ├── MarkdownEditor.tsx
 │   │       ├── EditorShortcuts.tsx
 │   │       ├── exportHtml.ts
+│   │       ├── onboarding.ts
 │   │       ├── dialogs/
 │   │       ├── panels/
 │   │       ├── toolbar/
 │   │       ├── indicators/
 │   │       └── styles/
+│   │           ├── index.css
+│   │           ├── base/
+│   │           ├── components/
+│   │           └── vendor/
 │   │
-│   └── config/                    # @writenex/config
-│       ├── eslint/
-│       │   ├── package.json
-│       │   └── index.js
-│       ├── typescript/
-│       │   ├── package.json
+│   └── config/                    # Shared configs
+│       ├── eslint/                # @writenex/eslint-config
+│       ├── typescript/            # @writenex/tsconfig
 │       │   ├── base.json
 │       │   ├── nextjs.json
 │       │   └── react-library.json
-│       └── tailwind/
-│           ├── package.json
-│           └── index.ts
+│       └── tailwind/              # @writenex/tailwind-config
 │
 ├── package.json                   # Root workspace
 ├── pnpm-workspace.yaml
 ├── turbo.json
-├── tsconfig.json                  # Base tsconfig
 ├── .prettierrc
 ├── .gitignore
 ├── LICENSE
-└── README.md
+├── README.md
+└── MONOREPO_PLAN.md
 ```
 
 ## Dependencies Mapping
@@ -289,20 +297,37 @@ writenex/
    - [x] Create src/destructive-action-dialog.tsx
    - [x] Create src/index.ts (barrel export)
    - [x] Test TypeScript compilation
-3. [~] `@writenex/db` - Depends on utils (**IN PROGRESS**)
-4. [ ] `@writenex/store` - Depends on db, utils
-5. [ ] `@writenex/hooks` - Depends on store, db, utils
-6. [ ] `@writenex/editor` - Depends on all above
+3. [x] `@writenex/db` - Depends on utils ✅
+4. [x] `@writenex/store` - Depends on utils ✅ (Note: does NOT depend on db)
+5. [x] `@writenex/hooks` - Depends on store, db, utils ✅
+6. [x] `@writenex/editor` - Depends on all above ✅
+   - [x] Copy all editor components from src/components/editor/
+   - [x] Copy styles from src/styles/
+   - [x] Copy exportHtml.ts
+   - [x] Move onboarding.ts to editor package (has React/Lucide deps)
+   - [x] Update all imports to use workspace packages
+   - [x] Fix TypeScript errors (NodeJS.Timeout → ReturnType<typeof setTimeout>)
+   - [x] Fix styled-jsx → regular style tag
+   - [x] Add proper package exports for styles
 
-### Phase 3: Move App
-- [ ] Move current app to `apps/writenex`
-- [ ] Update all imports
-- [ ] Update Vercel configuration
+### Phase 3: Move App ✅
+- [x] Create `apps/writenex/` directory structure
+- [x] Move `app/` to `apps/writenex/app/`
+- [x] Move `public/` to `apps/writenex/public/`
+- [x] Move config files (next.config.mjs, vercel.json, postcss.config.mjs)
+- [x] Create apps/writenex/package.json with workspace dependencies
+- [x] Create apps/writenex/tsconfig.json
+- [x] Move app-specific components (ThemeProvider, landing/)
+- [x] Move app-specific libs (jsonld.ts)
+- [x] Update all imports to use workspace packages
+- [x] Update globals.css to import @writenex/editor/styles
+- [x] Delete old src/ directory
+- [x] Verify `pnpm build` passes
 
 ### Phase 4: Verify
-- [ ] Local build works
-- [ ] Local dev works
-- [ ] Deploy to staging
+- [x] Local build works (`pnpm build` passes)
+- [ ] Local dev works (`pnpm dev`)
+- [ ] Deploy to staging (Vercel preview)
 - [ ] Full feature testing
 - [ ] Production deployment
 
@@ -321,10 +346,79 @@ git checkout -b hotfix
 # Deploy hotfix branch to Vercel
 ```
 
+## Implementation Notes
+
+### Important Architectural Decisions
+
+1. **Package Exports**: All packages use TypeScript source files directly (no build step).
+   Package exports use `"./src/index.ts"` pattern for types and imports.
+
+2. **Styles Location**: Editor styles live in `@writenex/editor/src/styles/` and are
+   exported via `@writenex/editor/styles`. Apps import with:
+   ```css
+   @import "@writenex/editor/styles";
+   ```
+
+3. **onboarding.ts moved to editor**: Originally in utils, but has React and Lucide
+   dependencies, so moved to `@writenex/editor/src/onboarding.ts`.
+
+4. **styled-jsx replaced**: MarkdownEditor.tsx used Next.js styled-jsx which doesn't
+   work in library packages. Replaced with regular `<style>` tag with `__jsx` suffix
+   to avoid conflicts.
+
+5. **NodeJS.Timeout type**: Browser-compatible packages use `ReturnType<typeof setTimeout>`
+   instead of `NodeJS.Timeout` for timer refs.
+
+6. **App structure**: apps/writenex uses `app/` as source root with `@/*` path alias
+   mapping to `./app/*`. App-specific code (ThemeProvider, landing/, jsonld.ts) lives
+   in the app, not in packages.
+
+### Package Dependency Graph
+
+```
+@writenex/utils (no deps)
+       ↓
+@writenex/ui (utils)
+       ↓
+@writenex/db (utils)
+       ↓
+@writenex/store (utils) ← Note: does NOT depend on db
+       ↓
+@writenex/hooks (store, db, utils)
+       ↓
+@writenex/editor (all above)
+       ↓
+apps/writenex (all packages)
+```
+
+### Verified Working Commands
+
+```bash
+# Install all dependencies
+pnpm install
+
+# Type-check all packages
+pnpm -r type-check
+
+# Build the app
+pnpm build
+
+# Run specific package type-check
+cd packages/editor && pnpm type-check
+```
+
+### Next Steps (Phase 4 Remaining)
+
+1. Test `pnpm dev` works correctly
+2. Create Vercel project configuration for apps/writenex
+3. Deploy to preview/staging
+4. Full manual testing of all features
+5. Production deployment
+
 ## Notes
 
 - Package manager: pnpm 10.15.1
 - Build tool: Turborepo
 - All packages use `workspace:*` protocol
 - React/React DOM are peer dependencies for library packages
-- TypeScript configs extend from `@writenex/config/typescript`
+- TypeScript configs extend from `@writenex/tsconfig`

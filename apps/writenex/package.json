@@ -1,0 +1,45 @@
+{
+  "name": "writenex",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Modern WYSIWYG Markdown editor - the core Writenex application",
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mdxeditor/editor": "^3.20.1",
+    "@radix-ui/react-dialog": "^1.1.14",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
+    "@radix-ui/react-tooltip": "^1.2.7",
+    "@writenex/db": "workspace:*",
+    "@writenex/editor": "workspace:*",
+    "@writenex/hooks": "workspace:*",
+    "@writenex/store": "workspace:*",
+    "@writenex/ui": "workspace:*",
+    "@writenex/utils": "workspace:*",
+    "dexie": "^4.2.1",
+    "lucide-react": "^0.511.0",
+    "next": "^15.3.3",
+    "next-themes": "^0.4.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "zustand": "^5.0.5"
+  },
+  "devDependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
+    "@tailwindcss/postcss": "^4.1.7",
+    "@tailwindcss/typography": "^0.5.16",
+    "@types/node": "^22.15.23",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.5",
+    "eslint": "^9.28.0",
+    "eslint-config-next": "^15.3.3",
+    "postcss": "^8.5.4",
+    "tailwindcss": "^4.1.7",
+    "typescript": "^5.8.3"
+  }
+}
