@@ -1,6 +1,6 @@
 # Writenex Monorepo Migration Plan
 
-> **Status:** Phase 0 Complete - Planning & Preparation
+> **Status:** Phase 2 In Progress - Extracting @writenex/utils
 > **Branch:** `monorepo-migration`
 > **Backup:** `pre-monorepo-backup` branch, `v1.0.0-pre-monorepo` tag
 
@@ -266,7 +266,17 @@ writenex/
 - [x] Update `.gitignore` for monorepo
 
 ### Phase 2: Extract Packages (Order matters!)
-1. [ ] `@writenex/utils` - No internal deps
+1. [~] `@writenex/utils` - No internal deps (**IN PROGRESS**)
+   - [x] Create package.json
+   - [x] Create tsconfig.json
+   - [x] Create src/cn.ts
+   - [x] Create src/helpers.ts
+   - [x] Copy src/constants.ts
+   - [x] Copy src/storage.ts
+   - [x] Copy src/keyboardShortcuts.ts
+   - [x] Create src/index.ts (barrel export)
+   - [ ] Test TypeScript compilation (blocked: network issue)
+   - [ ] Update imports in main app
 2. [ ] `@writenex/ui` - Depends on utils
 3. [ ] `@writenex/db` - Depends on utils
 4. [ ] `@writenex/store` - Depends on db, utils
@@ -307,3 +317,23 @@ git checkout -b hotfix
 - All packages use `workspace:*` protocol
 - React/React DOM are peer dependencies for library packages
 - TypeScript configs extend from `@writenex/config/typescript`
+
+## Resume Instructions
+
+To continue the migration after network is stable:
+
+```bash
+# 1. Go to project root
+cd /home/erland/writenex
+
+# 2. Install dependencies
+pnpm install
+
+# 3. Test @writenex/utils package
+cd packages/utils
+pnpm type-check
+
+# 4. If successful, continue with updating imports in main app
+```
+
+**Next step after resume:** Test TypeScript compilation for `@writenex/utils`, then update imports in main app to use `@writenex/utils` instead of `@/lib/*`.
