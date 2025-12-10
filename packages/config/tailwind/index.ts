@@ -12,8 +12,8 @@
 export const contentPaths = {
   // Shared packages that contain Tailwind classes
   packages: [
-    '../../packages/ui/src/**/*.{ts,tsx}',
-    '../../packages/editor/src/**/*.{ts,tsx}',
+    "../../packages/ui/src/**/*.{ts,tsx}",
+    "../../packages/editor/src/**/*.{ts,tsx}",
   ],
 };
 
@@ -22,8 +22,5 @@ export const contentPaths = {
  * @param appName - The name of the app (e.g., 'writenex')
  */
 export function getContentPaths(appName: string): string[] {
-  return [
-    `./src/**/*.{ts,tsx,mdx}`,
-    ...contentPaths.packages,
-  ];
+  return [`./src/**/*.{ts,tsx,mdx}`, ...contentPaths.packages];
 }

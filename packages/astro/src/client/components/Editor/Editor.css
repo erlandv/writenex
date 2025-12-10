@@ -1,0 +1,624 @@
+/**
+ * @fileoverview Editor component styles
+ *
+ * Contains styling for the MDXEditor wrapper and dark mode overrides.
+ * Full-width editor that adjusts when panels are open.
+ * Styling matches Writenex Editor design system.
+ */
+
+/* ============================================================================
+   EDITOR CONTAINER
+   ============================================================================ */
+
+.wn-editor {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background-color: #18181b; /* zinc-900 */
+}
+
+.wn-editor-content {
+  flex: 1;
+  overflow: auto;
+  background-color: #18181b; /* zinc-900 */
+  padding: 0.5rem 1rem;
+}
+
+.wn-editor-wrapper {
+  height: 100%;
+}
+
+/* ============================================================================
+   MDXEDITOR DARK MODE OVERRIDES
+   Matches Writenex Editor theme.css styling
+   ============================================================================ */
+
+/* Base MDXEditor variables */
+.mdxeditor {
+  /* Background colors */
+  --baseBg: #18181b; /* zinc-900 */
+  --baseBgSubtle: #27272a; /* zinc-800 */
+  --baseBgHover: rgba(255, 255, 255, 0.1);
+  --baseBgActive: rgba(255, 255, 255, 0.15);
+  --basePageBg: #09090b; /* zinc-950 */
+
+  /* Border colors */
+  --baseBorder: #3f3f46; /* zinc-700 */
+  --baseBorderSubtle: #52525b; /* zinc-600 */
+
+  /* Text colors */
+  --baseText: #a1a1aa; /* zinc-400 */
+  --baseTextContrast: #d4d4d8; /* zinc-300 - optimized for reading */
+  --baseTextMuted: #71717a; /* zinc-500 */
+  --baseTextSubtle: #52525b; /* zinc-600 */
+
+  /* Accent colors */
+  --accentColor: #5c7cff; /* brand blue */
+  --accentColorHover: rgba(92, 124, 255, 0.2);
+
+  /* Selection */
+  --selectionBg: rgba(99, 102, 241, 0.3);
+
+  /* Font */
+  --font-body:
+    system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    sans-serif;
+  --font-mono:
+    ui-monospace, "Cascadia Code", Menlo, Consolas, "Courier New", monospace;
+}
+
+/* Editor root */
+.mdxeditor,
+.mdxeditor [class*="_editorRoot_"],
+.mdxeditor [class*="_rootContentEditableWrapper_"] {
+  background-color: var(--baseBg) !important;
+}
+
+/* Editor content */
+.mdxeditor [data-lexical-editor] {
+  color: var(--baseTextContrast) !important;
+  font-family: var(--font-body) !important;
+}
+
+/* Content editable area - smaller padding like Writenex Editor */
+.mdxeditor [class*="_contentEditable_"] {
+  padding: 1rem 1.5rem !important;
+  min-height: 100% !important;
+}
+
+/* ============================================================================
+   PROSE TYPOGRAPHY - Matches Writenex Editor styling
+   ============================================================================ */
+
+/* Prose base styling */
+.mdxeditor .prose {
+  max-width: none !important;
+  color: #e2e8f0 !important; /* slate-200 - body text */
+  font-size: 1rem !important;
+  line-height: 1.75 !important;
+}
+
+/* Headings - brighter color, proper spacing */
+.mdxeditor .prose h1 {
+  color: #fafafa !important;
+  font-size: 2.25rem !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0.875rem !important;
+}
+
+.mdxeditor .prose h2 {
+  color: #fafafa !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.mdxeditor .prose h3 {
+  color: #fafafa !important;
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  margin-top: 1.25rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.mdxeditor .prose h4,
+.mdxeditor .prose h5,
+.mdxeditor .prose h6 {
+  color: #fafafa !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Paragraphs */
+.mdxeditor .prose p {
+  color: #e2e8f0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 1rem !important;
+}
+
+/* Strong/Bold text */
+.mdxeditor .prose strong {
+  color: #fafafa !important;
+  font-weight: 600 !important;
+}
+
+/* Emphasis/Italic text */
+.mdxeditor .prose em {
+  color: #e2e8f0 !important;
+}
+
+/* Lists */
+.mdxeditor .prose ul,
+.mdxeditor .prose ol {
+  margin-top: 0.5rem !important;
+  margin-bottom: 1rem !important;
+  padding-left: 1.5rem !important;
+}
+
+.mdxeditor .prose li {
+  color: #e2e8f0 !important;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.mdxeditor .prose ul > li::marker {
+  color: #71717a !important;
+}
+
+.mdxeditor .prose ol > li::marker {
+  color: #a1a1aa !important;
+}
+
+/* Lead paragraph (first paragraph after heading) */
+.mdxeditor .prose [class*="lead"] {
+  color: #a1a1aa !important;
+}
+
+/* Placeholder text */
+.mdxeditor .editor-placeholder {
+  color: var(--baseTextSubtle) !important;
+}
+
+/* ============================================================================
+   TOOLBAR - Matches Writenex Editor styling (smaller padding)
+   ============================================================================ */
+
+.mdxeditor [class*="_toolbarRoot_"],
+.mdxeditor [class*="_toolbar_"] {
+  background-color: var(--baseBgSubtle) !important;
+  border-color: var(--baseBorder) !important;
+  border-bottom: 1px solid var(--baseBorder) !important;
+  padding: 0.25rem 0.5rem !important;
+  gap: 0.125rem !important;
+}
+
+/* Toolbar buttons - pointer cursor for all */
+.mdxeditor [class*="_toolbarRoot_"] button,
+.mdxeditor [class*="_toolbar_"] button,
+.mdxeditor [class*="_selectTrigger_"],
+.mdxeditor [class*="_toolbarModeSwitch_"] button,
+.mdxeditor [class*="_codeMirrorToolbar_"] button,
+[class*="_selectItem_"] {
+  cursor: pointer !important;
+}
+
+.mdxeditor [class*="_toolbarRoot_"] button,
+.mdxeditor [class*="_toolbar_"] button {
+  color: var(--baseText) !important;
+  border-radius: 0.25rem !important;
+}
+
+.mdxeditor [class*="_toolbarRoot_"] button:hover,
+.mdxeditor [class*="_toolbar_"] button:hover {
+  background-color: var(--baseBgHover) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+.mdxeditor [class*="_toolbarRoot_"] button[data-state="on"],
+.mdxeditor [class*="_toolbar_"] button[data-state="on"] {
+  background-color: var(--accentColorHover) !important;
+  color: var(--accentColor) !important;
+}
+
+/* Toolbar select */
+.mdxeditor [class*="_selectTrigger_"] {
+  background-color: var(--baseBgHover) !important;
+  border-color: var(--baseBorder) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+.mdxeditor [class*="_selectTrigger_"]:hover {
+  background-color: var(--baseBgHover) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+/* Toolbar separator */
+.mdxeditor [class*="_toolbarRoot_"] [class*="_separator_"],
+.mdxeditor [class*="_toolbar_"] [class*="_separator_"] {
+  background-color: var(--baseBorder) !important;
+}
+
+/* ============================================================================
+   CODE BLOCKS & INLINE CODE
+   ============================================================================ */
+
+/* Code block wrapper */
+.mdxeditor [class*="_codeMirrorWrapper_"] {
+  border-color: var(--baseBorder) !important;
+  background-color: var(--baseBg) !important;
+  box-shadow: none !important;
+}
+
+/* Code block toolbar */
+.mdxeditor [class*="_codeMirrorToolbar_"] {
+  background-color: var(--baseBgSubtle) !important;
+  border-bottom-color: var(--baseBorder) !important;
+}
+
+.mdxeditor [class*="_codeMirrorToolbar_"] button,
+.mdxeditor [class*="_codeMirrorToolbar_"] [class*="_selectTrigger_"] {
+  color: var(--baseText) !important;
+}
+
+.mdxeditor [class*="_codeMirrorToolbar_"] [class*="_selectTrigger_"]:hover {
+  background-color: var(--baseBorder) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+/* Delete button hover (red) */
+.mdxeditor [class*="_codeMirrorToolbar_"] button:last-child:hover {
+  background-color: rgba(239, 68, 68, 0.2) !important;
+  color: #f87171 !important;
+}
+
+/* CodeMirror editor */
+.mdxeditor .cm-editor {
+  background-color: var(--baseBg) !important;
+}
+
+.mdxeditor .cm-content {
+  color: var(--baseTextContrast) !important;
+  caret-color: var(--baseTextContrast) !important;
+}
+
+.mdxeditor .cm-gutters {
+  background-color: var(--baseBgSubtle) !important;
+  border-right: 1px solid var(--baseBorder) !important;
+  color: var(--baseTextSubtle) !important;
+}
+
+.mdxeditor .cm-activeLineGutter {
+  background-color: var(--baseBorder) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+.mdxeditor .cm-activeLine {
+  background-color: var(--baseBgActive) !important;
+}
+
+.mdxeditor .cm-cursor {
+  border-left-color: var(--baseTextContrast) !important;
+}
+
+.mdxeditor .cm-selectionBackground {
+  background-color: var(--selectionBg) !important;
+}
+
+/* Inline code */
+.mdxeditor code:not(pre code) {
+  background-color: var(--baseBorder) !important;
+  color: var(--baseTextContrast) !important;
+  border: 1px solid var(--baseBorderSubtle) !important;
+  border-radius: 0.25rem !important;
+  padding: 0.125rem 0.375rem !important;
+  font-family: var(--font-mono) !important;
+}
+
+.mdxeditor code:not(pre code) span {
+  background-color: transparent !important;
+  border: none !important;
+  color: inherit !important;
+}
+
+/* ============================================================================
+   DIALOGS
+   ============================================================================ */
+
+.mdxeditor [class*="_dialogContent_"] {
+  background-color: var(--baseBg) !important;
+  border: 1px solid var(--baseBorder) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+.mdxeditor [class*="_dialogContent_"] input,
+.mdxeditor [class*="_dialogContent_"] textarea {
+  background-color: var(--baseBgSubtle) !important;
+  border: 1px solid var(--baseBorder) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+.mdxeditor [class*="_dialogContent_"] input:focus,
+.mdxeditor [class*="_dialogContent_"] textarea:focus {
+  border-color: var(--accentColor) !important;
+  box-shadow: 0 0 0 2px var(--accentColorHover) !important;
+  outline: none !important;
+}
+
+.mdxeditor [class*="_dialogContent_"] label {
+  color: var(--baseText) !important;
+}
+
+/* ============================================================================
+   CONTENT ELEMENTS
+   ============================================================================ */
+
+/* Links */
+.mdxeditor a {
+  color: var(--accentColor) !important;
+  text-decoration: underline !important;
+}
+
+/* Blockquote - matches Writenex Editor */
+.mdxeditor blockquote {
+  border-left: 4px solid var(--accentColor) !important;
+  background-color: #18181b !important;
+  padding: 1rem !important;
+  margin: 1rem 0 !important;
+  border-radius: 0 0.375rem 0.375rem 0 !important;
+  color: #e4e4e7 !important;
+}
+
+.mdxeditor blockquote p {
+  margin: 0 !important;
+}
+
+/* Tables */
+.mdxeditor table,
+.mdxeditor th,
+.mdxeditor td {
+  border-color: var(--baseBorder) !important;
+}
+
+.mdxeditor th {
+  background-color: var(--baseBgSubtle) !important;
+}
+
+/* ============================================================================
+   CHECKLIST
+   ============================================================================ */
+
+.mdxeditor li[role="checkbox"]::before {
+  background-color: var(--baseBgSubtle) !important;
+  border-color: var(--baseBorderSubtle) !important;
+}
+
+.mdxeditor li[role="checkbox"][aria-checked="true"]::before {
+  background-color: var(--accentColor) !important;
+  border-color: var(--accentColor) !important;
+}
+
+.mdxeditor li[role="checkbox"][aria-checked="true"]::after {
+  border-color: #ffffff !important;
+}
+
+.mdxeditor li[role="checkbox"]:hover::before {
+  border-color: var(--accentColor) !important;
+}
+
+.mdxeditor li[role="checkbox"][aria-checked="true"] {
+  color: var(--baseTextMuted) !important;
+}
+
+/* ============================================================================
+   DROPDOWNS & POPOVERS (rendered via portal)
+   ============================================================================ */
+
+[class*="_selectContainer_"],
+[class*="_toolbarNodeKindSelectContainer_"],
+[class*="_toolbarButtonDropdownContainer_"] {
+  background-color: #27272a !important;
+  border: 1px solid #3f3f46 !important;
+  color: #d4d4d8 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+[class*="_selectItem_"] {
+  color: #d4d4d8 !important;
+  background-color: transparent !important;
+}
+
+[class*="_selectItem_"]:hover,
+[class*="_selectItem_"][data-highlighted],
+[class*="_selectItem_"][data-state="checked"] {
+  background-color: #3f3f46 !important;
+  color: #d4d4d8 !important;
+}
+
+/* ============================================================================
+   DIFF SOURCE TOGGLE
+   ============================================================================ */
+
+[class*="_diffSourceToggle_"],
+[class*="_toolbarModeSwitch_"] {
+  background-color: #27272a !important;
+  border-color: #3f3f46 !important;
+  border-radius: 0.375rem !important;
+}
+
+[class*="_diffSourceToggle_"] button,
+[class*="_toolbarModeSwitch_"] button {
+  color: #a1a1aa !important;
+  padding: 0.25rem 0.5rem !important;
+  font-size: 0.75rem !important;
+}
+
+[class*="_diffSourceToggle_"] button:hover,
+[class*="_toolbarModeSwitch_"] button:hover {
+  background-color: #3f3f46 !important;
+  color: #d4d4d8 !important;
+}
+
+[class*="_diffSourceToggle_"] button[data-state="on"],
+[class*="_toolbarModeSwitch_"] button[data-state="on"] {
+  background-color: #3f3f46 !important;
+  color: #d4d4d8 !important;
+}
+
+/* ============================================================================
+   SOURCE/DIFF MODE
+   ============================================================================ */
+
+/* Source editor */
+.mdxeditor [class*="_sourceEditor_"],
+.mdxeditor [class*="_sourceEditor_"] .cm-editor {
+  background-color: var(--baseBg) !important;
+  color: var(--baseTextContrast) !important;
+}
+
+.mdxeditor [class*="_sourceEditor_"] .cm-scroller {
+  background-color: var(--baseBg) !important;
+}
+
+.mdxeditor [class*="_sourceEditor_"] .cm-content {
+  color: var(--baseTextContrast) !important;
+  caret-color: var(--baseTextContrast) !important;
+}
+
+.mdxeditor [class*="_sourceEditor_"] .cm-content .cm-line {
+  color: var(--baseTextContrast) !important;
+}
+
+.mdxeditor [class*="_sourceEditor_"] .cm-content .cm-line span {
+  color: var(--baseTextContrast) !important;
+}
+
+.mdxeditor [class*="_sourceEditor_"] .cm-gutters {
+  background-color: var(--baseBgSubtle) !important;
+  border-right: 1px solid var(--baseBorder) !important;
+  color: var(--baseTextMuted) !important;
+}
+
+.mdxeditor [class*="_sourceEditor_"] .cm-activeLineGutter {
+  background-color: var(--baseBorder) !important;
+}
+
+.mdxeditor [class*="_sourceEditor_"] .cm-activeLine {
+  background-color: var(--baseBgActive) !important;
+}
+
+/* Diff mode */
+.mdxeditor [class*="_diffEditor_"],
+.mdxeditor .cm-mergeView {
+  background-color: #0d1117 !important;
+}
+
+.mdxeditor [class*="_diffEditor_"] .cm-editor,
+.mdxeditor .cm-mergeView .cm-scroller {
+  background-color: #0d1117 !important;
+}
+
+.mdxeditor [class*="_diffEditor_"] .cm-content {
+  color: var(--baseTextContrast) !important;
+}
+
+.mdxeditor [class*="_diffEditor_"] .cm-gutters,
+.mdxeditor .cm-mergeView .cm-gutters {
+  background-color: #161b22 !important;
+  border-right: 1px solid #30363d !important;
+  color: #6e7681 !important;
+}
+
+/* Diff highlighting */
+.mdxeditor .cm-changedLine {
+  background-color: rgba(46, 160, 67, 0.15) !important;
+}
+
+.mdxeditor .cm-changedText {
+  background-color: rgba(46, 160, 67, 0.4) !important;
+}
+
+.mdxeditor .cm-deletedChunk {
+  background-color: rgba(248, 81, 73, 0.15) !important;
+}
+
+/* ============================================================================
+   TOOLTIP
+   ============================================================================ */
+
+.mdxeditor [data-radix-popper-content-wrapper] [class*="tooltipContent"] {
+  background-color: #fafafa !important;
+  color: #18181b !important;
+}
+
+/* ============================================================================
+   EDITOR LOADING STATE
+   ============================================================================ */
+
+.wn-editor-loading {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  color: #71717a; /* zinc-500 */
+}
+
+.wn-editor-loading-spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid #3f3f46; /* zinc-700 */
+  border-top-color: #3b82f6; /* blue-500 */
+  border-radius: 50%;
+  animation: wn-spin 1s linear infinite;
+}
+
+.wn-editor-loading-text {
+  font-size: 0.875rem;
+}
+
+@keyframes wn-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================================================
+   EDITOR EMPTY STATE
+   ============================================================================ */
+
+.wn-editor-empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.wn-editor-empty-icon {
+  color: #52525b; /* zinc-600 */
+}
+
+.wn-editor-empty-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: #f4f4f5; /* zinc-100 */
+}
+
+.wn-editor-empty-text {
+  max-width: 24rem;
+  font-size: 0.875rem;
+  color: #71717a; /* zinc-500 */
+}

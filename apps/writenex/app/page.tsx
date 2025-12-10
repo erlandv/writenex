@@ -46,7 +46,7 @@ import {
   softwareApplicationSchema,
   createBreadcrumbSchema,
   faqSchema,
-} from "@/lib/jsonld";
+} from "@/app/lib/jsonld";
 import {
   FAQAccordion,
   LandingHeader,

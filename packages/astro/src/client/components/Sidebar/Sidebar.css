@@ -1,0 +1,359 @@
+/* Sidebar Panel */
+.wn-sidebar {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #18181b;
+  overflow: hidden;
+  transition: width 0.3s ease-in-out;
+}
+
+.wn-sidebar--open {
+  width: 280px;
+}
+
+.wn-sidebar--closed {
+  width: 0;
+}
+
+.wn-sidebar-inner {
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  height: 100%;
+}
+
+/* Sidebar Header */
+.wn-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wn-sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fafafa;
+}
+
+.wn-sidebar-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wn-sidebar-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Collections Section */
+.wn-sidebar-section {
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wn-sidebar-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.wn-sidebar-section-title {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.wn-sidebar-section-actions {
+  display: flex;
+  gap: 4px;
+}
+
+/* Collection List */
+.wn-collection-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wn-collection-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wn-collection-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fafafa;
+}
+
+.wn-collection-item--selected {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+}
+
+.wn-collection-item-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wn-collection-item-count {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Content Section */
+.wn-sidebar-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Search and Filter */
+.wn-sidebar-search {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wn-search-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #09090b;
+  transition: border-color 0.15s ease;
+}
+
+.wn-search-input-wrapper:focus-within {
+  border-color: #3b82f6;
+}
+
+.wn-search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  color: #fafafa;
+}
+
+.wn-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.wn-search-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.wn-search-clear:hover {
+  color: #fafafa;
+}
+
+/* Filter Tabs */
+.wn-filter-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.wn-filter-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wn-filter-tab:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.wn-filter-tab--active {
+  background: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+}
+
+/* Content List */
+.wn-content-list {
+  list-style: none;
+  margin: 0;
+  padding: 8px;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wn-content-item {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wn-content-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.wn-content-item--selected {
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.wn-content-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wn-content-item-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: #fafafa;
+}
+
+.wn-content-item-date {
+  margin-top: 2px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Badge */
+.wn-badge-draft {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  background: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+}
+
+/* Icon Button */
+.wn-sidebar-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wn-sidebar-icon-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.wn-sidebar-icon-btn--primary {
+  color: #3b82f6;
+}
+
+.wn-sidebar-icon-btn--primary:hover {
+  color: #60a5fa;
+}
+
+/* Empty State */
+.wn-sidebar-empty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  text-align: center;
+}
+
+.wn-sidebar-empty-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.wn-sidebar-empty-link {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #3b82f6;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.wn-sidebar-empty-link:hover {
+  text-decoration: underline;
+}
+
+/* Loading State */
+.wn-sidebar-loading {
+  padding: 32px;
+  text-align: center;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.4);
+}

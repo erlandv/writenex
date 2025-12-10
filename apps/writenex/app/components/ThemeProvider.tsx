@@ -26,7 +26,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useEditorStore } from "@writenex/store";
+import { useEditorStore } from "@/lib/store";
 
 /**
  * Props for the ThemeProvider component.
@@ -81,7 +81,6 @@ export function ThemeProvider({
    * requires browser APIs that aren't available during SSR.
    */
   useEffect(() => {
-    // eslint-disable-next-line
     setMounted(true);
   }, []);
 

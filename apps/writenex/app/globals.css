@@ -10,14 +10,13 @@
 
 /* 
  * Source directories for Tailwind CSS class detection
- * Must include all packages that use Tailwind classes
  */
-@source "../../../packages/ui/src";
-@source "../../../packages/editor/src";
-@source "../../../packages/hooks/src";
-@source "../../../packages/store/src";
+@source "../lib/ui";
+@source "../lib/editor";
+@source "../lib/hooks";
+@source "../lib/store";
 
-@import "@writenex/editor/styles";
+@import "../lib/editor/styles/index.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

@@ -1,4 +1,4 @@
-import eslintConfigPrettier from 'eslint-config-prettier';
+import eslintConfigPrettier from "eslint-config-prettier";
 
 /**
  * Base ESLint configuration for all packages
@@ -7,7 +7,7 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 export const baseConfig = [
   eslintConfigPrettier,
   {
-    ignores: ['node_modules/**', 'dist/**', '.next/**', '.turbo/**'],
+    ignores: ["node_modules/**", "dist/**", ".next/**", ".turbo/**"],
   },
 ];
 

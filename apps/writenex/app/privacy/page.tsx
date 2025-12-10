@@ -15,7 +15,7 @@
  */
 
 import type { Metadata } from "next";
-import { createBreadcrumbSchema } from "@/lib/jsonld";
+import { createBreadcrumbSchema } from "@/app/lib/jsonld";
 import { LandingHeader, LandingFooter } from "@/components/landing";
 
 /**

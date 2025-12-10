@@ -1,0 +1,77 @@
+{
+  "name": "@writenex/astro",
+  "version": "0.1.8",
+  "description": "CMS integration for Astro content collections - WYSIWYG editing for your Astro site",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:client": "tsup --config tsup.client.config.ts",
+    "prepublishOnly": "pnpm build",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src/"
+  },
+  "keywords": [
+    "astro",
+    "astro-integration",
+    "cms",
+    "markdown",
+    "editor",
+    "content-collections",
+    "wysiwyg",
+    "writenex",
+    "mdx",
+    "headless-cms"
+  ],
+  "author": "Writenex",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/erlandv/writenex.git",
+    "directory": "packages/astro"
+  },
+  "homepage": "https://github.com/erlandv/writenex/tree/main/packages/astro#readme",
+  "bugs": {
+    "url": "https://github.com/erlandv/writenex/issues"
+  },
+  "dependencies": {
+    "@mdxeditor/editor": "^3.50.0",
+    "chokidar": "^4.0.0",
+    "gray-matter": "^4.0.3",
+    "lucide-react": "^0.556.0",
+    "slugify": "^1.6.6",
+    "zod": "^3.24.0"
+  },
+  "peerDependencies": {
+    "astro": "^4.0.0 || ^5.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.32",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "@writenex/eslint-config": "workspace:*",
+    "@writenex/tsconfig": "workspace:*",
+    "astro": "^5.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.0.0"
+  }
+}

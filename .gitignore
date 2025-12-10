@@ -46,6 +46,9 @@ next-env.d.ts
 .github/copilot-instructions.md
 AGENTS.md
 
+# IDE
+.vscode
+
 # PWA - generated service worker files (monorepo paths)
 apps/*/public/sw.js
 apps/*/public/sw.js.map

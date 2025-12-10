@@ -1,0 +1,104 @@
+.wn-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #18181b;
+  min-height: 56px;
+}
+
+.wn-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.wn-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wn-header-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wn-header-logo-text {
+  font-size: 18px;
+  font-weight: 600;
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.wn-header-badge {
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.wn-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.wn-toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 0 6px;
+}
+
+.wn-toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wn-toolbar-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.wn-toolbar-btn--active {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.wn-toolbar-btn--disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.wn-toolbar-btn--disabled:hover {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.wn-placeholder-icon {
+  font-size: 14px;
+  font-weight: 600;
+  font-family: monospace;
+}

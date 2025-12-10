@@ -1,0 +1,302 @@
+/* FrontmatterForm Panel */
+.wn-frontmatter-panel {
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  background-color: #18181b;
+  overflow: hidden;
+  transition: width 0.3s ease-in-out;
+}
+
+.wn-frontmatter-panel--open {
+  width: 320px;
+}
+
+.wn-frontmatter-panel--closed {
+  width: 0;
+  border-left: none;
+}
+
+.wn-frontmatter-panel-inner {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  height: 100%;
+}
+
+/* Panel Header */
+.wn-frontmatter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wn-frontmatter-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fafafa;
+}
+
+.wn-frontmatter-badge {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.wn-frontmatter-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wn-frontmatter-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Panel Content */
+.wn-frontmatter-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+/* Empty State */
+.wn-frontmatter-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+  text-align: center;
+}
+
+.wn-frontmatter-empty-icon {
+  margin-bottom: 12px;
+  opacity: 0.3;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.wn-frontmatter-empty-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 4px;
+}
+
+.wn-frontmatter-empty-hint {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Form Fields */
+.wn-frontmatter-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wn-frontmatter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wn-frontmatter-field--full {
+  grid-column: span 2;
+}
+
+.wn-frontmatter-field--row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.wn-frontmatter-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.wn-frontmatter-required {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.wn-frontmatter-input,
+.wn-frontmatter-textarea,
+.wn-frontmatter-select {
+  padding: 8px 10px;
+  background: #09090b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: #fafafa;
+  font-size: 13px;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.wn-frontmatter-input:focus,
+.wn-frontmatter-textarea:focus,
+.wn-frontmatter-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.wn-frontmatter-input:disabled,
+.wn-frontmatter-textarea:disabled,
+.wn-frontmatter-select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wn-frontmatter-input::placeholder,
+.wn-frontmatter-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.wn-frontmatter-textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.wn-frontmatter-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-size: 16px;
+  background-position: right 8px center;
+  background-repeat: no-repeat;
+  padding-right: 32px;
+}
+
+.wn-frontmatter-hint {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Checkbox Field */
+.wn-frontmatter-checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+}
+
+.wn-frontmatter-checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.wn-frontmatter-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #fafafa;
+  cursor: pointer;
+}
+
+.wn-frontmatter-checkbox-hint {
+  margin-left: auto;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* Tags / Array Field */
+.wn-frontmatter-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.wn-frontmatter-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 4px;
+  font-size: 11px;
+  color: #60a5fa;
+}
+
+.wn-frontmatter-tag-remove {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wn-frontmatter-tag-remove:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+/* Image Field */
+.wn-frontmatter-image-field {
+  display: flex;
+  gap: 8px;
+}
+
+.wn-frontmatter-image-field .wn-frontmatter-input {
+  flex: 1;
+}
+
+.wn-frontmatter-upload-btn {
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.wn-frontmatter-upload-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fafafa;
+}
+
+.wn-frontmatter-upload-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Section Divider */
+.wn-frontmatter-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 4px 0;
+}

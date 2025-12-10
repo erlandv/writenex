@@ -25,10 +25,10 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import localFont from "next/font/local";
-import { TooltipProvider } from "@writenex/ui";
-import { TOOLTIP_DELAY } from "@writenex/utils";
+import { TooltipProvider } from "@/lib/ui";
+import { TOOLTIP_DELAY } from "@/lib/utils";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { websiteSchema, organizationSchema } from "@/lib/jsonld";
+import { websiteSchema, organizationSchema } from "@/app/lib/jsonld";
 import "./globals.css";
 
 /**

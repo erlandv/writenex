@@ -27,9 +27,9 @@
 
 import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { Header, FocusModeOverlay, UpdatePrompt } from "@writenex/editor";
-import { useEditorStore } from "@writenex/store";
-import { cn } from "@writenex/utils";
+import { Header, FocusModeOverlay, UpdatePrompt } from "@/lib/editor";
+import { useEditorStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 
 /**
  * Dynamically imported MarkdownEditor component.
@@ -40,10 +40,7 @@ import { cn } from "@writenex/utils";
  * @see {@link MarkdownEditor} - The actual editor component
  */
 const MarkdownEditor = dynamic(
-  () =>
-    import("@writenex/editor").then(
-      (mod) => mod.MarkdownEditor
-    ),
+  () => import("@/lib/editor").then((mod) => mod.MarkdownEditor),
   {
     ssr: false,
     loading: () => (
