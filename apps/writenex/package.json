@@ -42,7 +42,7 @@
     "@ducanh2912/next-pwa": "^10.2.9",
     "@tailwindcss/postcss": "^4.1.7",
     "@tailwindcss/typography": "^0.5.16",
-    "@types/node": "^22.15.32",
+    "@types/node": "^24.10.2",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "eslint": "^9.28.0",
