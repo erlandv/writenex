@@ -23,7 +23,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dexie": "^4.2.1",
-    "lexical": "^0.35.0",
+    "lexical": "^0.38.2",
     "lucide-react": "^0.556.0",
     "marked": "^17.0.1",
     "next": "^15.3.3",
