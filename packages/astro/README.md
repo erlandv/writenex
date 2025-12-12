@@ -1,6 +1,6 @@
 # @writenex/astro
 
-CMS integration for Astro content collections - WYSIWYG editing for your Astro site.
+Visual editor for Astro content collections - WYSIWYG editing for your Astro site.
 
 ## Overview
 
@@ -13,12 +13,14 @@ CMS integration for Astro content collections - WYSIWYG editing for your Astro s
 - **Smart Schema Detection** - Automatically infers frontmatter schema from existing content
 - **Dynamic Forms** - Auto-generated forms based on detected or configured schema
 - **Image Upload** - Drag-and-drop image upload with colocated or public storage
+- **Version History** - Creates automatic shadow copies on save
 - **Autosave** - Automatic saving with configurable interval
 - **Keyboard Shortcuts** - Familiar shortcuts for common actions
 - **Draft Management** - Toggle draft/published status with visual indicators
 - **Search & Filter** - Find content quickly with search and draft filters
 - **Preview Links** - Quick access to preview your content in the browser
 - **Production Safe** - Disabled by default in production builds
+- **Version History** - Automatic shadow copies with restore capability
 
 ## Installation
 
@@ -199,6 +201,145 @@ images: {
   publicPath: "/images",
   storagePath: "public/images",
 }
+```
+
+## Version History
+
+Writenex automatically creates shadow copies of your content before each save, providing a safety net for content editors.
+
+### How It Works
+
+1. Before saving content, Writenex creates a snapshot of the current file
+2. Snapshots are stored in `.writenex/versions/` (excluded from Git by default)
+3. Old versions are automatically pruned to maintain the configured limit
+4. Labeled versions (manual snapshots) are preserved during pruning
+
+### Storage Structure
+
+```
+.writenex/versions/
+├── .gitignore              # Excludes version files from Git
+└── blog/
+    └── my-post/
+        ├── manifest.json   # Version metadata
+        ├── 2024-12-11T10-30-00-000Z.md
+        └── 2024-12-11T11-45-00-000Z.md
+```
+
+### Configuration
+
+```typescript
+// writenex.config.ts
+import { defineConfig } from "@writenex/astro";
+
+export default defineConfig({
+  versionHistory: {
+    enabled: true, // Enable/disable version history (default: true)
+    maxVersions: 20, // Max versions per content item (default: 20)
+    storagePath: ".writenex/versions", // Storage path (default)
+  },
+});
+```
+
+| Option        | Type      | Default              | Description                           |
+| ------------- | --------- | -------------------- | ------------------------------------- |
+| `enabled`     | `boolean` | `true`               | Enable/disable version history        |
+| `maxVersions` | `number`  | `20`                 | Maximum unlabeled versions to keep    |
+| `storagePath` | `string`  | `.writenex/versions` | Storage path relative to project root |
+
+### Version History API
+
+| Method | Endpoint                                               | Description           |
+| ------ | ------------------------------------------------------ | --------------------- |
+| GET    | `/_writenex/api/versions/:collection/:id`              | List all versions     |
+| GET    | `/_writenex/api/versions/:collection/:id/:versionId`   | Get specific version  |
+| POST   | `/_writenex/api/versions/:collection/:id`              | Create manual version |
+| POST   | `/_writenex/api/versions/:collection/:id/:vid/restore` | Restore version       |
+| GET    | `/_writenex/api/versions/:collection/:id/:vid/diff`    | Get diff data         |
+| DELETE | `/_writenex/api/versions/:collection/:id/:versionId`   | Delete version        |
+| DELETE | `/_writenex/api/versions/:collection/:id`              | Clear all versions    |
+
+### Example: List Versions
+
+```bash
+curl http://localhost:4321/_writenex/api/versions/blog/my-post
+```
+
+```json
+{
+  "versions": [
+    {
+      "id": "2024-12-11T12-00-00-000Z",
+      "timestamp": "2024-12-11T12:00:00.000Z",
+      "preview": "# My Post\n\nThis is the introduction...",
+      "size": 2048
+    },
+    {
+      "id": "2024-12-11T11-45-00-000Z",
+      "timestamp": "2024-12-11T11:45:00.000Z",
+      "preview": "# My Post\n\nEarlier version...",
+      "size": 1856,
+      "label": "Before major rewrite"
+    }
+  ]
+}
+```
+
+### Example: Restore Version
+
+```bash
+curl -X POST http://localhost:4321/_writenex/api/versions/blog/my-post/2024-12-11T11-45-00-000Z/restore
+```
+
+```json
+{
+  "success": true,
+  "version": {
+    "id": "2024-12-11T11-45-00-000Z",
+    "timestamp": "2024-12-11T11:45:00.000Z",
+    "preview": "# My Post\n\nEarlier version...",
+    "size": 1856
+  },
+  "safetySnapshot": {
+    "id": "2024-12-11T12-05-00-000Z",
+    "timestamp": "2024-12-11T12:05:00.000Z",
+    "preview": "# My Post\n\nThis is the introduction...",
+    "size": 2048,
+    "label": "Before restore"
+  }
+}
+```
+
+### Programmatic Usage
+
+```typescript
+import {
+  saveVersionWithConfig,
+  getVersionsWithConfig,
+  restoreVersionWithConfig,
+} from "@writenex/astro";
+
+// Save a version with label
+await saveVersionWithConfig(
+  "/project",
+  "blog",
+  "my-post",
+  "---\ntitle: My Post\n---\n\nContent...",
+  { maxVersions: 50 },
+  { label: "Before major changes" }
+);
+
+// List versions
+const versions = await getVersionsWithConfig("/project", "blog", "my-post");
+
+// Restore a version
+const result = await restoreVersionWithConfig(
+  "/project",
+  "blog",
+  "my-post",
+  "2024-12-11T10-30-00-000Z",
+  "/project/src/content/blog/my-post.md"
+);
 ```
 
 ## File Patterns

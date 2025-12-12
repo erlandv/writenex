@@ -3,11 +3,14 @@
  *
  * Modal component displaying Writenex Astro configuration settings,
  * including image settings, editor settings, and discovered collections.
+ * Includes focus trap for accessibility compliance.
  *
  * @module @writenex/astro/client/components/ConfigPanel
  */
 
+import { useEffect, useRef } from "react";
 import { X, Settings, Folder, Image, Info } from "lucide-react";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 import type { Collection, WritenexClientConfig } from "../../hooks/useApi";
 import "./ConfigPanel.css";
 
@@ -45,6 +48,22 @@ export function ConfigPanel({
   isOpen,
   onClose,
 }: ConfigPanelProps): React.ReactElement | null {
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  // Store the trigger element when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      triggerRef.current = document.activeElement as HTMLElement;
+    }
+  }, [isOpen]);
+
+  // Focus trap for accessibility
+  const { containerRef } = useFocusTrap({
+    enabled: isOpen,
+    onEscape: onClose,
+    returnFocusTo: triggerRef.current,
+  });
+
   if (!isOpen) return null;
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -53,10 +72,16 @@ export function ConfigPanel({
 
   return (
     <div className="wn-config-overlay" onClick={handleOverlayClick}>
-      <div className="wn-config-modal" role="dialog" aria-modal="true">
+      <div
+        ref={containerRef}
+        className="wn-config-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="config-panel-title"
+      >
         {/* Header */}
         <div className="wn-config-header">
-          <h2 className="wn-config-title">
+          <h2 id="config-panel-title" className="wn-config-title">
             <Settings size={16} />
             Configuration
           </h2>

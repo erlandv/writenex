@@ -14,6 +14,7 @@ import type {
   EditorConfig,
   DiscoveryConfig,
   CollectionConfig,
+  VersionHistoryConfig,
 } from "../types";
 
 /**
@@ -39,6 +40,15 @@ export const DEFAULT_EDITOR_CONFIG: Required<EditorConfig> = {
 export const DEFAULT_DISCOVERY_CONFIG: Required<DiscoveryConfig> = {
   enabled: true,
   ignore: ["**/node_modules/**", "**/.git/**", "**/dist/**"],
+};
+
+/**
+ * Default version history configuration
+ */
+export const DEFAULT_VERSION_HISTORY_CONFIG: Required<VersionHistoryConfig> = {
+  enabled: true,
+  maxVersions: 20,
+  storagePath: ".writenex/versions",
 };
 
 /**
@@ -92,5 +102,8 @@ export function applyConfigDefaults(
     discovery: config.discovery
       ? { ...DEFAULT_DISCOVERY_CONFIG, ...config.discovery }
       : DEFAULT_DISCOVERY_CONFIG,
+    versionHistory: config.versionHistory
+      ? { ...DEFAULT_VERSION_HISTORY_CONFIG, ...config.versionHistory }
+      : DEFAULT_VERSION_HISTORY_CONFIG,
   };
 }

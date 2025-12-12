@@ -1,0 +1,51 @@
+/**
+ * @fileoverview Skip Link component styles
+ *
+ * Styles for the skip link component that is visually hidden
+ * but becomes visible when focused.
+ */
+
+/* Skip link - visually hidden by default */
+.wn-skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 9999;
+  padding: 0.75rem 1rem;
+  background-color: var(--wn-blue-600);
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  border-radius: 0 0 0.375rem 0;
+  transition: top 0.15s ease-in-out;
+}
+
+/* Skip link - visible on focus */
+.wn-skip-link:focus {
+  top: 0;
+  outline: 2px solid var(--wn-blue-400);
+  outline-offset: 2px;
+}
+
+/* Skip link - hover state */
+.wn-skip-link:hover {
+  background-color: var(--wn-blue-700);
+}
+
+/* Light mode overrides */
+.wn-light .wn-skip-link {
+  background-color: var(--wn-blue-600);
+  color: white;
+}
+
+.wn-light .wn-skip-link:focus {
+  outline-color: var(--wn-blue-500);
+}
+
+/* Reduced motion - disable transition */
+@media (prefers-reduced-motion: reduce) {
+  .wn-skip-link {
+    transition: none;
+  }
+}

@@ -1,0 +1,430 @@
+/**
+ * @fileoverview Diff Viewer styles
+ *
+ * Styling for the diff viewer modal with split and unified views.
+ */
+
+/* ============================================================================
+   MODAL OVERLAY
+   ============================================================================ */
+
+.wn-diff-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.8);
+  animation: fadeIn 150ms ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================================================
+   MODAL CONTAINER
+   ============================================================================ */
+
+.wn-diff-modal {
+  width: 95%;
+  max-width: 72rem;
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+  border-radius: 0.5rem;
+  border: 1px solid #3f3f46;
+  background-color: #18181b;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: zoomIn 150ms ease-out;
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================================================
+   HEADER
+   ============================================================================ */
+
+.wn-diff-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #3f3f46;
+  flex-shrink: 0;
+}
+
+.wn-diff-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.wn-diff-title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fafafa;
+}
+
+.wn-diff-stats {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.wn-diff-stat {
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: ui-monospace, monospace;
+}
+
+.wn-diff-stat--added {
+  background-color: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+}
+
+.wn-diff-stat--removed {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.wn-diff-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wn-diff-view-toggle {
+  display: flex;
+  border: 1px solid #3f3f46;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.wn-diff-view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  background-color: transparent;
+  color: #71717a;
+  cursor: pointer;
+  transition:
+    background-color 150ms,
+    color 150ms;
+}
+
+.wn-diff-view-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #a1a1aa;
+}
+
+.wn-diff-view-btn--active {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+}
+
+.wn-diff-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.25rem;
+  background-color: transparent;
+  color: #a1a1aa;
+  cursor: pointer;
+  transition:
+    background-color 150ms,
+    color 150ms;
+}
+
+.wn-diff-close:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fafafa;
+}
+
+/* ============================================================================
+   CONTENT
+   ============================================================================ */
+
+.wn-diff-content {
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ============================================================================
+   SPLIT VIEW
+   ============================================================================ */
+
+.wn-diff-split {
+  display: flex;
+  height: 100%;
+}
+
+.wn-diff-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.wn-diff-column:first-child {
+  border-right: 1px solid #3f3f46;
+}
+
+.wn-diff-column-header {
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #3f3f46;
+  background-color: #09090b;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #a1a1aa;
+  flex-shrink: 0;
+}
+
+.wn-diff-column-content {
+  flex: 1;
+  overflow-y: auto;
+  font-family: ui-monospace, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+/* ============================================================================
+   UNIFIED VIEW
+   ============================================================================ */
+
+.wn-diff-unified {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.wn-diff-unified-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #3f3f46;
+  background-color: #09090b;
+  flex-shrink: 0;
+}
+
+.wn-diff-unified-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.wn-diff-unified-label--old {
+  color: #f87171;
+}
+
+.wn-diff-unified-label--new {
+  color: #4ade80;
+}
+
+.wn-diff-unified-arrow {
+  color: #52525b;
+}
+
+.wn-diff-unified-content {
+  flex: 1;
+  overflow-y: auto;
+  font-family: ui-monospace, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+/* ============================================================================
+   DIFF LINES
+   ============================================================================ */
+
+.wn-diff-line {
+  display: flex;
+  min-height: 1.5rem;
+}
+
+.wn-diff-line--added {
+  background-color: rgba(34, 197, 94, 0.15);
+}
+
+.wn-diff-line--removed {
+  background-color: rgba(239, 68, 68, 0.15);
+}
+
+.wn-diff-line--empty {
+  background-color: rgba(63, 63, 70, 0.3);
+}
+
+.wn-diff-line-num {
+  width: 3rem;
+  padding: 0 0.5rem;
+  text-align: right;
+  color: #52525b;
+  background-color: rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.wn-diff-unified .wn-diff-line-num {
+  width: 2.5rem;
+}
+
+.wn-diff-line-content {
+  flex: 1;
+  padding: 0 0.75rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #d4d4d8;
+}
+
+.wn-diff-line--added .wn-diff-line-content {
+  color: #4ade80;
+}
+
+.wn-diff-line--removed .wn-diff-line-content {
+  color: #f87171;
+}
+
+.wn-diff-line-marker {
+  display: inline-block;
+  width: 1rem;
+  font-weight: 600;
+}
+
+/* ============================================================================
+   LIGHT MODE OVERRIDES
+   ============================================================================ */
+
+.wn-light .wn-diff-overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+.wn-light .wn-diff-modal {
+  border-color: #e4e4e7;
+  background-color: #fff;
+}
+
+.wn-light .wn-diff-header {
+  border-bottom-color: #e4e4e7;
+}
+
+.wn-light .wn-diff-title {
+  color: #18181b;
+}
+
+.wn-light .wn-diff-stat--added {
+  background-color: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+}
+
+.wn-light .wn-diff-stat--removed {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+}
+
+.wn-light .wn-diff-view-toggle {
+  border-color: #e4e4e7;
+}
+
+.wn-light .wn-diff-view-btn {
+  color: #a1a1aa;
+}
+
+.wn-light .wn-diff-view-btn:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  color: #71717a;
+}
+
+.wn-light .wn-diff-view-btn--active {
+  background-color: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+}
+
+.wn-light .wn-diff-close {
+  color: #71717a;
+}
+
+.wn-light .wn-diff-close:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #18181b;
+}
+
+.wn-light .wn-diff-column:first-child {
+  border-right-color: #e4e4e7;
+}
+
+.wn-light .wn-diff-column-header {
+  border-bottom-color: #e4e4e7;
+  background-color: #fafafa;
+  color: #71717a;
+}
+
+.wn-light .wn-diff-unified-header {
+  border-bottom-color: #e4e4e7;
+  background-color: #fafafa;
+}
+
+.wn-light .wn-diff-unified-label--old {
+  color: #dc2626;
+}
+
+.wn-light .wn-diff-unified-label--new {
+  color: #16a34a;
+}
+
+.wn-light .wn-diff-unified-arrow {
+  color: #a1a1aa;
+}
+
+.wn-light .wn-diff-line--added {
+  background-color: rgba(34, 197, 94, 0.1);
+}
+
+.wn-light .wn-diff-line--removed {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.wn-light .wn-diff-line--empty {
+  background-color: rgba(228, 228, 231, 0.5);
+}
+
+.wn-light .wn-diff-line-num {
+  color: #a1a1aa;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.wn-light .wn-diff-line-content {
+  color: #3f3f46;
+}
+
+.wn-light .wn-diff-line--added .wn-diff-line-content {
+  color: #16a34a;
+}
+
+.wn-light .wn-diff-line--removed .wn-diff-line-content {
+  color: #dc2626;
+}

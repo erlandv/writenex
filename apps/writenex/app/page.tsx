@@ -433,6 +433,38 @@ function FAQSection(): React.ReactElement {
   );
 }
 
+/**
+ * Related section linking to @writenex/astro.
+ */
+function RelatedSection(): React.ReactElement {
+  return (
+    <section className="bg-zinc-50 px-4 py-20 sm:px-6 lg:px-8 dark:bg-zinc-800/50">
+      <div className="mx-auto max-w-4xl">
+        <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h3 className="mb-2 text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                Building with Astro?
+              </h3>
+              <p className="text-zinc-600 dark:text-zinc-400">
+                @writenex/astro brings visual editing to your content
+                collections. Zero config, auto-discovery, and version history.
+              </p>
+            </div>
+            <Link
+              href="/astro"
+              className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 font-normal text-white transition-colors hover:bg-purple-700"
+            >
+              Learn More
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // =============================================================================
 // PAGE
 // =============================================================================
@@ -486,6 +518,7 @@ export default function LandingPage(): React.ReactElement {
         <HowItWorksSection />
         <FAQSection />
         <CTASection />
+        <RelatedSection />
       </main>
       <LandingFooter />
     </div>

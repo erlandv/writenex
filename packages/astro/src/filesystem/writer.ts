@@ -10,20 +10,23 @@
  * - Delete content files
  * - Generate unique slugs to avoid collisions
  * - Support for different file patterns (flat, folder-based, date-prefixed)
+ * - Automatic version history creation before updates
  *
  * @module @writenex/astro/filesystem/writer
  */
 
-import { writeFile, unlink, mkdir } from "node:fs/promises";
+import { writeFile, unlink, mkdir, readFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { join, dirname, basename } from "node:path";
 import slugify from "slugify";
 import { readContentFile } from "./reader";
+import { saveVersion } from "./versions";
 import {
   generatePathFromPattern,
   resolvePatternTokens,
   isValidPattern,
 } from "../discovery/patterns";
+import type { VersionHistoryConfig } from "../types";
 
 /**
  * Options for creating content
@@ -49,6 +52,12 @@ export interface UpdateContentOptions {
   frontmatter?: Record<string, unknown>;
   /** Updated markdown body content */
   body?: string;
+  /** Project root for version history (required for version creation) */
+  projectRoot?: string;
+  /** Collection name for version history */
+  collection?: string;
+  /** Version history configuration */
+  versionHistoryConfig?: Required<VersionHistoryConfig>;
 }
 
 /**
@@ -318,9 +327,13 @@ export async function createContent(
 /**
  * Update an existing content file
  *
+ * Creates a version snapshot of the current content before updating
+ * when version history is configured. Version creation errors are logged
+ * but do not fail the save operation.
+ *
  * @param filePath - Absolute path to the content file
  * @param collectionPath - Path to the collection directory
- * @param options - Update options
+ * @param options - Update options including version history config
  * @returns WriteResult with success status
  *
  * @example
@@ -331,6 +344,9 @@ export async function createContent(
  *   {
  *     frontmatter: { title: 'Updated Title' },
  *     body: '# Updated Content',
+ *     projectRoot: '/project',
+ *     collection: 'blog',
+ *     versionHistoryConfig: { enabled: true, maxVersions: 20, storagePath: '.writenex/versions' },
  *   }
  * );
  * ```
@@ -340,6 +356,8 @@ export async function updateContent(
   collectionPath: string,
   options: UpdateContentOptions
 ): Promise<WriteResult> {
+  const { projectRoot, collection, versionHistoryConfig } = options;
+
   try {
     // Read existing content
     const existing = await readContentFile(filePath, collectionPath);
@@ -349,6 +367,50 @@ export async function updateContent(
         success: false,
         error: existing.error ?? "Content not found",
       };
+    }
+
+    // Create version snapshot before updating (if version history is configured)
+    // Requirements 1.1, 1.5: Create shadow copy before overwriting, skip for new content
+    if (
+      projectRoot &&
+      collection &&
+      versionHistoryConfig &&
+      versionHistoryConfig.enabled &&
+      existsSync(filePath)
+    ) {
+      try {
+        // Read current file content for version snapshot
+        const currentContent = await readFile(filePath, "utf-8");
+
+        // Extract content ID from file path
+        const fileName = basename(filePath);
+        const contentId =
+          fileName === "index.md" || fileName === "index.mdx"
+            ? basename(dirname(filePath))
+            : fileName.replace(/\.(md|mdx)$/, "");
+
+        // Save version (errors are logged but don't fail the save)
+        const versionResult = await saveVersion(
+          projectRoot,
+          collection,
+          contentId,
+          currentContent,
+          versionHistoryConfig,
+          { skipIfIdentical: true }
+        );
+
+        if (!versionResult.success) {
+          console.warn(
+            `[writenex] Failed to create version snapshot: ${versionResult.error}`
+          );
+        }
+      } catch (versionError) {
+        // Log version creation error but continue with save
+        console.warn(
+          `[writenex] Version creation error (save will continue):`,
+          versionError
+        );
+      }
     }
 
     // Merge frontmatter

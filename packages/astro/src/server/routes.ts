@@ -14,6 +14,13 @@
  * - GET /api/images/:collection/:contentId - Discover images for content
  * - GET /api/images/:collection/:contentId/* - Serve image file
  * - POST /api/images - Upload image
+ * - GET /api/versions/:collection/:id - List versions
+ * - GET /api/versions/:collection/:id/:versionId - Get version
+ * - POST /api/versions/:collection/:id - Create manual version
+ * - POST /api/versions/:collection/:id/:versionId/restore - Restore version
+ * - GET /api/versions/:collection/:id/:versionId/diff - Get diff data
+ * - DELETE /api/versions/:collection/:id/:versionId - Delete version
+ * - DELETE /api/versions/:collection/:id - Clear all versions
  *
  * @module @writenex/astro/server/routes
  */
@@ -46,6 +53,15 @@ import {
   isValidImageFile,
   discoverContentImages,
 } from "../filesystem/images";
+import {
+  getVersions,
+  getVersion,
+  saveVersion,
+  restoreVersion,
+  deleteVersion,
+  clearVersions,
+} from "../filesystem/versions";
+import type { VersionHistoryConfig } from "../types";
 
 /**
  * API route handler function type
@@ -63,6 +79,7 @@ type RouteHandler = (
 interface RouteParams {
   collection?: string;
   id?: string;
+  versionId?: string;
   query: Record<string, string>;
 }
 
@@ -149,6 +166,43 @@ export function createApiRouter(
         return handleImageUpload(req, res, params, context);
       }
       return sendError(res, "Method not allowed", 405);
+    }
+
+    // Route: /versions/:collection/:id/:versionId?
+    if (segments[0] === "versions") {
+      params.collection = segments[1];
+      params.id = segments[2];
+      params.versionId = segments[3];
+
+      // Check for special action routes (restore, diff)
+      const action = segments[4];
+
+      switch (method) {
+        case "GET":
+          if (params.versionId) {
+            // Check if this is a diff request
+            if (action === "diff") {
+              return handleGetVersionDiff(req, res, params, context);
+            }
+            return handleGetVersion(req, res, params, context);
+          }
+          return handleListVersions(req, res, params, context);
+        case "POST":
+          if (params.versionId && action === "restore") {
+            return handleRestoreVersion(req, res, params, context);
+          }
+          if (!params.versionId) {
+            return handleCreateVersion(req, res, params, context);
+          }
+          return sendError(res, "Method not allowed", 405);
+        case "DELETE":
+          if (params.versionId) {
+            return handleDeleteVersion(req, res, params, context);
+          }
+          return handleClearVersions(req, res, params, context);
+        default:
+          return sendError(res, "Method not allowed", 405);
+      }
     }
 
     // Route: /health (for testing)
@@ -399,10 +453,13 @@ const handleCreateContent: RouteHandler = async (req, res, params, context) => {
 
 /**
  * PUT /api/content/:collection/:id - Update content
+ *
+ * Creates a version snapshot of the current content before updating
+ * when version history is enabled in configuration.
  */
 const handleUpdateContent: RouteHandler = async (req, res, params, context) => {
   const { collection, id } = params;
-  const { projectRoot } = context;
+  const { projectRoot, config } = context;
 
   if (!collection || !id) {
     return sendError(res, "Collection and content ID required", 400);
@@ -431,9 +488,17 @@ const handleUpdateContent: RouteHandler = async (req, res, params, context) => {
       );
     }
 
+    // Pass version history config to updateContent for automatic version creation
+    // Note: config.versionHistory is guaranteed to have all required fields
+    // because applyConfigDefaults() applies DEFAULT_VERSION_HISTORY_CONFIG
     const result = await updateContent(filePath, collectionPath, {
       frontmatter,
       body: contentBody,
+      projectRoot,
+      collection,
+      versionHistoryConfig: config.versionHistory as Required<
+        typeof config.versionHistory
+      >,
     });
 
     if (!result.success) {
@@ -745,5 +810,465 @@ const handleServeImage = async (
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
     sendError(res, `Failed to serve image: ${message}`, 500);
+  }
+};
+
+// =============================================================================
+// Version History Route Handlers
+// =============================================================================
+
+/**
+ * Get the resolved version history config with all required fields
+ *
+ * @param config - The version history config from context
+ * @returns Resolved config with all required fields
+ */
+function getResolvedVersionConfig(
+  config: VersionHistoryConfig | undefined
+): Required<VersionHistoryConfig> {
+  return {
+    enabled: config?.enabled ?? true,
+    maxVersions: config?.maxVersions ?? 20,
+    storagePath: config?.storagePath ?? ".writenex/versions",
+  };
+}
+
+/**
+ * GET /api/versions/:collection/:id - List all versions
+ *
+ * Returns versions sorted by timestamp in descending order (newest first).
+ *
+ * Response:
+ * {
+ *   success: boolean;
+ *   versions: VersionEntry[];
+ *   total: number;
+ * }
+ */
+const handleListVersions: RouteHandler = async (_req, res, params, context) => {
+  const { collection, id } = params;
+  const { projectRoot, config } = context;
+
+  if (!collection || !id) {
+    return sendError(res, "Collection and content ID required", 400);
+  }
+
+  try {
+    const versionConfig = getResolvedVersionConfig(config.versionHistory);
+
+    const versions = await getVersions(
+      projectRoot,
+      collection,
+      id,
+      versionConfig
+    );
+
+    sendJson(res, {
+      success: true,
+      versions,
+      total: versions.length,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    sendError(res, `Failed to list versions: ${message}`, 500);
+  }
+};
+
+/**
+ * GET /api/versions/:collection/:id/:versionId - Get specific version
+ *
+ * Returns the full content of a specific version.
+ *
+ * Response:
+ * {
+ *   success: boolean;
+ *   version: Version;
+ * }
+ */
+const handleGetVersion: RouteHandler = async (_req, res, params, context) => {
+  const { collection, id, versionId } = params;
+  const { projectRoot, config } = context;
+
+  if (!collection || !id || !versionId) {
+    return sendError(
+      res,
+      "Collection, content ID, and version ID required",
+      400
+    );
+  }
+
+  try {
+    const versionConfig = getResolvedVersionConfig(config.versionHistory);
+
+    const version = await getVersion(
+      projectRoot,
+      collection,
+      id,
+      versionId,
+      versionConfig
+    );
+
+    if (!version) {
+      return sendError(res, `Version '${versionId}' not found`, 404);
+    }
+
+    sendJson(res, {
+      success: true,
+      version,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    sendError(res, `Failed to get version: ${message}`, 500);
+  }
+};
+
+/**
+ * POST /api/versions/:collection/:id - Create manual version
+ *
+ * Creates a manual version snapshot with optional label.
+ *
+ * Request body:
+ * {
+ *   label?: string;
+ * }
+ *
+ * Response:
+ * {
+ *   success: boolean;
+ *   version?: VersionEntry;
+ * }
+ */
+const handleCreateVersion: RouteHandler = async (req, res, params, context) => {
+  const { collection, id } = params;
+  const { projectRoot, config } = context;
+
+  if (!collection || !id) {
+    return sendError(res, "Collection and content ID required", 400);
+  }
+
+  try {
+    const versionConfig = getResolvedVersionConfig(config.versionHistory);
+
+    // Check if version history is enabled
+    if (!versionConfig.enabled) {
+      return sendError(res, "Version history is disabled", 400);
+    }
+
+    // Parse request body for optional label
+    const body = await parseJsonBody(req);
+    const label =
+      body && typeof body === "object" && "label" in body
+        ? String(body.label)
+        : undefined;
+
+    // Get current content
+    const collectionPath = join(projectRoot, "src/content", collection);
+    const filePath = getContentFilePath(collectionPath, id);
+
+    if (!filePath) {
+      return sendError(
+        res,
+        `Content '${id}' not found in '${collection}'`,
+        404
+      );
+    }
+
+    // Read current content
+    const readResult = await readContentFile(filePath, collectionPath);
+
+    if (!readResult.success || !readResult.content) {
+      return sendError(res, readResult.error ?? "Failed to read content", 500);
+    }
+
+    // Create version
+    const result = await saveVersion(
+      projectRoot,
+      collection,
+      id,
+      readResult.content.raw,
+      versionConfig,
+      { label }
+    );
+
+    if (!result.success) {
+      return sendError(res, result.error ?? "Failed to create version", 500);
+    }
+
+    sendJson(res, {
+      success: true,
+      version: result.version,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    sendError(res, `Failed to create version: ${message}`, 500);
+  }
+};
+
+/**
+ * POST /api/versions/:collection/:id/:versionId/restore - Restore version
+ *
+ * Restores a version to the current content file.
+ * Creates a safety snapshot before restoring.
+ *
+ * Response:
+ * {
+ *   success: boolean;
+ *   version?: VersionEntry;
+ *   content?: string;
+ *   safetySnapshot?: VersionEntry;
+ * }
+ */
+const handleRestoreVersion: RouteHandler = async (
+  _req,
+  res,
+  params,
+  context
+) => {
+  const { collection, id, versionId } = params;
+  const { projectRoot, config } = context;
+
+  if (!collection || !id || !versionId) {
+    return sendError(
+      res,
+      "Collection, content ID, and version ID required",
+      400
+    );
+  }
+
+  try {
+    const versionConfig = getResolvedVersionConfig(config.versionHistory);
+
+    // Get content file path
+    const collectionPath = join(projectRoot, "src/content", collection);
+    const filePath = getContentFilePath(collectionPath, id);
+
+    if (!filePath) {
+      return sendError(
+        res,
+        `Content '${id}' not found in '${collection}'`,
+        404
+      );
+    }
+
+    // Restore version
+    const result = await restoreVersion(
+      projectRoot,
+      collection,
+      id,
+      versionId,
+      filePath,
+      versionConfig
+    );
+
+    if (!result.success) {
+      // Check if it's a not found error
+      if (result.error?.includes("not found")) {
+        return sendError(res, result.error, 404);
+      }
+      return sendError(res, result.error ?? "Failed to restore version", 500);
+    }
+
+    // Invalidate cache for this collection (content modified)
+    const cache = getCache();
+    cache.handleFileChange("change", collection);
+
+    sendJson(res, {
+      success: true,
+      version: result.version,
+      content: result.content,
+      safetySnapshot: result.safetySnapshot,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    sendError(res, `Failed to restore version: ${message}`, 500);
+  }
+};
+
+/**
+ * GET /api/versions/:collection/:id/:versionId/diff - Get diff data
+ *
+ * Returns both the version content and current content for comparison.
+ *
+ * Response:
+ * {
+ *   success: boolean;
+ *   version: Version;
+ *   current: {
+ *     content: string;
+ *     frontmatter: Record<string, unknown>;
+ *     body: string;
+ *   };
+ * }
+ */
+const handleGetVersionDiff: RouteHandler = async (
+  _req,
+  res,
+  params,
+  context
+) => {
+  const { collection, id, versionId } = params;
+  const { projectRoot, config } = context;
+
+  if (!collection || !id || !versionId) {
+    return sendError(
+      res,
+      "Collection, content ID, and version ID required",
+      400
+    );
+  }
+
+  try {
+    const versionConfig = getResolvedVersionConfig(config.versionHistory);
+
+    // Get version content
+    const version = await getVersion(
+      projectRoot,
+      collection,
+      id,
+      versionId,
+      versionConfig
+    );
+
+    if (!version) {
+      return sendError(res, `Version '${versionId}' not found`, 404);
+    }
+
+    // Get current content
+    const collectionPath = join(projectRoot, "src/content", collection);
+    const filePath = getContentFilePath(collectionPath, id);
+
+    if (!filePath) {
+      return sendError(
+        res,
+        `Content '${id}' not found in '${collection}'`,
+        404
+      );
+    }
+
+    const readResult = await readContentFile(filePath, collectionPath);
+
+    if (!readResult.success || !readResult.content) {
+      return sendError(
+        res,
+        readResult.error ?? "Failed to read current content",
+        500
+      );
+    }
+
+    sendJson(res, {
+      success: true,
+      version,
+      current: {
+        content: readResult.content.raw,
+        frontmatter: readResult.content.frontmatter,
+        body: readResult.content.body,
+      },
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    sendError(res, `Failed to get diff data: ${message}`, 500);
+  }
+};
+
+/**
+ * DELETE /api/versions/:collection/:id/:versionId - Delete specific version
+ *
+ * Deletes a specific version file and removes it from the manifest.
+ *
+ * Response:
+ * {
+ *   success: boolean;
+ *   version?: VersionEntry;
+ * }
+ */
+const handleDeleteVersion: RouteHandler = async (
+  _req,
+  res,
+  params,
+  context
+) => {
+  const { collection, id, versionId } = params;
+  const { projectRoot, config } = context;
+
+  if (!collection || !id || !versionId) {
+    return sendError(
+      res,
+      "Collection, content ID, and version ID required",
+      400
+    );
+  }
+
+  try {
+    const versionConfig = getResolvedVersionConfig(config.versionHistory);
+
+    const result = await deleteVersion(
+      projectRoot,
+      collection,
+      id,
+      versionId,
+      versionConfig
+    );
+
+    if (!result.success) {
+      // Check if it's a not found error
+      if (result.error?.includes("not found")) {
+        return sendError(res, result.error, 404);
+      }
+      return sendError(res, result.error ?? "Failed to delete version", 500);
+    }
+
+    sendJson(res, {
+      success: true,
+      version: result.version,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    sendError(res, `Failed to delete version: ${message}`, 500);
+  }
+};
+
+/**
+ * DELETE /api/versions/:collection/:id - Clear all versions
+ *
+ * Deletes all version files for a content item and resets the manifest.
+ *
+ * Response:
+ * {
+ *   success: boolean;
+ * }
+ */
+const handleClearVersions: RouteHandler = async (
+  _req,
+  res,
+  params,
+  context
+) => {
+  const { collection, id } = params;
+  const { projectRoot, config } = context;
+
+  if (!collection || !id) {
+    return sendError(res, "Collection and content ID required", 400);
+  }
+
+  try {
+    const versionConfig = getResolvedVersionConfig(config.versionHistory);
+
+    const result = await clearVersions(
+      projectRoot,
+      collection,
+      id,
+      versionConfig
+    );
+
+    if (!result.success) {
+      return sendError(res, result.error ?? "Failed to clear versions", 500);
+    }
+
+    sendJson(res, {
+      success: true,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    sendError(res, `Failed to clear versions: ${message}`, 500);
   }
 };

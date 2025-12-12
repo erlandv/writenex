@@ -451,3 +451,56 @@ body {
 .wn-light .wn-btn-published {
   border-color: rgba(16, 185, 129, 0.4);
 }
+
+/* ============================================================================
+   ACCESSIBILITY UTILITIES
+   ============================================================================ */
+
+/**
+ * Screen reader only utility class
+ * Visually hides content while keeping it accessible to screen readers.
+ * Uses standard techniques: position absolute, clip, and overflow hidden.
+ */
+.wn-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/**
+ * Screen reader only - focusable variant
+ * Becomes visible when focused (useful for skip links)
+ */
+.wn-sr-only-focusable:focus,
+.wn-sr-only-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  padding: inherit;
+  margin: inherit;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* ============================================================================
+   REDUCED MOTION PREFERENCES
+   Respects user's system preference for reduced motion
+   ============================================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

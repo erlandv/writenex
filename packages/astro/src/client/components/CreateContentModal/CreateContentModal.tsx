@@ -3,12 +3,14 @@
  *
  * Modal dialog for creating new content with title input and slug preview.
  * Replaces the native window.prompt for a better user experience.
+ * Includes focus trap for accessibility compliance.
  *
  * @module @writenex/astro/client/components/CreateContentModal
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { X, FileText } from "lucide-react";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 import "./CreateContentModal.css";
 
 /**
@@ -71,31 +73,32 @@ export function CreateContentModal({
 }: CreateContentModalProps): React.ReactElement | null {
   const [title, setTitle] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
 
-  // Reset and focus when modal opens
+  // Store the trigger element when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      triggerRef.current = document.activeElement as HTMLElement;
+    }
+  }, [isOpen]);
+
+  // Focus trap for accessibility
+  const { containerRef } = useFocusTrap({
+    enabled: isOpen,
+    onEscape: isCreating ? undefined : onClose,
+    returnFocusTo: triggerRef.current,
+  });
+
+  // Reset title and focus input when modal opens
   useEffect(() => {
     if (isOpen) {
       setTitle("");
-      // Small delay to ensure modal is rendered
+      // Small delay to ensure modal is rendered and focus trap is active
       setTimeout(() => {
         inputRef.current?.focus();
       }, 50);
     }
   }, [isOpen]);
-
-  // Handle keyboard events
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -129,6 +132,7 @@ export function CreateContentModal({
       role="presentation"
     >
       <div
+        ref={containerRef}
         className="wn-create-modal"
         role="dialog"
         aria-modal="true"

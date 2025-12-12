@@ -17,6 +17,7 @@ import {
   Sun,
   Moon,
   Monitor,
+  History,
 } from "lucide-react";
 import { useTheme, type Theme } from "../../context/ThemeContext";
 import "./Header.css";
@@ -55,6 +56,12 @@ interface HeaderProps {
   isSearchOpen?: boolean;
   /** Callback to toggle search panel */
   onToggleSearch?: () => void;
+  /** Whether the version history panel is open */
+  isVersionHistoryOpen?: boolean;
+  /** Callback to toggle version history panel */
+  onToggleVersionHistory?: () => void;
+  /** Whether version history is available (content selected) */
+  versionHistoryEnabled?: boolean;
   /** Callback when keyboard shortcuts button is clicked */
   onKeyboardShortcuts?: () => void;
   /** Callback when settings button is clicked */
@@ -208,6 +215,9 @@ export function Header({
   onToggleFrontmatter,
   isSearchOpen = false,
   onToggleSearch,
+  isVersionHistoryOpen = false,
+  onToggleVersionHistory,
+  versionHistoryEnabled = false,
   onKeyboardShortcuts,
   onSettings,
 }: HeaderProps): React.ReactElement {
@@ -249,6 +259,13 @@ export function Header({
           label="Search & Replace (Ctrl+F)"
           onClick={onToggleSearch}
           active={isSearchOpen}
+        />
+        <ToolbarButton
+          icon={<History size={14} />}
+          label="Version History"
+          onClick={onToggleVersionHistory}
+          active={isVersionHistoryOpen}
+          disabled={!versionHistoryEnabled}
         />
 
         <ToolbarSeparator />

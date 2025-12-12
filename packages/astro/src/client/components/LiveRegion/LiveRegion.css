@@ -1,0 +1,19 @@
+/**
+ * @fileoverview Live Region component styles
+ *
+ * Styles for the live region component that is visually hidden
+ * but accessible to screen readers.
+ */
+
+/* Live region - visually hidden but accessible */
+.wn-live-region {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

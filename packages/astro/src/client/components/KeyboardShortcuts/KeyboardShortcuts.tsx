@@ -3,11 +3,14 @@
  *
  * Displays a modal with all available keyboard shortcuts including
  * application shortcuts and built-in editor formatting shortcuts.
+ * Includes focus trap for accessibility compliance.
  *
  * @module @writenex/astro/client/components/KeyboardShortcuts
  */
 
+import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 import {
   formatShortcut,
   type ShortcutDefinition,
@@ -64,6 +67,20 @@ export function ShortcutsHelpModal({
   shortcuts,
   onClose,
 }: ShortcutsHelpModalProps): React.ReactElement {
+  const triggerRef = useRef<HTMLElement | null>(null);
+
+  // Store the trigger element when modal mounts
+  useEffect(() => {
+    triggerRef.current = document.activeElement as HTMLElement;
+  }, []);
+
+  // Focus trap for accessibility
+  const { containerRef } = useFocusTrap({
+    enabled: true,
+    onEscape: onClose,
+    returnFocusTo: triggerRef.current,
+  });
+
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
   };
@@ -71,6 +88,7 @@ export function ShortcutsHelpModal({
   return (
     <div className="wn-shortcuts-overlay" onClick={handleOverlayClick}>
       <div
+        ref={containerRef}
         className="wn-shortcuts-modal wn-shortcuts-modal--large"
         role="dialog"
         aria-modal="true"

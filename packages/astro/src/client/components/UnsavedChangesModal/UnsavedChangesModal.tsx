@@ -4,12 +4,14 @@
  * Modal dialog that prompts users when they attempt to navigate away
  * from content with unsaved changes. Provides options to save or discard.
  * Cancel is available via X button, clicking outside, or pressing Escape.
+ * Includes focus trap for accessibility compliance.
  *
  * @module @writenex/astro/client/components/UnsavedChangesModal
  */
 
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { X, AlertTriangle } from "lucide-react";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 import "./UnsavedChangesModal.css";
 
 /**
@@ -55,19 +57,31 @@ export function UnsavedChangesModal({
   onSave,
   isSaving = false,
 }: UnsavedChangesModalProps): React.ReactElement | null {
-  // Handle keyboard events
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const discardButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Store the trigger element when modal opens
   useEffect(() => {
-    if (!isOpen) return;
+    if (isOpen) {
+      triggerRef.current = document.activeElement as HTMLElement;
+    }
+  }, [isOpen]);
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !isSaving) {
-        onClose();
-      }
-    };
+  // Focus trap for accessibility
+  const { containerRef } = useFocusTrap({
+    enabled: isOpen,
+    onEscape: isSaving ? undefined : onClose,
+    returnFocusTo: triggerRef.current,
+  });
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose, isSaving]);
+  // Focus first button when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setTimeout(() => {
+        discardButtonRef.current?.focus();
+      }, 50);
+    }
+  }, [isOpen]);
 
   const handleOverlayClick = useCallback(
     (e: React.MouseEvent) => {
@@ -87,6 +101,7 @@ export function UnsavedChangesModal({
       role="presentation"
     >
       <div
+        ref={containerRef}
         className="wn-unsaved-modal"
         role="alertdialog"
         aria-modal="true"
@@ -122,6 +137,7 @@ export function UnsavedChangesModal({
         {/* Footer */}
         <div className="wn-unsaved-modal-footer">
           <button
+            ref={discardButtonRef}
             type="button"
             className="wn-unsaved-modal-btn wn-unsaved-modal-btn--secondary"
             onClick={onDiscard}

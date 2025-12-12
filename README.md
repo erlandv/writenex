@@ -1,15 +1,13 @@
 # Writenex Monorepo
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](./LICENSE)
-
 A collection of tools for modern markdown editing and content management.
 
 ## Products
 
 | **Product**     | **Description**                                             |
 | --------------- | ----------------------------------------------------------- |
-| Writenex        | WYSIWYG Markdown editor - PWA, offline-first, local storage |
-| @writenex/astro | CMS integration for Astro content collections               |
+| [Writenex](/erlandv/writenex/tree/main/apps/writenex)        | WYSIWYG Markdown editor - PWA, offline-first, local storage |
+| [@writenex/astro](/erlandv/writenex/tree/main/packages/astro) | Visual editor for Astro content collections                 |
 
 ## Project Structure
 
@@ -20,7 +18,7 @@ writenex/
 │       └── lib/               # Core modules (db, editor, hooks, store, ui, utils)
 │
 ├── packages/
-│   ├── astro/                 # @writenex/astro - Astro integration (standalone)
+│   ├── astro/                 # @writenex/astro - Astro integration
 │   └── config/                # Shared configurations
 │       ├── typescript/        # @writenex/tsconfig
 │       └── eslint/            # @writenex/eslint-config

@@ -37,6 +37,10 @@ import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { ShortcutsHelpModal } from "./components/KeyboardShortcuts";
 import { SearchReplacePanel } from "./components/SearchReplace";
 import { useSearch } from "./hooks/useSearch";
+import { VersionHistoryPanel } from "./components/VersionHistory";
+import { SkipLink } from "./components/SkipLink";
+import { LiveRegion } from "./components/LiveRegion";
+import { useAnnounce } from "./hooks/useAnnounce";
 
 interface AppProps {
   basePath: string;
@@ -66,13 +70,17 @@ function AutosaveIndicator({
   lastSaved,
   enabled,
   onToggle,
+  announce,
 }: {
   status: AutosaveStatus;
   hasUnsavedChanges: boolean;
   lastSaved: Date | null;
   enabled: boolean;
   onToggle: () => void;
+  announce: (message: string, politeness?: "polite" | "assertive") => void;
 }): React.ReactElement {
+  const prevStatusRef = useRef<AutosaveStatus | null>(null);
+
   let text = "";
   let statusClass = "wn-autosave-text--idle";
 
@@ -103,6 +111,27 @@ function AutosaveIndicator({
     }
   }
 
+  // Announce status changes to screen readers (Requirements 3.1, 3.2, 3.3, 3.4)
+  useEffect(() => {
+    // Only announce when status actually changes
+    if (prevStatusRef.current === status) return;
+    prevStatusRef.current = status;
+
+    if (!enabled) return;
+
+    switch (status) {
+      case "saved":
+        announce("Content saved", "polite");
+        break;
+      case "error":
+        announce("Save failed", "assertive");
+        break;
+      case "pending":
+        announce("Unsaved changes", "polite");
+        break;
+    }
+  }, [status, enabled, announce]);
+
   return (
     <div className="wn-autosave-indicator">
       {text && (
@@ -124,10 +153,16 @@ function AutosaveIndicator({
   );
 }
 
+/** Main content area ID for skip link navigation */
+const MAIN_CONTENT_ID = "wn-main-editor";
+
 export function App({ apiBase }: AppProps): React.ReactElement {
   const api = useApi(apiBase);
   const { config, refresh: refreshConfig } = useConfig(apiBase);
   const imageStrategy = config?.images?.strategy ?? "colocated";
+
+  // Accessibility: Live region for screen reader announcements
+  const { announce, currentMessage, currentPoliteness } = useAnnounce();
 
   const {
     collections,
@@ -160,6 +195,7 @@ export function App({ apiBase }: AppProps): React.ReactElement {
   const [isCreatingContent, setIsCreatingContent] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isFrontmatterOpen, setIsFrontmatterOpen] = useState(true);
+  const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
 
   // Unsaved changes modal state
   const [showUnsavedModal, setShowUnsavedModal] = useState(false);
@@ -202,15 +238,18 @@ export function App({ apiBase }: AppProps): React.ReactElement {
   useEffect(() => {
     if (selectedCollection && selectedContentId) {
       setContentLoadingState(true);
+      announce("Loading content", "polite");
       api
         .getContent(selectedCollection, selectedContentId)
         .then((content) => {
           setCurrentContent(content);
           setHasUnsavedChanges(false);
+          announce("Content loaded", "polite");
         })
         .catch((err) => {
           console.error("Failed to load content:", err);
           setCurrentContent(null);
+          announce("Failed to load content", "assertive");
         })
         .finally(() => {
           setContentLoadingState(false);
@@ -218,7 +257,7 @@ export function App({ apiBase }: AppProps): React.ReactElement {
     } else {
       setCurrentContent(null);
     }
-  }, [api, selectedCollection, selectedContentId]);
+  }, [api, selectedCollection, selectedContentId, announce]);
 
   const handleSelectCollection = useCallback((name: string) => {
     setSelectedCollection(name);
@@ -436,6 +475,70 @@ export function App({ apiBase }: AppProps): React.ReactElement {
     );
   }, [currentContent]);
 
+  const handleToggleVersionHistory = useCallback(() => {
+    setIsVersionHistoryOpen((prev) => !prev);
+  }, []);
+
+  const handleVersionRestore = useCallback((content: string) => {
+    // Parse the restored content to extract frontmatter and body
+    // The content is raw markdown with frontmatter
+    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+    if (frontmatterMatch) {
+      try {
+        // Parse YAML frontmatter
+        const yamlContent = frontmatterMatch[1] ?? "";
+        const body = frontmatterMatch[2] ?? "";
+        const frontmatter: Record<string, unknown> = {};
+
+        // Simple YAML parsing for common fields
+        yamlContent.split("\n").forEach((line) => {
+          const colonIndex = line.indexOf(":");
+          if (colonIndex > 0) {
+            const key = line.slice(0, colonIndex).trim();
+            let value: unknown = line.slice(colonIndex + 1).trim();
+
+            // Handle quoted strings
+            if (
+              (value as string).startsWith('"') &&
+              (value as string).endsWith('"')
+            ) {
+              value = (value as string).slice(1, -1);
+            } else if (
+              (value as string).startsWith("'") &&
+              (value as string).endsWith("'")
+            ) {
+              value = (value as string).slice(1, -1);
+            } else if (value === "true") {
+              value = true;
+            } else if (value === "false") {
+              value = false;
+            } else if (!isNaN(Number(value)) && value !== "") {
+              value = Number(value);
+            }
+
+            frontmatter[key] = value;
+          }
+        });
+
+        setCurrentContent((prev) =>
+          prev ? { ...prev, frontmatter, body } : null
+        );
+        setHasUnsavedChanges(true);
+        setContentChanged(true);
+      } catch {
+        // If parsing fails, just update the body
+        setCurrentContent((prev) => (prev ? { ...prev, body: content } : null));
+        setHasUnsavedChanges(true);
+        setContentChanged(true);
+      }
+    } else {
+      // No frontmatter, just update body
+      setCurrentContent((prev) => (prev ? { ...prev, body: content } : null));
+      setHasUnsavedChanges(true);
+      setContentChanged(true);
+    }
+  }, []);
+
   const { showHelp, toggleHelp, closeHelp, shortcuts } = useKeyboardShortcuts({
     shortcuts: [
       {
@@ -518,6 +621,12 @@ export function App({ apiBase }: AppProps): React.ReactElement {
 
   return (
     <div className="wn-app">
+      {/* Skip link for keyboard navigation - must be first focusable element */}
+      <SkipLink targetId={MAIN_CONTENT_ID}>Skip to main content</SkipLink>
+
+      {/* Global live region for screen reader announcements */}
+      <LiveRegion message={currentMessage} politeness={currentPoliteness} />
+
       {showHelp && (
         <ShortcutsHelpModal shortcuts={shortcuts} onClose={closeHelp} />
       )}
@@ -553,6 +662,9 @@ export function App({ apiBase }: AppProps): React.ReactElement {
         onToggleFrontmatter={() => setIsFrontmatterOpen(!isFrontmatterOpen)}
         isSearchOpen={isSearchOpen}
         onToggleSearch={toggleSearch}
+        isVersionHistoryOpen={isVersionHistoryOpen}
+        onToggleVersionHistory={handleToggleVersionHistory}
+        versionHistoryEnabled={!!currentContent}
         onKeyboardShortcuts={toggleHelp}
         onSettings={() => setShowConfigPanel(true)}
       />
@@ -592,6 +704,7 @@ export function App({ apiBase }: AppProps): React.ReactElement {
               lastSaved={lastSaved}
               enabled={autosaveEnabled}
               onToggle={() => setAutosaveEnabled(!autosaveEnabled)}
+              announce={announce}
             />
             <button
               className={`wn-btn-secondary ${
@@ -666,7 +779,13 @@ export function App({ apiBase }: AppProps): React.ReactElement {
         />
 
         {/* Center: Editor */}
-        <main className="wn-main-content" style={{ position: "relative" }}>
+        <main
+          id={MAIN_CONTENT_ID}
+          className="wn-main-content"
+          style={{ position: "relative" }}
+          aria-label="Content editor"
+          aria-busy={contentLoadingState}
+        >
           {/* Search Panel - rendered outside editor wrapper for proper positioning */}
           {currentContent && (
             <SearchReplacePanel
@@ -711,6 +830,17 @@ export function App({ apiBase }: AppProps): React.ReactElement {
           onImageUpload={handleImageUpload}
           collection={selectedCollection ?? undefined}
           contentId={selectedContentId ?? undefined}
+        />
+
+        {/* Version History Panel */}
+        <VersionHistoryPanel
+          isOpen={isVersionHistoryOpen}
+          onClose={() => setIsVersionHistoryOpen(false)}
+          apiBase={apiBase}
+          collection={selectedCollection}
+          contentId={selectedContentId}
+          currentContent={currentContent?.body ?? ""}
+          onRestore={handleVersionRestore}
         />
       </div>
     </div>

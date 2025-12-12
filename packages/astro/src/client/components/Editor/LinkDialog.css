@@ -1,0 +1,326 @@
+/**
+ * @fileoverview Styles for Custom Link Dialog
+ *
+ * Styles for the custom link dialog component that replaces
+ * MDXEditor's default link dialog. Includes both preview popover
+ * and edit modal styles.
+ */
+
+/* ============================================================================
+   LINK PREVIEW POPOVER
+   ============================================================================ */
+
+.wn-link-preview {
+  position: fixed;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem;
+  background-color: var(--wn-zinc-900);
+  border: 1px solid var(--wn-zinc-700);
+  border-radius: 0.5rem;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.3),
+    0 4px 6px -4px rgba(0, 0, 0, 0.2);
+  animation: wn-fade-in 0.1s ease-out;
+}
+
+@keyframes wn-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.wn-link-preview-url {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--wn-blue-400);
+  text-decoration: none;
+}
+
+.wn-link-preview-url:hover {
+  text-decoration: underline;
+}
+
+.wn-link-preview-divider {
+  width: 1px;
+  height: 1rem;
+  margin: 0 0.25rem;
+  background-color: var(--wn-zinc-700);
+}
+
+.wn-link-preview-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0.25rem;
+  color: var(--wn-zinc-400);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.wn-link-preview-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--wn-zinc-100);
+}
+
+.wn-link-preview-btn--danger:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  color: var(--wn-red-400);
+}
+
+/* ============================================================================
+   LINK DIALOG MODAL
+   ============================================================================ */
+
+.wn-link-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.wn-link-dialog {
+  width: 100%;
+  max-width: 400px;
+  margin: 1rem;
+  background-color: var(--wn-zinc-900);
+  border: 1px solid var(--wn-zinc-700);
+  border-radius: 0.5rem;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.3),
+    0 8px 10px -6px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================================================
+   DIALOG HEADER
+   ============================================================================ */
+
+.wn-link-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--wn-zinc-800);
+}
+
+.wn-link-dialog-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--wn-zinc-100);
+  margin: 0;
+}
+
+.wn-link-dialog-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0.25rem;
+  color: var(--wn-zinc-400);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.wn-link-dialog-close:hover {
+  background-color: var(--wn-zinc-800);
+  color: var(--wn-zinc-100);
+}
+
+/* ============================================================================
+   DIALOG CONTENT
+   ============================================================================ */
+
+.wn-link-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+/* ============================================================================
+   FORM FIELDS
+   ============================================================================ */
+
+.wn-link-dialog-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.wn-link-dialog-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--wn-zinc-300);
+}
+
+.wn-link-dialog-input-wrapper {
+  position: relative;
+}
+
+.wn-link-dialog-input-icon {
+  position: absolute;
+  top: 50%;
+  left: 0.75rem;
+  transform: translateY(-50%);
+  color: var(--wn-zinc-500);
+  pointer-events: none;
+}
+
+.wn-link-dialog-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background-color: var(--wn-zinc-800);
+  border: 1px solid var(--wn-zinc-700);
+  border-radius: 0.375rem;
+  color: var(--wn-zinc-100);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.wn-link-dialog-input--with-icon {
+  padding-left: 2.25rem;
+}
+
+.wn-link-dialog-input::placeholder {
+  color: var(--wn-zinc-500);
+}
+
+.wn-link-dialog-input:focus {
+  outline: none;
+  border-color: var(--wn-blue-500);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.wn-link-dialog-input--error {
+  border-color: var(--wn-red-500);
+}
+
+.wn-link-dialog-input--error:focus {
+  border-color: var(--wn-red-500);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.wn-link-dialog-error {
+  font-size: 0.75rem;
+  color: var(--wn-red-500);
+  margin: 0;
+}
+
+/* ============================================================================
+   DIALOG FOOTER
+   ============================================================================ */
+
+.wn-link-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid var(--wn-zinc-800);
+}
+
+/* ============================================================================
+   LIGHT MODE OVERRIDES
+   ============================================================================ */
+
+.wn-light .wn-link-preview {
+  background-color: white;
+  border-color: var(--wn-zinc-200);
+}
+
+.wn-light .wn-link-preview-url {
+  color: var(--wn-blue-600);
+}
+
+.wn-light .wn-link-preview-divider {
+  background-color: var(--wn-zinc-200);
+}
+
+.wn-light .wn-link-preview-btn {
+  color: var(--wn-zinc-500);
+}
+
+.wn-light .wn-link-preview-btn:hover {
+  background-color: var(--wn-zinc-100);
+  color: var(--wn-zinc-900);
+}
+
+.wn-light .wn-link-preview-btn--danger:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--wn-red-600);
+}
+
+.wn-light .wn-link-dialog {
+  background-color: white;
+  border-color: var(--wn-zinc-200);
+}
+
+.wn-light .wn-link-dialog-header {
+  border-bottom-color: var(--wn-zinc-200);
+}
+
+.wn-light .wn-link-dialog-title {
+  color: var(--wn-zinc-900);
+}
+
+.wn-light .wn-link-dialog-close {
+  color: var(--wn-zinc-500);
+}
+
+.wn-light .wn-link-dialog-close:hover {
+  background-color: var(--wn-zinc-100);
+  color: var(--wn-zinc-900);
+}
+
+.wn-light .wn-link-dialog-label {
+  color: var(--wn-zinc-700);
+}
+
+.wn-light .wn-link-dialog-input-icon {
+  color: var(--wn-zinc-400);
+}
+
+.wn-light .wn-link-dialog-input {
+  background-color: white;
+  border-color: var(--wn-zinc-300);
+  color: var(--wn-zinc-900);
+}
+
+.wn-light .wn-link-dialog-input::placeholder {
+  color: var(--wn-zinc-400);
+}
+
+.wn-light .wn-link-dialog-footer {
+  border-top-color: var(--wn-zinc-200);
+}

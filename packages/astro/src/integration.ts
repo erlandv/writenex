@@ -1,5 +1,5 @@
 /**
- * @fileoverview Astro integration for Writenex CMS
+ * @fileoverview Astro integration for Writenex visual editor
  *
  * This module provides the main Astro integration that injects the Writenex
  * editor UI and API routes into an Astro project.
@@ -44,7 +44,7 @@ const PACKAGE_NAME = "@writenex/astro";
 /**
  * Creates the Writenex Astro integration.
  *
- * This integration injects the Writenex CMS editor into your Astro project,
+ * This integration injects the Writenex visual editor into your Astro project,
  * providing a WYSIWYG interface for editing content collections.
  *
  * @param options - Integration options

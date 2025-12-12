@@ -1,0 +1,318 @@
+/**
+ * @fileoverview Version Actions styles
+ *
+ * Styling for version action buttons and confirmation modals.
+ */
+
+/* ============================================================================
+   VERSION ACTIONS BAR
+   ============================================================================ */
+
+.wn-version-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  padding: 0.75rem;
+  border-top: 1px solid #3f3f46;
+  background-color: #09090b;
+  flex-shrink: 0;
+}
+
+.wn-version-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  flex: 1 1 calc(50% - 0.1875rem);
+  min-width: 0;
+  padding: 0.5rem 0.375rem;
+  border: 1px solid #3f3f46;
+  border-radius: 0.25rem;
+  background-color: transparent;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: #a1a1aa;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    background-color 150ms,
+    border-color 150ms,
+    color 150ms;
+}
+
+.wn-version-action:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: #52525b;
+  color: #fafafa;
+}
+
+.wn-version-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wn-version-action--primary {
+  border-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #60a5fa;
+}
+
+.wn-version-action--primary:hover:not(:disabled) {
+  background-color: rgba(59, 130, 246, 0.2);
+  border-color: #60a5fa;
+  color: #93c5fd;
+}
+
+.wn-version-action--danger {
+  border-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+.wn-version-action--danger:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.2);
+  border-color: #f87171;
+  color: #fca5a5;
+}
+
+/* ============================================================================
+   CONFIRMATION MODAL
+   ============================================================================ */
+
+.wn-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.75);
+  animation: fadeIn 150ms ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.wn-confirm-modal {
+  width: 100%;
+  max-width: 24rem;
+  padding: 1.25rem;
+  border-radius: 0.5rem;
+  border: 1px solid #3f3f46;
+  background-color: #18181b;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  animation: zoomIn 150ms ease-out;
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.wn-confirm-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.wn-confirm-icon {
+  color: #fbbf24;
+  flex-shrink: 0;
+}
+
+.wn-confirm-title {
+  flex: 1;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fafafa;
+}
+
+.wn-confirm-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.25rem;
+  background-color: transparent;
+  color: #71717a;
+  cursor: pointer;
+  transition:
+    background-color 150ms,
+    color 150ms;
+}
+
+.wn-confirm-close:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fafafa;
+}
+
+.wn-confirm-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.wn-confirm-message {
+  margin: 0 0 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #a1a1aa;
+}
+
+.wn-confirm-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.wn-confirm-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 150ms,
+    border-color 150ms;
+}
+
+.wn-confirm-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.wn-confirm-btn--cancel {
+  border: 1px solid #3f3f46;
+  background-color: transparent;
+  color: #a1a1aa;
+}
+
+.wn-confirm-btn--cancel:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-color: #52525b;
+  color: #fafafa;
+}
+
+.wn-confirm-btn--primary {
+  border: 1px solid #3b82f6;
+  background-color: #3b82f6;
+  color: #fff;
+}
+
+.wn-confirm-btn--primary:hover:not(:disabled) {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+.wn-confirm-btn--danger {
+  border: 1px solid #ef4444;
+  background-color: #ef4444;
+  color: #fff;
+}
+
+.wn-confirm-btn--danger:hover:not(:disabled) {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+
+/* ============================================================================
+   LIGHT MODE OVERRIDES
+   ============================================================================ */
+
+.wn-light .wn-version-actions {
+  border-top-color: #e4e4e7;
+  background-color: #fafafa;
+}
+
+.wn-light .wn-version-action {
+  border-color: #e4e4e7;
+  color: #71717a;
+}
+
+.wn-light .wn-version-action:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-color: #d4d4d8;
+  color: #18181b;
+}
+
+.wn-light .wn-version-action--primary {
+  border-color: #3b82f6;
+  background-color: rgba(59, 130, 246, 0.08);
+  color: #2563eb;
+}
+
+.wn-light .wn-version-action--primary:hover:not(:disabled) {
+  background-color: rgba(59, 130, 246, 0.15);
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+.wn-light .wn-version-action--danger {
+  border-color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+}
+
+.wn-light .wn-version-action--danger:hover:not(:disabled) {
+  background-color: rgba(239, 68, 68, 0.15);
+  border-color: #dc2626;
+  color: #b91c1c;
+}
+
+.wn-light .wn-confirm-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.wn-light .wn-confirm-modal {
+  border-color: #e4e4e7;
+  background-color: #fff;
+}
+
+.wn-light .wn-confirm-title {
+  color: #18181b;
+}
+
+.wn-light .wn-confirm-close {
+  color: #a1a1aa;
+}
+
+.wn-light .wn-confirm-close:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #18181b;
+}
+
+.wn-light .wn-confirm-message {
+  color: #71717a;
+}
+
+.wn-light .wn-confirm-btn--cancel {
+  border-color: #e4e4e7;
+  color: #71717a;
+}
+
+.wn-light .wn-confirm-btn--cancel:hover:not(:disabled) {
+  background-color: rgba(0, 0, 0, 0.03);
+  border-color: #d4d4d8;
+  color: #18181b;
+}

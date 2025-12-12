@@ -1,0 +1,344 @@
+/**
+ * @fileoverview Styles for Custom Image Dialog
+ *
+ * Styles for the custom image dialog component that replaces
+ * MDXEditor's default image dialog.
+ */
+
+/* ============================================================================
+   DIALOG BACKDROP & CONTAINER
+   ============================================================================ */
+
+.wn-image-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.wn-image-dialog {
+  width: 100%;
+  max-width: 400px;
+  margin: 1rem;
+  background-color: var(--wn-zinc-900);
+  border: 1px solid var(--wn-zinc-700);
+  border-radius: 0.5rem;
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.3),
+    0 8px 10px -6px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================================================
+   DIALOG HEADER
+   ============================================================================ */
+
+.wn-image-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1rem 0.75rem;
+  border-bottom: 1px solid var(--wn-zinc-800);
+}
+
+.wn-image-dialog-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--wn-zinc-100);
+  margin: 0;
+}
+
+.wn-image-dialog-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0.25rem;
+  color: var(--wn-zinc-400);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.wn-image-dialog-close:hover {
+  background-color: var(--wn-zinc-800);
+  color: var(--wn-zinc-100);
+}
+
+/* ============================================================================
+   TABS
+   ============================================================================ */
+
+.wn-image-dialog-tabs {
+  display: flex;
+  margin: 0.75rem 1rem 0;
+  padding: 0.25rem;
+  background-color: var(--wn-zinc-800);
+  border-radius: 0.375rem;
+}
+
+.wn-image-dialog-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  border-radius: 0.25rem;
+  color: var(--wn-zinc-400);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.wn-image-dialog-tab:hover {
+  color: var(--wn-zinc-200);
+}
+
+.wn-image-dialog-tab--active {
+  background-color: var(--wn-zinc-700);
+  color: var(--wn-zinc-100);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================================================
+   CONTENT
+   ============================================================================ */
+
+.wn-image-dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+/* ============================================================================
+   DROPZONE
+   ============================================================================ */
+
+.wn-image-dialog-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border: 2px dashed var(--wn-zinc-700);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    border-color 0.15s;
+}
+
+.wn-image-dialog-dropzone:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+  border-color: var(--wn-zinc-600);
+}
+
+.wn-image-dialog-dropzone:focus {
+  outline: 2px solid var(--wn-blue-500);
+  outline-offset: 2px;
+}
+
+.wn-image-dialog-file-input {
+  display: none;
+}
+
+.wn-image-dialog-dropzone-icon {
+  color: var(--wn-zinc-500);
+}
+
+.wn-image-dialog-dropzone-text {
+  font-size: 0.875rem;
+  color: var(--wn-zinc-400);
+  margin: 0;
+}
+
+.wn-image-dialog-file-info {
+  text-align: center;
+}
+
+.wn-image-dialog-file-name {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--wn-zinc-100);
+  margin: 0;
+}
+
+.wn-image-dialog-file-size {
+  font-size: 0.75rem;
+  color: var(--wn-zinc-400);
+  margin: 0.25rem 0 0;
+}
+
+/* ============================================================================
+   FORM FIELDS
+   ============================================================================ */
+
+.wn-image-dialog-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.wn-image-dialog-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--wn-zinc-300);
+}
+
+.wn-image-dialog-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background-color: var(--wn-zinc-800);
+  border: 1px solid var(--wn-zinc-700);
+  border-radius: 0.375rem;
+  color: var(--wn-zinc-100);
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.wn-image-dialog-input::placeholder {
+  color: var(--wn-zinc-500);
+}
+
+.wn-image-dialog-input:focus {
+  outline: none;
+  border-color: var(--wn-blue-500);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.wn-image-dialog-input--error {
+  border-color: var(--wn-red-500);
+}
+
+.wn-image-dialog-input--error:focus {
+  border-color: var(--wn-red-500);
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+}
+
+.wn-image-dialog-error {
+  font-size: 0.75rem;
+  color: var(--wn-red-500);
+  margin: 0;
+}
+
+/* ============================================================================
+   FOOTER
+   ============================================================================ */
+
+.wn-image-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem 1rem;
+  border-top: 1px solid var(--wn-zinc-800);
+}
+
+/* ============================================================================
+   LIGHT MODE OVERRIDES
+   ============================================================================ */
+
+.wn-light .wn-image-dialog {
+  background-color: white;
+  border-color: var(--wn-zinc-200);
+}
+
+.wn-light .wn-image-dialog-header {
+  border-bottom-color: var(--wn-zinc-200);
+}
+
+.wn-light .wn-image-dialog-title {
+  color: var(--wn-zinc-900);
+}
+
+.wn-light .wn-image-dialog-close {
+  color: var(--wn-zinc-500);
+}
+
+.wn-light .wn-image-dialog-close:hover {
+  background-color: var(--wn-zinc-100);
+  color: var(--wn-zinc-900);
+}
+
+.wn-light .wn-image-dialog-tabs {
+  background-color: var(--wn-zinc-100);
+}
+
+.wn-light .wn-image-dialog-tab {
+  color: var(--wn-zinc-500);
+}
+
+.wn-light .wn-image-dialog-tab:hover {
+  color: var(--wn-zinc-700);
+}
+
+.wn-light .wn-image-dialog-tab--active {
+  background-color: white;
+  color: var(--wn-zinc-900);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.wn-light .wn-image-dialog-dropzone {
+  border-color: var(--wn-zinc-300);
+}
+
+.wn-light .wn-image-dialog-dropzone:hover {
+  background-color: var(--wn-zinc-50);
+  border-color: var(--wn-zinc-400);
+}
+
+.wn-light .wn-image-dialog-dropzone-icon {
+  color: var(--wn-zinc-400);
+}
+
+.wn-light .wn-image-dialog-dropzone-text {
+  color: var(--wn-zinc-500);
+}
+
+.wn-light .wn-image-dialog-file-name {
+  color: var(--wn-zinc-900);
+}
+
+.wn-light .wn-image-dialog-file-size {
+  color: var(--wn-zinc-500);
+}
+
+.wn-light .wn-image-dialog-label {
+  color: var(--wn-zinc-700);
+}
+
+.wn-light .wn-image-dialog-input {
+  background-color: white;
+  border-color: var(--wn-zinc-300);
+  color: var(--wn-zinc-900);
+}
+
+.wn-light .wn-image-dialog-input::placeholder {
+  color: var(--wn-zinc-400);
+}
+
+.wn-light .wn-image-dialog-footer {
+  border-top-color: var(--wn-zinc-200);
+}

@@ -21,11 +21,11 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 /**
- * Fixed header component with logo and CTA.
+ * Fixed header component with logo, navigation, and CTA.
  *
- * Displays the Writenex logo (clickable, navigates to home) and a CTA
- * button to open the editor. Uses a frosted glass effect with backdrop
- * blur for visual appeal.
+ * Displays the Writenex logo (clickable, navigates to home), navigation
+ * links, and a CTA button to open the editor. Uses a frosted glass effect
+ * with backdrop blur for visual appeal.
  *
  * @component
  * @example
@@ -33,7 +33,7 @@ import { ArrowRight } from "lucide-react";
  * <LandingHeader />
  * ```
  *
- * @returns Fixed position header with logo and CTA
+ * @returns Fixed position header with logo, nav, and CTA
  */
 export function LandingHeader(): React.ReactElement {
   return (
@@ -56,14 +56,25 @@ export function LandingHeader(): React.ReactElement {
             </span>
           </Link>
 
-          {/* CTA */}
-          <Link
-            href="/editor"
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-normal text-white transition-colors hover:bg-blue-700"
-          >
-            Open Editor
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          {/* Navigation and CTA */}
+          <div className="flex items-center gap-6">
+            {/* Nav link */}
+            <Link
+              href="/astro"
+              className="hidden text-sm text-zinc-600 transition-colors hover:text-zinc-900 sm:block dark:text-zinc-400 dark:hover:text-zinc-100"
+            >
+              @writenex/astro
+            </Link>
+
+            {/* CTA */}
+            <Link
+              href="/editor"
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-normal text-white transition-colors hover:bg-blue-700"
+            >
+              Open Editor
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </div>
     </header>

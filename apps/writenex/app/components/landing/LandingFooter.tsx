@@ -36,7 +36,10 @@ export function LandingFooter(): React.ReactElement {
   return (
     <footer className="border-t border-zinc-200 px-4 py-8 sm:px-6 lg:px-8 dark:border-zinc-800">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+        <p
+          className="text-sm text-zinc-500 dark:text-zinc-400"
+          suppressHydrationWarning
+        >
           Copyright © {new Date().getFullYear()} Writenex
         </p>
         <div className="flex items-center gap-6">

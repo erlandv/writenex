@@ -46,6 +46,8 @@ import {
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import "./Editor.css";
+import { ImageDialog } from "./ImageDialog";
+import { LinkDialog } from "./LinkDialog";
 
 /**
  * Props for the Editor component
@@ -281,8 +283,11 @@ export function Editor({
 
               // Links and images
               linkPlugin(),
-              linkDialogPlugin(),
+              linkDialogPlugin({
+                LinkDialog: LinkDialog,
+              }),
               imagePlugin({
+                ImageDialog: ImageDialog,
                 imageUploadHandler: async (file: File) => {
                   if (onImageUpload) {
                     const result = await onImageUpload(file);
@@ -389,7 +394,7 @@ export function Editor({
  */
 export function EditorLoading(): React.ReactElement {
   return (
-    <div className="wn-editor-loading">
+    <div className="wn-editor-loading" aria-busy="true" aria-live="polite">
       <div className="wn-editor-loading-spinner" />
       <span className="wn-editor-loading-text">Loading editor...</span>
     </div>

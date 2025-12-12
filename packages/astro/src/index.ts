@@ -32,6 +32,7 @@ export {
   DEFAULT_IMAGE_CONFIG,
   DEFAULT_EDITOR_CONFIG,
   DEFAULT_DISCOVERY_CONFIG,
+  DEFAULT_VERSION_HISTORY_CONFIG,
   DEFAULT_FILE_PATTERN,
   DEFAULT_CONTENT_PATH,
 } from "./config/defaults";
@@ -99,6 +100,40 @@ export type { PatternDetectionResult } from "./discovery/patterns";
 export { detectSchema, mergeSchema, describeSchema } from "./discovery/schema";
 export type { SchemaDetectionResult } from "./discovery/schema";
 
+// Version History utilities
+export {
+  saveVersion,
+  getVersions,
+  getVersion,
+  deleteVersion,
+  clearVersions,
+  pruneVersions,
+  restoreVersion,
+  generateVersionId,
+  parseVersionId,
+  getVersionStoragePath,
+  getVersionFilePath,
+  getManifestPath,
+  generatePreview,
+  ensureGitignore,
+  readManifest,
+  writeManifest,
+  recoverManifest,
+} from "./filesystem/versions";
+
+// Config-aware version history wrappers
+export {
+  resolveVersionConfig,
+  isVersionHistoryEnabled,
+  saveVersionWithConfig,
+  getVersionsWithConfig,
+  getVersionWithConfig,
+  deleteVersionWithConfig,
+  clearVersionsWithConfig,
+  pruneVersionsWithConfig,
+  restoreVersionWithConfig,
+} from "./filesystem/version-config";
+
 // Types
 export type {
   WritenexConfig,
@@ -113,4 +148,13 @@ export type {
   ContentItem,
   ContentSummary,
   DiscoveredCollection,
+  // Version History Types
+  VersionEntry,
+  VersionManifest,
+  Version,
+  VersionHistoryConfig,
+  VersionResult,
+  SaveVersionOptions,
+  RestoreVersionOptions,
+  RestoreResult,
 } from "./types";

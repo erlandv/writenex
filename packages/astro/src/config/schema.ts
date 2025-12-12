@@ -82,6 +82,15 @@ const editorConfigSchema = z.object({
 });
 
 /**
+ * Schema for version history configuration
+ */
+const versionHistoryConfigSchema = z.object({
+  enabled: z.boolean().optional(),
+  maxVersions: z.number().int().positive().optional(),
+  storagePath: z.string().optional(),
+});
+
+/**
  * Main Writenex configuration schema
  */
 export const writenexConfigSchema = z.object({
@@ -89,6 +98,7 @@ export const writenexConfigSchema = z.object({
   images: imageConfigSchema.optional(),
   editor: editorConfigSchema.optional(),
   discovery: discoveryConfigSchema.optional(),
+  versionHistory: versionHistoryConfigSchema.optional(),
 });
 
 /**

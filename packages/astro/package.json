@@ -1,7 +1,7 @@
 {
   "name": "@writenex/astro",
-  "version": "0.2.0",
-  "description": "CMS integration for Astro content collections - WYSIWYG editing for your Astro site",
+  "version": "0.2.2",
+  "description": "Visual editor for Astro content collections - WYSIWYG editing for your Astro site",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -25,30 +25,27 @@
     "build:client": "tsup --config tsup.client.config.ts",
     "prepublishOnly": "pnpm build",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src/",
-    "test": "vitest run",
-    "test:watch": "vitest"
+    "lint": "eslint src/"
   },
   "keywords": [
     "astro",
     "astro-integration",
-    "cms",
     "markdown",
     "editor",
     "content-collections",
     "wysiwyg",
     "writenex",
     "mdx",
-    "headless-cms"
+    "visual-editor"
   ],
-  "author": "Writenex",
+  "author": "Erland <hello@erland.me>",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/erlandv/writenex.git",
     "directory": "packages/astro"
   },
-  "homepage": "https://github.com/erlandv/writenex/tree/main/packages/astro#readme",
+  "homepage": "https://writenex.com/astro",
   "bugs": {
     "url": "https://github.com/erlandv/writenex/issues"
   },
@@ -72,10 +69,8 @@
     "@writenex/eslint-config": "workspace:*",
     "@writenex/tsconfig": "workspace:*",
     "astro": "^5.0.0",
-    "fast-check": "^4.4.0",
     "tsup": "^8.5.0",
     "typescript": "^5.8.3",
-    "vite": "^6.0.0",
-    "vitest": "^4.0.15"
+    "vite": "^6.0.0"
   }
 }
