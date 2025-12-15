@@ -49,7 +49,7 @@
     "url": "https://github.com/erlandv/writenex/issues"
   },
   "dependencies": {
-    "@mdxeditor/editor": "^3.50.0",
+    "@mdxeditor/editor": "^3.52.1",
     "chokidar": "^4.0.0",
     "gray-matter": "^4.0.3",
     "lucide-react": "^0.556.0",
