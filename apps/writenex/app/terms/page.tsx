@@ -47,7 +47,7 @@ export default function TermsOfUsePage(): React.ReactElement {
     { name: "Terms of Use", url: "https://writenex.com/terms" },
   ]);
 
-  const lastUpdated = "December 11, 2025";
+  const lastUpdated = "December 13, 2025";
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-900">
@@ -71,110 +71,142 @@ export default function TermsOfUsePage(): React.ReactElement {
           </p>
 
           <p>
-            Welcome to Writenex. By accessing and using this website,
-            applications, or software packages, you agree to be bound by these
-            Terms of Use. Please read them carefully.
+            Welcome to Writenex. By accessing or using any Writenex website,
+            application, or software package, including open source
+            distributions and local installations, you agree to these Terms of
+            Use. If you do not agree to these terms, you should not use Writenex
+            products.
           </p>
 
           <h2>1. Acceptance of Terms</h2>
 
           <p>
-            By using any Writenex product, you agree to these Terms of Use. If
-            you do not agree with any part of these terms, you should not use
-            the services.
+            By using any Writenex product, you acknowledge that you have read,
+            understood, and agreed to these Terms of Use. Your agreement applies
+            regardless of whether you create an account or are required to click
+            an explicit acceptance button.
           </p>
 
           <h2>2. Description of Services</h2>
 
-          <p>Writenex provides the following products:</p>
+          <p>
+            Writenex provides the following products and features, which may
+            evolve over time.
+          </p>
 
           <h3>Writenex Editor</h3>
 
           <p>
-            A free, web-based Markdown editor that runs entirely in your
-            browser. The editor allows you to:
+            Writenex Editor is a free, web based Markdown editor that runs
+            entirely in your browser. It allows you to:
           </p>
 
           <ul>
             <li>Create and edit Markdown documents</li>
             <li>Store documents locally in your browser</li>
             <li>Export documents to Markdown (.md) and HTML formats</li>
-            <li>Access version history of your documents</li>
-            <li>Use the application offline after initial load</li>
+            <li>Access local version history for document recovery</li>
+            <li>Use the editor offline after the initial load</li>
           </ul>
 
           <h3>@writenex/astro</h3>
 
           <p>
-            An npm package that provides a visual editor for Astro content
-            collections. This package:
+            <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              @writenex/astro
+            </code>{" "}
+            is an npm package that provides a visual editor for{" "}
+            <a
+              href="https://docs.astro.build/en/guides/content-collections/"
+              target="_blank"
+              rel="nofollow noopener noreferrer"
+            >
+              Astro Content Collections
+            </a>
+            . The package:
           </p>
 
           <ul>
-            <li>Runs entirely on your local development environment</li>
-            <li>Provides WYSIWYG editing for your Astro content files</li>
-            <li>Reads and writes directly to your local filesystem</li>
+            <li>Runs entirely in your local development environment</li>
+            <li>Provides visual editing for Astro content files</li>
+            <li>Reads from and writes to your local filesystem</li>
             <li>Is disabled by default in production builds</li>
-            <li>Does not transmit any data to external servers</li>
+            <li>Does not transmit data to external servers</li>
           </ul>
 
           <h2>3. No Account Required</h2>
 
           <p>
-            Writenex products do not require registration or an account. You can
-            use all features immediately without providing any personal
-            information.
+            Writenex products do not require registration or user accounts. You
+            may use all features without providing personal information.
           </p>
 
           <h2>4. Local Data Storage</h2>
 
+          <p>
+            Writenex products are designed to store data locally by default.
+          </p>
+
           <h3>Writenex Editor</h3>
 
           <p>
-            All your documents and data are stored locally in your browser using
-            IndexedDB. This means:
+            All documents and related data are stored locally in your browser
+            using IndexedDB. By using the editor, you acknowledge that:
           </p>
 
           <ul>
             <li>
-              <strong>You are responsible for backing up your data.</strong> We
-              recommend regularly exporting important documents.
+              You are responsible for backing up your data by exporting
+              documents
             </li>
             <li>
-              <strong>Data loss can occur</strong> if you clear your browser
-              data, uninstall the PWA, or switch devices.
+              Data may be lost if you clear browser data, reinstall the browser,
+              or switch devices
             </li>
             <li>
-              <strong>We cannot recover lost data.</strong> Since data is stored
-              only on your device, we have no backup copies.
+              We cannot recover lost data because no server side backups exist
             </li>
           </ul>
 
           <h3>@writenex/astro</h3>
 
-          <p>Content is stored in your local project filesystem. This means:</p>
+          <p>
+            Content edited through{" "}
+            <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              @writenex/astro
+            </code>{" "}
+            is stored directly in your local project filesystem. By using the
+            package, you acknowledge that:
+          </p>
 
           <ul>
             <li>
-              <strong>You are responsible for your project files.</strong> Use
-              version control (Git) to track changes.
+              You are responsible for managing and backing up your project files
             </li>
             <li>
-              <strong>The package modifies files directly.</strong> Changes are
-              written to your content directory.
+              The package writes changes directly to your content directories
             </li>
             <li>
-              <strong>Version history is stored locally.</strong> Shadow copies
-              are saved in your project&apos;s .writenex directory.
+              Local version history is stored in the{" "}
+              <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                .writenex
+              </code>{" "}
+              directory within your project
+            </li>
+            <li>
+              We cannot recover lost data because no server side backups exist
             </li>
           </ul>
 
           <h3>Data Portability</h3>
 
           <p>
-            You can export your documents at any time. For Writenex Editor, use
-            the export feature. For @writenex/astro, your content files are
-            already in standard Markdown format in your project.
+            You may export your data at any time. Writenex Editor provides
+            export functionality, and{" "}
+            <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              @writenex/astro
+            </code>{" "}
+            stores content in standard Markdown files within your project.
           </p>
 
           <h2>5. Acceptable Use</h2>
@@ -185,14 +217,10 @@ export default function TermsOfUsePage(): React.ReactElement {
           </p>
 
           <ul>
-            <li>Use the services for any illegal activity</li>
-            <li>Attempt to interfere with or disrupt the services</li>
-            <li>
-              Attempt to gain unauthorized access to any systems or networks
-            </li>
-            <li>
-              Use automated systems to access the services in a harmful way
-            </li>
+            <li>Use the products for illegal activities</li>
+            <li>Interfere with or disrupt the operation of the products</li>
+            <li>Attempt to gain unauthorized access to systems or networks</li>
+            <li>Use automated access in a manner that causes harm or abuse</li>
           </ul>
 
           <h2>6. Intellectual Property</h2>
@@ -201,44 +229,67 @@ export default function TermsOfUsePage(): React.ReactElement {
 
           <p>
             You retain full ownership of all content you create using Writenex
-            products. Since your content is stored locally and never transmitted
-            to us, we have no claim or access to it.
+            products. Because content is stored locally and not transmitted to
+            us, Writenex does not claim ownership of or access to your content.
           </p>
 
           <h3>Our Software</h3>
 
           <p>
-            All Writenex software, including Writenex Editor and
-            @writenex/astro, is open source and available on{" "}
+            Writenex software is open source and available on GitHub under the{" "}
             <a
-              href="https://github.com/erlandv/writenex"
+              href="https://pitt.libguides.com/openlicensing/MIT"
               target="_blank"
-              rel="noopener noreferrer"
+              rel="nofollow noopener noreferrer"
             >
-              GitHub
-            </a>{" "}
-            under the MIT License. You are free to use, modify, and distribute
-            the software in accordance with the license terms.
+              MIT License
+            </a>
+            . The MIT License governs the use, modification, and distribution of
+            the software itself. These Terms of Use apply to your use of
+            Writenex products and do not replace or modify the applicable open
+            source licenses.
+          </p>
+
+          <h3>Name, Logo, and Branding</h3>
+
+          <p>
+            The Writenex name, logo, and visual identity are not covered by the
+            MIT License.
+          </p>
+
+          <p>
+            Permission to use, modify, and distribute the Writenex source code
+            under the MIT License does not grant permission to use the Writenex
+            name, logo, or branding in a way that suggests endorsement,
+            affiliation, or official status.
+          </p>
+
+          <p>
+            You may refer to Writenex in a descriptive manner, such as when
+            attributing the original project or describing compatibility, but
+            you may not present modified versions, forks, or derivative works as
+            official Writenex products.
           </p>
 
           <h2>7. Disclaimer of Warranties</h2>
 
           <p>
             <strong>
-              WRITENEX PRODUCTS ARE PROVIDED &quot;AS IS&quot; AND &quot;AS
-              AVAILABLE&quot; WITHOUT WARRANTIES OF ANY KIND.
+              WRITENEX PRODUCTS ARE PROVIDED ON AN "AS IS" AND "AS AVAILABLE"
+              BASIS WITHOUT WARRANTIES OF ANY KIND.
             </strong>
           </p>
 
           <p>We do not warrant that:</p>
 
           <ul>
-            <li>The services will be uninterrupted or error-free</li>
+            <li>The products will be uninterrupted or error free</li>
             <li>Defects will be corrected</li>
             <li>
-              The services are free of viruses or other harmful components
+              The products or their dependencies are free from harmful
+              components
             </li>
-            <li>The services will meet your specific requirements</li>
+            <li>The products will meet your specific requirements</li>
           </ul>
 
           <p>
@@ -249,76 +300,79 @@ export default function TermsOfUsePage(): React.ReactElement {
           <h2>8. Limitation of Liability</h2>
 
           <p>
-            To the maximum extent permitted by law, Writenex and its creators
-            shall not be liable for any:
+            To the maximum extent permitted by applicable law, Writenex and its
+            creators are not liable for any:
           </p>
 
           <ul>
-            <li>Loss of data, documents, or content files</li>
+            <li>Loss of data, documents, or project files</li>
             <li>Indirect, incidental, or consequential damages</li>
             <li>Loss of profits, revenue, or business opportunities</li>
             <li>
-              Damages arising from your use or inability to use the services
+              Damages arising from your use or inability to use the products
             </li>
             <li>
-              Damages resulting from modifications to your project files by
-              @writenex/astro
+              Damages resulting from filesystem modifications performed by
+              <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                @writenex/astro
+              </code>
             </li>
           </ul>
 
           <h2>9. Service and Package Availability</h2>
 
           <p>
-            We strive to maintain availability, but we do not guarantee
-            uninterrupted access. We may:
+            Writenex does not guarantee continuous or uninterrupted
+            availability. We may:
           </p>
 
           <ul>
-            <li>Modify or discontinue services at any time</li>
-            <li>
-              Perform maintenance that may temporarily affect availability
-            </li>
+            <li>Modify, suspend, or discontinue products at any time</li>
+            <li>Perform maintenance that affects availability</li>
             <li>Update features or packages without prior notice</li>
             <li>Deprecate or remove npm packages</li>
           </ul>
 
           <p>
-            Writenex Editor works offline after initial load. @writenex/astro
-            runs entirely locally and does not depend on our servers.
+            Offline availability does not imply guarantees regarding data
+            persistence or recovery.
           </p>
 
           <h2>10. @writenex/astro Specific Terms</h2>
 
-          <p>When using @writenex/astro, you additionally acknowledge that:</p>
+          <p>
+            When using{" "}
+            <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              @writenex/astro
+            </code>
+            , you acknowledge and agree that:
+          </p>
 
           <ul>
             <li>
-              <strong>Filesystem access:</strong> The package reads and writes
-              files in your project directory. You are responsible for ensuring
-              proper backups.
+              The package reads and writes files within your project directory
             </li>
             <li>
-              <strong>Development use:</strong> The package is intended for
-              development environments. Enabling it in production is at your own
-              risk.
+              You are responsible for system permissions granted to the package
+            </li>
+            <li>The package is intended for development use</li>
+            <li>
+              Enabling the package in production environments is at your own
+              risk
             </li>
             <li>
-              <strong>No telemetry:</strong> The package does not collect usage
-              data or send information to external servers.
-            </li>
-            <li>
-              <strong>Compatibility:</strong> We do not guarantee compatibility
-              with all Astro versions or configurations.
+              Compatibility with all Astro versions or configurations is not
+              guaranteed
             </li>
           </ul>
 
           <h2>11. Changes to Terms</h2>
 
           <p>
-            We may update these Terms of Use from time to time. Changes will be
-            posted on this page with an updated date. Your continued use of
-            Writenex products after changes constitutes acceptance of the new
-            terms.
+            We may update these Terms of Use from time to time. Updated terms
+            will be posted on this page with a revised{" "}
+            <strong>"Last updated"</strong> date. Continued use of Writenex
+            products after changes constitutes acceptance of the updated terms.
           </p>
 
           <h2>12. Governing Law</h2>
@@ -332,14 +386,14 @@ export default function TermsOfUsePage(): React.ReactElement {
           <h2>13. Contact</h2>
 
           <p>
-            If you have questions about these Terms of Use, you can reach us
-            through our{" "}
+            If you have questions about these Terms of Use, you can contact us
+            through the Writenex GitHub repository at{" "}
             <a
               href="https://github.com/erlandv/writenex"
               target="_blank"
               rel="nofollow noopener noreferrer"
             >
-              GitHub repository
+              https://github.com/erlandv/writenex
             </a>
             .
           </p>

@@ -32,27 +32,39 @@ import type { MiddlewareContext } from "./middleware";
 import {
   sendJson,
   sendError,
+  sendWritenexError,
   parseQueryParams,
   parseJsonBody,
 } from "./middleware";
-import { getCache } from "./cache";
 import {
-  discoverCollections,
-  mergeCollections,
-} from "../discovery/collections";
-import { getCollectionSummaries, readContentFile } from "../filesystem/reader";
+  ApiBadRequestError,
+  ApiMethodNotAllowedError,
+  CollectionNotFoundError,
+  CollectionDiscoveryError,
+  ContentNotFoundError,
+  ImageInvalidTypeError,
+  ImageNotFoundError,
+  PathTraversalError,
+  VersionNotFoundError,
+  isWritenexError,
+  wrapError,
+  WritenexErrorCode,
+} from "@/core/errors";
+import { getCache } from "./cache";
+import { discoverCollections, mergeCollections } from "@/discovery/collections";
+import { getCollectionSummaries, readContentFile } from "@/filesystem/reader";
 import {
   createContent,
   updateContent,
   deleteContent,
   getContentFilePath,
-} from "../filesystem/writer";
+} from "@/filesystem/writer";
 import {
   uploadImage,
   parseMultipartFormData,
   isValidImageFile,
   discoverContentImages,
-} from "../filesystem/images";
+} from "@/filesystem/images";
 import {
   getVersions,
   getVersion,
@@ -60,8 +72,8 @@ import {
   restoreVersion,
   deleteVersion,
   clearVersions,
-} from "../filesystem/versions";
-import type { VersionHistoryConfig } from "../types";
+} from "@/filesystem/versions";
+import type { VersionHistoryConfig } from "@/types";
 
 /**
  * API route handler function type
@@ -108,15 +120,24 @@ export function createApiRouter(
       if (method === "GET") {
         return handleGetCollections(req, res, params, context);
       }
-      return sendError(res, "Method not allowed", 405);
+      return sendWritenexError(
+        res,
+        new ApiMethodNotAllowedError(method, ["GET"])
+      );
     }
 
-    // Route: /config
+    // Route: /config or /config/path
     if (segments[0] === "config") {
       if (method === "GET") {
+        if (segments[1] === "path") {
+          return handleGetConfigPath(req, res, params, context);
+        }
         return handleGetConfig(req, res, params, context);
       }
-      return sendError(res, "Method not allowed", 405);
+      return sendWritenexError(
+        res,
+        new ApiMethodNotAllowedError(method, ["GET"])
+      );
     }
 
     // Route: /content/:collection/:id?
@@ -137,7 +158,15 @@ export function createApiRouter(
         case "DELETE":
           return handleDeleteContent(req, res, params, context);
         default:
-          return sendError(res, "Method not allowed", 405);
+          return sendWritenexError(
+            res,
+            new ApiMethodNotAllowedError(method, [
+              "GET",
+              "POST",
+              "PUT",
+              "DELETE",
+            ])
+          );
       }
     }
 
@@ -165,7 +194,10 @@ export function createApiRouter(
       if (method === "POST") {
         return handleImageUpload(req, res, params, context);
       }
-      return sendError(res, "Method not allowed", 405);
+      return sendWritenexError(
+        res,
+        new ApiMethodNotAllowedError(method, ["GET", "POST"])
+      );
     }
 
     // Route: /versions/:collection/:id/:versionId?
@@ -194,14 +226,20 @@ export function createApiRouter(
           if (!params.versionId) {
             return handleCreateVersion(req, res, params, context);
           }
-          return sendError(res, "Method not allowed", 405);
+          return sendWritenexError(
+            res,
+            new ApiMethodNotAllowedError(method, ["GET", "POST", "DELETE"])
+          );
         case "DELETE":
           if (params.versionId) {
             return handleDeleteVersion(req, res, params, context);
           }
           return handleClearVersions(req, res, params, context);
         default:
-          return sendError(res, "Method not allowed", 405);
+          return sendWritenexError(
+            res,
+            new ApiMethodNotAllowedError(method, ["GET", "POST", "DELETE"])
+          );
       }
     }
 
@@ -235,6 +273,31 @@ const handleGetConfig: RouteHandler = async (_req, res, _params, context) => {
 };
 
 /**
+ * GET /api/config/path - Get config file path
+ *
+ * Returns the absolute path to the configuration file for opening in editor.
+ * Also returns the project root for reference.
+ */
+const handleGetConfigPath: RouteHandler = async (
+  _req,
+  res,
+  _params,
+  context
+) => {
+  const { projectRoot } = context;
+
+  // Import findConfigFile from config loader
+  const { findConfigFile } = await import("@/config/loader");
+  const configPath = findConfigFile(projectRoot);
+
+  sendJson(res, {
+    configPath,
+    projectRoot,
+    hasConfigFile: configPath !== null,
+  });
+};
+
+/**
  * GET /api/collections - List all collections
  *
  * Returns discovered and configured collections with metadata.
@@ -264,8 +327,13 @@ const handleGetCollections: RouteHandler = async (
 
     sendJson(res, { collections });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    sendError(res, `Failed to discover collections: ${message}`, 500);
+    const wrappedError = isWritenexError(error)
+      ? error
+      : new CollectionDiscoveryError(
+          join(projectRoot, "src/content"),
+          error instanceof Error ? error : undefined
+        );
+    sendWritenexError(res, wrappedError);
   }
 };
 
@@ -284,13 +352,21 @@ const handleListContent: RouteHandler = async (_req, res, params, context) => {
   const { projectRoot } = context;
 
   if (!collection) {
-    return sendError(res, "Collection name required", 400);
+    return sendWritenexError(
+      res,
+      new ApiBadRequestError("Collection name required")
+    );
   }
 
   const cache = getCache();
 
   try {
     const collectionPath = join(projectRoot, "src/content", collection);
+
+    // Check if collection exists
+    if (!existsSync(collectionPath)) {
+      return sendWritenexError(res, new CollectionNotFoundError(collection));
+    }
 
     // Parse query parameters
     const includeDrafts = query.draft === "true";
@@ -322,9 +398,11 @@ const handleListContent: RouteHandler = async (_req, res, params, context) => {
       total: items.length,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
     console.error("[writenex] List content error:", error);
-    sendError(res, `Failed to list content: ${message}`, 500);
+    const wrappedError = isWritenexError(error)
+      ? error
+      : wrapError(error, WritenexErrorCode.API_INTERNAL_ERROR);
+    sendWritenexError(res, wrappedError);
   }
 };
 
@@ -336,7 +414,10 @@ const handleGetContent: RouteHandler = async (_req, res, params, context) => {
   const { projectRoot } = context;
 
   if (!collection || !id) {
-    return sendError(res, "Collection and content ID required", 400);
+    return sendWritenexError(
+      res,
+      new ApiBadRequestError("Collection and content ID required")
+    );
   }
 
   try {
@@ -344,11 +425,7 @@ const handleGetContent: RouteHandler = async (_req, res, params, context) => {
     const filePath = getContentFilePath(collectionPath, id);
 
     if (!filePath) {
-      return sendError(
-        res,
-        `Content '${id}' not found in '${collection}'`,
-        404
-      );
+      return sendWritenexError(res, new ContentNotFoundError(collection, id));
     }
 
     const result = await readContentFile(filePath, collectionPath);
@@ -359,8 +436,10 @@ const handleGetContent: RouteHandler = async (_req, res, params, context) => {
 
     sendJson(res, result.content);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    sendError(res, `Failed to get content: ${message}`, 500);
+    const wrappedError = isWritenexError(error)
+      ? error
+      : wrapError(error, WritenexErrorCode.API_INTERNAL_ERROR);
+    sendWritenexError(res, wrappedError);
   }
 };
 
@@ -458,36 +537,66 @@ const handleCreateContent: RouteHandler = async (req, res, params, context) => {
  *
  * Creates a version snapshot of the current content before updating
  * when version history is enabled in configuration.
+ *
+ * Supports conflict detection via expectedMtime parameter:
+ * - If expectedMtime is provided and differs from current file mtime,
+ *   returns 409 Conflict with both versions for client-side resolution.
+ *
+ * Request body:
+ * {
+ *   frontmatter?: Record<string, unknown>;
+ *   body?: string;
+ *   expectedMtime?: number;  // For conflict detection
+ *   forceOverwrite?: boolean; // Skip conflict check (use with caution)
+ * }
+ *
+ * Response on conflict (409):
+ * {
+ *   error: string;
+ *   code: "CONTENT_CONFLICT";
+ *   serverContent: string;
+ *   serverMtime: number;
+ *   clientMtime: number;
+ * }
  */
 const handleUpdateContent: RouteHandler = async (req, res, params, context) => {
   const { collection, id } = params;
   const { projectRoot, config } = context;
 
   if (!collection || !id) {
-    return sendError(res, "Collection and content ID required", 400);
+    return sendWritenexError(
+      res,
+      new ApiBadRequestError("Collection and content ID required")
+    );
   }
 
   try {
     const body = await parseJsonBody(req);
 
     if (!body || typeof body !== "object") {
-      return sendError(res, "Invalid request body", 400);
+      return sendWritenexError(
+        res,
+        new ApiBadRequestError("Invalid request body")
+      );
     }
 
-    const { frontmatter, body: contentBody } = body as {
+    const {
+      frontmatter,
+      body: contentBody,
+      expectedMtime,
+      forceOverwrite,
+    } = body as {
       frontmatter?: Record<string, unknown>;
       body?: string;
+      expectedMtime?: number;
+      forceOverwrite?: boolean;
     };
 
     const collectionPath = join(projectRoot, "src/content", collection);
     const filePath = getContentFilePath(collectionPath, id);
 
     if (!filePath) {
-      return sendError(
-        res,
-        `Content '${id}' not found in '${collection}'`,
-        404
-      );
+      return sendWritenexError(res, new ContentNotFoundError(collection, id));
     }
 
     // Pass version history config to updateContent for automatic version creation
@@ -501,7 +610,14 @@ const handleUpdateContent: RouteHandler = async (req, res, params, context) => {
       versionHistoryConfig: config.versionHistory as Required<
         typeof config.versionHistory
       >,
+      // Only check mtime if not forcing overwrite
+      expectedMtime: forceOverwrite ? undefined : expectedMtime,
     });
+
+    // Handle conflict error specially
+    if (!result.success && result.conflict) {
+      return sendWritenexError(res, result.conflict);
+    }
 
     if (!result.success) {
       return sendError(res, result.error ?? "Failed to update content", 500);
@@ -515,10 +631,13 @@ const handleUpdateContent: RouteHandler = async (req, res, params, context) => {
       success: true,
       id: result.id,
       path: result.path,
+      mtime: result.mtime,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    sendError(res, `Failed to update content: ${message}`, 500);
+    const wrappedError = isWritenexError(error)
+      ? error
+      : wrapError(error, WritenexErrorCode.API_INTERNAL_ERROR);
+    sendWritenexError(res, wrappedError);
   }
 };
 
@@ -593,22 +712,39 @@ const handleImageUpload: RouteHandler = async (req, res, _params, context) => {
     const contentType = req.headers["content-type"] ?? "";
 
     if (!contentType.includes("multipart/form-data")) {
-      return sendError(res, "Content-Type must be multipart/form-data", 400);
+      return sendWritenexError(
+        res,
+        new ApiBadRequestError("Content-Type must be multipart/form-data")
+      );
     }
 
     // Parse multipart data
     const { file, fields } = parseMultipartFormData(body, contentType);
 
     if (!file) {
-      return sendError(res, "No file uploaded", 400);
+      return sendWritenexError(res, new ApiBadRequestError("No file uploaded"));
     }
 
     if (!fields.collection || !fields.contentId) {
-      return sendError(res, "collection and contentId are required", 400);
+      return sendWritenexError(
+        res,
+        new ApiBadRequestError("collection and contentId are required")
+      );
     }
 
     if (!isValidImageFile(file.filename)) {
-      return sendError(res, "Invalid image file type", 400);
+      return sendWritenexError(
+        res,
+        new ImageInvalidTypeError(file.filename, [
+          ".jpg",
+          ".jpeg",
+          ".png",
+          ".gif",
+          ".webp",
+          ".avif",
+          ".svg",
+        ])
+      );
     }
 
     // Upload image
@@ -631,8 +767,10 @@ const handleImageUpload: RouteHandler = async (req, res, _params, context) => {
       url: result.url,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    sendError(res, `Failed to upload image: ${message}`, 500);
+    const wrappedError = isWritenexError(error)
+      ? error
+      : wrapError(error, WritenexErrorCode.IMAGE_UPLOAD_ERROR);
+    sendWritenexError(res, wrappedError);
   }
 };
 
@@ -747,7 +885,10 @@ const handleServeImage = async (
   const { projectRoot } = context;
 
   if (!collection || !contentId) {
-    return sendError(res, "Collection and content ID required", 400);
+    return sendWritenexError(
+      res,
+      new ApiBadRequestError("Collection and content ID required")
+    );
   }
 
   try {
@@ -756,10 +897,9 @@ const handleServeImage = async (
     // Check if content exists
     const contentFilePath = getContentFilePath(collectionPath, contentId);
     if (!contentFilePath) {
-      return sendError(
+      return sendWritenexError(
         res,
-        `Content '${contentId}' not found in '${collection}'`,
-        404
+        new ContentNotFoundError(collection, contentId)
       );
     }
 
@@ -783,18 +923,24 @@ const handleServeImage = async (
     // Security check: ensure the path is within the content folder
     const normalizedPath = join(fullImagePath);
     if (!normalizedPath.startsWith(collectionPath)) {
-      return sendError(res, "Invalid image path", 400);
+      return sendWritenexError(
+        res,
+        new PathTraversalError(imagePath, collectionPath)
+      );
     }
 
     // Check if file exists
     if (!existsSync(fullImagePath)) {
-      return sendError(res, "Image not found", 404);
+      return sendWritenexError(res, new ImageNotFoundError(imagePath));
     }
 
     // Get file stats
     const stats = statSync(fullImagePath);
     if (!stats.isFile()) {
-      return sendError(res, "Not a file", 400);
+      return sendWritenexError(
+        res,
+        new ApiBadRequestError("Requested path is not a file")
+      );
     }
 
     // Determine MIME type
@@ -810,8 +956,10 @@ const handleServeImage = async (
     const stream = createReadStream(fullImagePath);
     stream.pipe(res);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    sendError(res, `Failed to serve image: ${message}`, 500);
+    const wrappedError = isWritenexError(error)
+      ? error
+      : wrapError(error, WritenexErrorCode.API_INTERNAL_ERROR);
+    sendWritenexError(res, wrappedError);
   }
 };
 
@@ -892,10 +1040,9 @@ const handleGetVersion: RouteHandler = async (_req, res, params, context) => {
   const { projectRoot, config } = context;
 
   if (!collection || !id || !versionId) {
-    return sendError(
+    return sendWritenexError(
       res,
-      "Collection, content ID, and version ID required",
-      400
+      new ApiBadRequestError("Collection, content ID, and version ID required")
     );
   }
 
@@ -911,7 +1058,10 @@ const handleGetVersion: RouteHandler = async (_req, res, params, context) => {
     );
 
     if (!version) {
-      return sendError(res, `Version '${versionId}' not found`, 404);
+      return sendWritenexError(
+        res,
+        new VersionNotFoundError(collection, id, versionId)
+      );
     }
 
     sendJson(res, {
@@ -919,8 +1069,10 @@ const handleGetVersion: RouteHandler = async (_req, res, params, context) => {
       version,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    sendError(res, `Failed to get version: ${message}`, 500);
+    const wrappedError = isWritenexError(error)
+      ? error
+      : wrapError(error, WritenexErrorCode.API_INTERNAL_ERROR);
+    sendWritenexError(res, wrappedError);
   }
 };
 

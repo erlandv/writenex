@@ -8,7 +8,7 @@
  */
 
 import { z } from "zod";
-import type { WritenexConfig } from "../types";
+import type { WritenexConfig } from "@/types";
 
 /**
  * Schema for field type definitions

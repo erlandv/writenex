@@ -15,7 +15,7 @@ import type {
   DiscoveryConfig,
   CollectionConfig,
   VersionHistoryConfig,
-} from "../types";
+} from "@/types";
 
 /**
  * Default image configuration

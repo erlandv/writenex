@@ -32,7 +32,7 @@
 import { readdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, extname, relative } from "node:path";
-import { isContentFile } from "../filesystem/reader";
+import { isContentFile } from "@/filesystem/reader";
 
 /**
  * Pattern definition with regex and template

@@ -14,9 +14,11 @@
 
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Connect } from "vite";
-import type { WritenexConfig } from "../types";
+import type { WritenexConfig } from "@/types";
 import { createApiRouter } from "./routes";
 import { serveEditorHtml, serveAsset } from "./assets";
+import type { WritenexError } from "@/core/errors";
+import { WritenexErrorCode, isWritenexError, wrapError } from "@/core/errors";
 
 /**
  * Middleware context passed to handlers
@@ -84,13 +86,18 @@ export function createMiddleware(
       // Handle editor UI (root and any sub-routes for client-side routing)
       return await serveEditorHtml(req, res, context);
     } catch (error) {
-      // Handle errors gracefully
-      const message = error instanceof Error ? error.message : "Unknown error";
-      console.error(`[writenex] Middleware error: ${message}`);
+      // Handle errors gracefully using WritenexError
+      const writenexError = isWritenexError(error)
+        ? error
+        : wrapError(error, WritenexErrorCode.API_INTERNAL_ERROR);
 
-      res.statusCode = 500;
+      console.error(
+        `[writenex] Middleware error [${writenexError.code}]: ${writenexError.message}`
+      );
+
+      res.statusCode = writenexError.httpStatus;
       res.setHeader("Content-Type", "application/json");
-      res.end(JSON.stringify({ error: "Internal server error" }));
+      res.end(JSON.stringify(writenexError.toJSON()));
     }
   };
 }
@@ -183,4 +190,20 @@ export function sendError(
   statusCode: number = 400
 ): void {
   sendJson(res, { error: message }, statusCode);
+}
+
+/**
+ * Send WritenexError response
+ *
+ * Automatically uses the error's HTTP status code and formats
+ * the response using the error's toJSON method.
+ *
+ * @param res - The server response
+ * @param error - WritenexError instance
+ */
+export function sendWritenexError(
+  res: ServerResponse,
+  error: WritenexError
+): void {
+  sendJson(res, error.toJSON(), error.httpStatus);
 }

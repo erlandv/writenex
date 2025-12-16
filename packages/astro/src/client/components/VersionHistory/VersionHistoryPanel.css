@@ -90,6 +90,15 @@
   cursor: not-allowed;
 }
 
+.wn-version-panel-btn--danger {
+  color: var(--wn-error-400);
+}
+
+.wn-version-panel-btn--danger:hover:not(:disabled) {
+  background-color: var(--wn-error-alpha-10);
+  color: var(--wn-error-300);
+}
+
 /* ============================================================================
    PANEL CONTENT
    ============================================================================ */
@@ -301,6 +310,15 @@
 .wn-light .wn-version-panel-btn:hover {
   background-color: var(--wn-overlay-light-5);
   color: var(--wn-zinc-900);
+}
+
+.wn-light .wn-version-panel-btn--danger {
+  color: var(--wn-error-500);
+}
+
+.wn-light .wn-version-panel-btn--danger:hover:not(:disabled) {
+  background-color: var(--wn-error-alpha-10);
+  color: var(--wn-error-600);
 }
 
 .wn-light .wn-version-panel-loading {

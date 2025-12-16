@@ -17,9 +17,9 @@
 import { readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import type { DiscoveredCollection, CollectionConfig } from "../types";
-import { getCollectionCount } from "../filesystem/reader";
-import { DEFAULT_FILE_PATTERN } from "../config/defaults";
+import type { DiscoveredCollection, CollectionConfig } from "@/types";
+import { getCollectionCount } from "@/filesystem/reader";
+import { DEFAULT_FILE_PATTERN } from "@/config/defaults";
 import { detectFilePattern as detectPattern } from "./patterns";
 import { detectSchema } from "./schema";
 

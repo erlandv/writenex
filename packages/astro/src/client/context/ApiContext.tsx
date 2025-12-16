@@ -15,6 +15,7 @@ import {
   type ReactElement,
 } from "react";
 import { createApiClient } from "../hooks/useApi";
+import { createVersionApiClient } from "../hooks/useVersionHistory";
 
 /**
  * API client type inferred from createApiClient
@@ -22,10 +23,16 @@ import { createApiClient } from "../hooks/useApi";
 type ApiClient = ReturnType<typeof createApiClient>;
 
 /**
+ * Version API client type inferred from createVersionApiClient
+ */
+type VersionApiClient = ReturnType<typeof createVersionApiClient>;
+
+/**
  * Context value containing the API client and base URL
  */
 interface ApiContextValue {
   client: ApiClient;
+  versionClient: VersionApiClient;
   apiBase: string;
 }
 
@@ -61,10 +68,11 @@ export function ApiProvider({
   apiBase,
   children,
 }: ApiProviderProps): ReactElement {
-  // Memoize the API client to prevent recreation on re-renders
+  // Memoize the API clients to prevent recreation on re-renders
   const value = useMemo(
     () => ({
       client: createApiClient({ apiBase }),
+      versionClient: createVersionApiClient({ apiBase }),
       apiBase,
     }),
     [apiBase]
@@ -115,4 +123,32 @@ export function useApiContext(): ApiContextValue {
 export function useSharedApi(): ApiClient {
   const { client } = useApiContext();
   return client;
+}
+
+/**
+ * Hook to access the API base URL from context
+ *
+ * @returns The API base URL string
+ */
+export function useApiBase(): string {
+  const { apiBase } = useApiContext();
+  return apiBase;
+}
+
+/**
+ * Hook to access the shared version API client
+ *
+ * @returns The shared version API client instance
+ *
+ * @example
+ * ```tsx
+ * function MyComponent() {
+ *   const versionApi = useSharedVersionApi();
+ *   const versions = await versionApi.listVersions(collection, contentId);
+ * }
+ * ```
+ */
+export function useSharedVersionApi(): VersionApiClient {
+  const { versionClient } = useApiContext();
+  return versionClient;
 }

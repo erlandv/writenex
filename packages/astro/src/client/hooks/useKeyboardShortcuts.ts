@@ -5,8 +5,8 @@
  * support for common editor operations.
  *
  * ## Shortcuts:
+ * - Alt + N: New content
  * - Ctrl/Cmd + S: Save
- * - Ctrl/Cmd + N: New content
  * - Ctrl/Cmd + P: Preview
  * - Ctrl/Cmd + /: Toggle shortcuts help
  * - Escape: Close modals/panels
@@ -126,7 +126,7 @@ export function formatShortcut(shortcut: ShortcutDefinition): string {
  * const { showHelp, toggleHelp, shortcuts } = useKeyboardShortcuts({
  *   shortcuts: [
  *     { key: 'save', label: 'Save', keys: 's', ctrl: true, handler: handleSave },
- *     { key: 'new', label: 'New', keys: 'n', ctrl: true, handler: handleNew },
+ *     { key: 'new', label: 'New', keys: 'n', alt: true, handler: handleNew },
  *   ],
  * });
  * ```

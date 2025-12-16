@@ -80,6 +80,15 @@ export interface WritenexClientConfig {
 }
 
 /**
+ * Config path response from API
+ */
+export interface ConfigPathResponse {
+  configPath: string | null;
+  projectRoot: string;
+  hasConfigFile: boolean;
+}
+
+/**
  * Create API client functions
  */
 export function createApiClient(config: ApiConfig) {
@@ -98,6 +107,17 @@ export function createApiClient(config: ApiConfig) {
       const response = await fetch(`${apiBase}/config`);
       if (!response.ok) {
         throw new Error("Failed to fetch config");
+      }
+      return response.json();
+    },
+
+    /**
+     * Fetch config file path for opening in editor
+     */
+    async getConfigPath(): Promise<ConfigPathResponse> {
+      const response = await fetch(`${apiBase}/config/path`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch config path");
       }
       return response.json();
     },
@@ -241,13 +261,21 @@ export function useApi(apiBase: string) {
   return client;
 }
 
+/** API client type */
+export type ApiClient = ReturnType<typeof createApiClient>;
+
 /**
  * Hook for fetching collections
  *
- * Uses a memoized API client to prevent unnecessary recreation.
+ * @param apiBaseOrClient - Either an API base URL string or a pre-created API client
  */
-export function useCollections(apiBase: string) {
-  const client = useMemo(() => createApiClient({ apiBase }), [apiBase]);
+export function useCollections(apiBaseOrClient: string | ApiClient) {
+  const client = useMemo(() => {
+    if (typeof apiBaseOrClient === "string") {
+      return createApiClient({ apiBase: apiBaseOrClient });
+    }
+    return apiBaseOrClient;
+  }, [apiBaseOrClient]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -273,10 +301,19 @@ export function useCollections(apiBase: string) {
 /**
  * Hook for fetching content list
  *
- * Uses a memoized API client to prevent unnecessary recreation.
+ * @param apiBaseOrClient - Either an API base URL string or a pre-created API client
+ * @param collection - Collection name to fetch content from
  */
-export function useContentList(apiBase: string, collection: string | null) {
-  const client = useMemo(() => createApiClient({ apiBase }), [apiBase]);
+export function useContentList(
+  apiBaseOrClient: string | ApiClient,
+  collection: string | null
+) {
+  const client = useMemo(() => {
+    if (typeof apiBaseOrClient === "string") {
+      return createApiClient({ apiBase: apiBaseOrClient });
+    }
+    return apiBaseOrClient;
+  }, [apiBaseOrClient]);
   const [items, setItems] = useState<ContentSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -307,10 +344,15 @@ export function useContentList(apiBase: string, collection: string | null) {
 /**
  * Hook for fetching configuration
  *
- * Uses a memoized API client to prevent unnecessary recreation.
+ * @param apiBaseOrClient - Either an API base URL string or a pre-created API client
  */
-export function useConfig(apiBase: string) {
-  const client = useMemo(() => createApiClient({ apiBase }), [apiBase]);
+export function useConfig(apiBaseOrClient: string | ApiClient) {
+  const client = useMemo(() => {
+    if (typeof apiBaseOrClient === "string") {
+      return createApiClient({ apiBase: apiBaseOrClient });
+    }
+    return apiBaseOrClient;
+  }, [apiBaseOrClient]);
   const [config, setConfig] = useState<WritenexClientConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

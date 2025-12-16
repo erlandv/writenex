@@ -41,7 +41,7 @@ import type {
   SaveVersionOptions,
   RestoreVersionOptions,
   RestoreResult,
-} from "../types";
+} from "@/types";
 
 // =============================================================================
 // Constants

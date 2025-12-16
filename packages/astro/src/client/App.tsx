@@ -23,12 +23,12 @@ import { FrontmatterForm } from "./components/FrontmatterForm";
 import { Save, FileEdit, CheckCircle, ExternalLink } from "lucide-react";
 import type { CollectionSchema } from "../types";
 import {
-  useApi,
   useCollections,
   useContentList,
   useConfig,
   type ContentItem,
 } from "./hooks/useApi";
+import { useSharedApi } from "./context/ApiContext";
 import {
   useAutosave,
   formatLastSaved,
@@ -42,11 +42,6 @@ import { VersionHistoryPanel } from "./components/VersionHistory";
 import { SkipLink } from "./components/SkipLink";
 import { LiveRegion } from "./components/LiveRegion";
 import { useAnnounce } from "./hooks/useAnnounce";
-
-interface AppProps {
-  basePath: string;
-  apiBase: string;
-}
 
 function generatePreviewUrl(
   pattern: string,
@@ -165,9 +160,9 @@ function AutosaveIndicator({
 /** Main content area ID for skip link navigation */
 const MAIN_CONTENT_ID = "wn-main-editor";
 
-export function App({ apiBase }: AppProps): React.ReactElement {
-  const api = useApi(apiBase);
-  const { config, refresh: refreshConfig } = useConfig(apiBase);
+export function App(): React.ReactElement {
+  const api = useSharedApi();
+  const { config, refresh: refreshConfig } = useConfig(api);
 
   // Accessibility: Live region for screen reader announcements
   const { announce, currentMessage, currentPoliteness } = useAnnounce();
@@ -176,7 +171,7 @@ export function App({ apiBase }: AppProps): React.ReactElement {
     collections,
     loading: collectionsLoading,
     refresh: refreshCollections,
-  } = useCollections(apiBase);
+  } = useCollections(api);
 
   const [selectedCollection, setSelectedCollection] = useState<string | null>(
     null
@@ -189,7 +184,7 @@ export function App({ apiBase }: AppProps): React.ReactElement {
     items: contentItems,
     loading: contentLoading,
     refresh: refreshContent,
-  } = useContentList(apiBase, selectedCollection);
+  } = useContentList(api, selectedCollection);
 
   const [currentContent, setCurrentContent] = useState<ContentItem | null>(
     null
@@ -197,7 +192,7 @@ export function App({ apiBase }: AppProps): React.ReactElement {
   const [contentLoadingState, setContentLoadingState] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [autosaveEnabled, setAutosaveEnabled] = useState(true);
+  const [autosaveEnabled, setAutosaveEnabled] = useState<boolean | null>(null);
   const [showConfigPanel, setShowConfigPanel] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isCreatingContent, setIsCreatingContent] = useState(false);
@@ -246,6 +241,13 @@ export function App({ apiBase }: AppProps): React.ReactElement {
   useEffect(() => {
     refreshConfig();
   }, [refreshConfig]);
+
+  // Sync autosave state with config when config is loaded
+  useEffect(() => {
+    if (config && autosaveEnabled === null) {
+      setAutosaveEnabled(config.editor?.autosave !== false);
+    }
+  }, [config, autosaveEnabled]);
 
   useEffect(() => {
     if (selectedCollection && selectedContentId) {
@@ -387,8 +389,8 @@ export function App({ apiBase }: AppProps): React.ReactElement {
     saveNow: saveNowAutosave,
     lastSaved,
   } = useAutosave({
-    delay: 3000,
-    enabled: autosaveEnabled && hasUnsavedChanges,
+    delay: config?.editor?.autosaveInterval ?? 3000,
+    enabled: autosaveEnabled === true && hasUnsavedChanges,
     onSave: performSave,
     onError: (err) => {
       console.error("Autosave failed:", err);
@@ -396,7 +398,7 @@ export function App({ apiBase }: AppProps): React.ReactElement {
   });
 
   useEffect(() => {
-    if (contentChanged && autosaveEnabled) {
+    if (contentChanged && autosaveEnabled === true) {
       triggerAutosave();
       setContentChanged(false);
     }
@@ -750,8 +752,8 @@ export function App({ apiBase }: AppProps): React.ReactElement {
               status={autosaveStatus}
               hasUnsavedChanges={hasUnsavedChanges}
               lastSaved={lastSaved}
-              enabled={autosaveEnabled}
-              onToggle={() => setAutosaveEnabled(!autosaveEnabled)}
+              enabled={autosaveEnabled === true}
+              onToggle={() => setAutosaveEnabled((prev) => prev !== true)}
               announce={announce}
             />
             <div className="wn-content-bar-separator" aria-hidden="true" />
@@ -887,7 +889,6 @@ export function App({ apiBase }: AppProps): React.ReactElement {
         <VersionHistoryPanel
           isOpen={isVersionHistoryOpen}
           onClose={() => setIsVersionHistoryOpen(false)}
-          apiBase={apiBase}
           collection={selectedCollection}
           contentId={selectedContentId}
           currentContent={currentContent?.body ?? ""}

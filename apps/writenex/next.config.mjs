@@ -1,10 +1,32 @@
+/**
+ * @fileoverview Next.js configuration for Writenex Editor
+ *
+ * This configuration sets up the PWA (Progressive Web App) functionality
+ * with service worker caching strategies for offline support. The editor
+ * works fully offline after initial load.
+ *
+ * ## PWA Features:
+ * - Service worker for offline caching
+ * - Network-first strategy for editor HTML
+ * - Cache-first strategy for static assets and fonts
+ * - Automatic version-based cache invalidation
+ *
+ * @module apps/writenex/next.config
+ */
+
 import withPWAInit from "@ducanh2912/next-pwa";
 import { readFileSync } from "fs";
 
-// Read version from package.json
+/**
+ * Read version from package.json for cache revision
+ */
 const packageJson = JSON.parse(readFileSync("./package.json", "utf-8"));
 const appVersion = process.env.NEXT_PUBLIC_APP_VERSION || packageJson.version;
 
+/**
+ * PWA configuration with Workbox service worker
+ * @see https://github.com/AugusDogus/next-pwa
+ */
 const withPWA = withPWAInit({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
@@ -84,9 +106,11 @@ const withPWA = withPWAInit({
   },
 });
 
-/** @type {import('next').NextConfig} */
+/**
+ * Next.js configuration options
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
-  /* config options here */
   devIndicators: false,
   // Silence Next.js 16 warning about webpack config without turbopack config.
   // PWA plugin adds webpack config, but we use Turbopack for dev (faster).

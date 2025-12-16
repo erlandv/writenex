@@ -15,7 +15,7 @@
 import { existsSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { join, resolve } from "node:path";
-import type { WritenexConfig } from "../types";
+import type { WritenexConfig } from "@/types";
 import { validateConfig } from "./schema";
 import { applyConfigDefaults } from "./defaults";
 

@@ -20,7 +20,8 @@ import type {
   DiscoveredImage,
   ImageDiscoveryOptions,
   ImageDiscoveryResult,
-} from "../types";
+} from "@/types";
+import { getContentFilePath } from "./reader";
 
 /**
  * Default image configuration
@@ -502,44 +503,7 @@ export function detectContentStructure(
   return "flat";
 }
 
-/**
- * Get the content file path for a content item
- *
- * Searches for the content file in the collection directory,
- * handling different content structures.
- *
- * @param collectionPath - Absolute path to the collection directory
- * @param contentId - Content ID (slug)
- * @returns Absolute path to the content file, or null if not found
- */
-export function getContentFilePath(
-  collectionPath: string,
-  contentId: string
-): string | null {
-  // Try folder-based structure first (slug/index.md or slug/index.mdx)
-  const indexMdPath = join(collectionPath, contentId, "index.md");
-  if (existsSync(indexMdPath)) {
-    return indexMdPath;
-  }
-
-  const indexMdxPath = join(collectionPath, contentId, "index.mdx");
-  if (existsSync(indexMdxPath)) {
-    return indexMdxPath;
-  }
-
-  // Try flat file structure (slug.md or slug.mdx)
-  const flatMdPath = join(collectionPath, `${contentId}.md`);
-  if (existsSync(flatMdPath)) {
-    return flatMdPath;
-  }
-
-  const flatMdxPath = join(collectionPath, `${contentId}.mdx`);
-  if (existsSync(flatMdxPath)) {
-    return flatMdxPath;
-  }
-
-  return null;
-}
+// getContentFilePath is imported from ./reader
 
 // =============================================================================
 // Recursive Image Scanner

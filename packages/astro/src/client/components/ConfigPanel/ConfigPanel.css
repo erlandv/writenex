@@ -398,3 +398,156 @@
 .wn-light .wn-config-empty {
   color: var(--wn-zinc-500);
 }
+
+/* ============================================================================
+   CONFIG ACTIONS (Open in Editor buttons)
+   ============================================================================ */
+
+.wn-config-actions {
+  display: flex;
+  gap: var(--wn-space-3);
+  margin-top: var(--wn-space-4);
+}
+
+.wn-config-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--wn-space-2);
+  padding: var(--wn-space-2) var(--wn-space-4);
+  border: none;
+  border-radius: var(--wn-radius-md);
+  font-size: var(--wn-font-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.wn-config-btn--primary {
+  background-color: var(--wn-brand-500);
+  color: #fff;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.wn-config-btn--primary:hover {
+  background-color: var(--wn-brand-600);
+}
+
+.wn-config-btn--secondary {
+  background-color: transparent;
+  border: 1px solid var(--wn-zinc-700);
+  color: var(--wn-zinc-300);
+}
+
+.wn-config-btn--secondary:hover {
+  background-color: var(--wn-zinc-800);
+  color: var(--wn-zinc-100);
+}
+
+.wn-config-btn--dropdown {
+  padding: var(--wn-space-2) var(--wn-space-2);
+  background-color: var(--wn-brand-500);
+  color: #fff;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 1px solid var(--wn-brand-400);
+}
+
+.wn-config-btn--dropdown:hover {
+  background-color: var(--wn-brand-600);
+}
+
+/* Editor select container */
+.wn-config-editor-select {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Dropdown menu */
+.wn-config-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: var(--wn-space-1);
+  padding: var(--wn-space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--wn-space-1);
+  border-radius: var(--wn-radius-md);
+  border: 1px solid var(--wn-zinc-700);
+  background-color: var(--wn-zinc-800);
+  box-shadow: var(--wn-shadow-lg);
+  z-index: 10;
+}
+
+.wn-config-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: var(--wn-space-2) var(--wn-space-3);
+  border: none;
+  border-radius: var(--wn-radius-sm);
+  background-color: transparent;
+  color: var(--wn-zinc-300);
+  font-size: var(--wn-font-sm);
+  text-align: left;
+  cursor: pointer;
+  transition: background-color var(--wn-transition-fast);
+}
+
+.wn-config-dropdown-item:hover {
+  background-color: var(--wn-zinc-700);
+}
+
+.wn-config-dropdown-item--active {
+  background-color: var(--wn-brand-500);
+  color: #fff;
+}
+
+.wn-config-dropdown-item--active:hover {
+  background-color: var(--wn-brand-600);
+}
+
+/* ============================================================================
+   LIGHT MODE - CONFIG ACTIONS
+   ============================================================================ */
+
+.wn-light .wn-config-btn--secondary {
+  border-color: var(--wn-zinc-300);
+  color: var(--wn-zinc-700);
+}
+
+.wn-light .wn-config-btn--secondary:hover {
+  background-color: var(--wn-zinc-100);
+  color: var(--wn-zinc-900);
+}
+
+.wn-light .wn-config-dropdown {
+  border-color: var(--wn-zinc-200);
+  background-color: #fff;
+}
+
+.wn-light .wn-config-dropdown-item {
+  color: var(--wn-zinc-700);
+}
+
+.wn-light .wn-config-dropdown-item:hover {
+  background-color: var(--wn-zinc-100);
+  color: var(--wn-zinc-900);
+}
+
+.wn-light .wn-config-dropdown-item--active {
+  background-color: var(--wn-brand-500);
+  color: #fff;
+}
+
+.wn-light .wn-config-dropdown-item--active:hover {
+  background-color: var(--wn-brand-600);
+  color: #fff;
+}
+
+.wn-light .wn-config-dropdown-item:hover {
+  background-color: var(--wn-zinc-100);
+}

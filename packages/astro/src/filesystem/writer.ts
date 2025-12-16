@@ -15,7 +15,7 @@
  * @module @writenex/astro/filesystem/writer
  */
 
-import { writeFile, unlink, mkdir, readFile } from "node:fs/promises";
+import { writeFile, unlink, mkdir, readFile, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, dirname, basename } from "node:path";
 import slugify from "slugify";
@@ -25,8 +25,9 @@ import {
   generatePathFromPattern,
   resolvePatternTokens,
   isValidPattern,
-} from "../discovery/patterns";
-import type { VersionHistoryConfig } from "../types";
+} from "@/discovery/patterns";
+import type { VersionHistoryConfig } from "@/types";
+import { ContentConflictError } from "@/core/errors";
 
 /**
  * Options for creating content
@@ -58,6 +59,11 @@ export interface UpdateContentOptions {
   collection?: string;
   /** Version history configuration */
   versionHistoryConfig?: Required<VersionHistoryConfig>;
+  /**
+   * Expected modification time for conflict detection.
+   * If provided and the file's mtime differs, the update will fail with a conflict error.
+   */
+  expectedMtime?: number;
 }
 
 /**
@@ -72,6 +78,10 @@ export interface WriteResult {
   path?: string;
   /** Error message if failed */
   error?: string;
+  /** New modification time after write (for conflict detection) */
+  mtime?: number;
+  /** Conflict error if update failed due to external modification */
+  conflict?: ContentConflictError;
 }
 
 /**
@@ -328,8 +338,9 @@ export async function createContent(
  * Update an existing content file
  *
  * Creates a version snapshot of the current content before updating
- * when version history is configured. Version creation errors are logged
- * but do not fail the save operation.
+ * when version history is configured. Skips both version creation and
+ * file write if the new content is identical to the current file content.
+ * Version creation errors are logged but do not fail the save operation.
  *
  * @param filePath - Absolute path to the content file
  * @param collectionPath - Path to the collection directory
@@ -356,7 +367,8 @@ export async function updateContent(
   collectionPath: string,
   options: UpdateContentOptions
 ): Promise<WriteResult> {
-  const { projectRoot, collection, versionHistoryConfig } = options;
+  const { projectRoot, collection, versionHistoryConfig, expectedMtime } =
+    options;
 
   try {
     // Read existing content
@@ -369,19 +381,64 @@ export async function updateContent(
       };
     }
 
+    // Conflict detection: check if file was modified externally
+    if (expectedMtime !== undefined && existing.content.mtime !== undefined) {
+      // Allow small tolerance (1ms) for filesystem precision differences
+      const mtimeDiff = Math.abs(existing.content.mtime - expectedMtime);
+      if (mtimeDiff > 1) {
+        // File was modified externally - return conflict error
+        const conflictError = new ContentConflictError(
+          collection ?? "unknown",
+          existing.content.id,
+          existing.content.raw,
+          existing.content.mtime,
+          expectedMtime
+        );
+
+        return {
+          success: false,
+          error: conflictError.message,
+          conflict: conflictError,
+        };
+      }
+    }
+
+    // Merge frontmatter
+    const frontmatter = options.frontmatter
+      ? { ...existing.content.frontmatter, ...options.frontmatter }
+      : existing.content.frontmatter;
+
+    // Use new body or existing
+    const body = options.body ?? existing.content.body;
+
+    // Create updated content
+    const newContent = createFileContent(frontmatter, body);
+
+    // Read current file content for comparison
+    const currentContent = existsSync(filePath)
+      ? await readFile(filePath, "utf-8")
+      : "";
+
+    // Skip if content is identical (no changes to save)
+    if (newContent === currentContent) {
+      return {
+        success: true,
+        id: existing.content.id,
+        path: filePath,
+        mtime: existing.content.mtime,
+      };
+    }
+
     // Create version snapshot before updating (if version history is configured)
-    // Requirements 1.1, 1.5: Create shadow copy before overwriting, skip for new content
+    // Only create version if content actually changed
     if (
       projectRoot &&
       collection &&
       versionHistoryConfig &&
       versionHistoryConfig.enabled &&
-      existsSync(filePath)
+      currentContent
     ) {
       try {
-        // Read current file content for version snapshot
-        const currentContent = await readFile(filePath, "utf-8");
-
         // Extract content ID from file path
         const fileName = basename(filePath);
         const contentId =
@@ -389,7 +446,8 @@ export async function updateContent(
             ? basename(dirname(filePath))
             : fileName.replace(/\.(md|mdx)$/, "");
 
-        // Save version (errors are logged but don't fail the save)
+        // Save version of the current content before overwriting
+        // skipIfIdentical compares with last version in history
         const versionResult = await saveVersion(
           projectRoot,
           collection,
@@ -413,26 +471,28 @@ export async function updateContent(
       }
     }
 
-    // Merge frontmatter
-    const frontmatter = options.frontmatter
-      ? { ...existing.content.frontmatter, ...options.frontmatter }
-      : existing.content.frontmatter;
+    // Write file with new content
+    await writeFile(filePath, newContent, "utf-8");
 
-    // Use new body or existing
-    const body = options.body ?? existing.content.body;
-
-    // Create updated content
-    const content = createFileContent(frontmatter, body);
-
-    // Write file
-    await writeFile(filePath, content, "utf-8");
+    // Get new mtime after write
+    const newStats = await stat(filePath);
 
     return {
       success: true,
       id: existing.content.id,
       path: filePath,
+      mtime: newStats.mtimeMs,
     };
   } catch (error) {
+    // Re-throw ContentConflictError as-is
+    if (error instanceof ContentConflictError) {
+      return {
+        success: false,
+        error: error.message,
+        conflict: error,
+      };
+    }
+
     const message = error instanceof Error ? error.message : String(error);
     return {
       success: false,
@@ -476,37 +536,5 @@ export async function deleteContent(filePath: string): Promise<WriteResult> {
   }
 }
 
-/**
- * Get the file path for a content item by ID
- *
- * @param collectionPath - Path to the collection directory
- * @param contentId - Content ID (slug)
- * @returns File path if found, null otherwise
- */
-export function getContentFilePath(
-  collectionPath: string,
-  contentId: string
-): string | null {
-  // Try common extensions
-  const extensions = [".md", ".mdx"];
-
-  for (const ext of extensions) {
-    const filePath = join(collectionPath, `${contentId}${ext}`);
-    if (existsSync(filePath)) {
-      return filePath;
-    }
-  }
-
-  // Try folder-based content (slug/index.md)
-  const indexPath = join(collectionPath, contentId, "index.md");
-  if (existsSync(indexPath)) {
-    return indexPath;
-  }
-
-  const indexMdxPath = join(collectionPath, contentId, "index.mdx");
-  if (existsSync(indexMdxPath)) {
-    return indexMdxPath;
-  }
-
-  return null;
-}
+// Re-export getContentFilePath from reader for backward compatibility
+export { getContentFilePath } from "./reader";

@@ -47,7 +47,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
     { name: "Privacy Policy", url: "https://writenex.com/privacy" },
   ]);
 
-  const lastUpdated = "December 11, 2025";
+  const lastUpdated = "December 13, 2025";
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-900">
@@ -72,29 +72,38 @@ export default function PrivacyPolicyPage(): React.ReactElement {
 
           <p>
             At Writenex, we believe your content is yours and yours alone. This
-            Privacy Policy explains how we handle your data across all Writenex
-            products - which is simple: we do not collect it.
+            Privacy Policy explains how data is handled when you use Writenex
+            products. In short, Writenex is designed so your content stays on
+            your device and is not collected or processed by us at the
+            application level.
           </p>
 
           <h2>The Short Version</h2>
 
           <ul>
             <li>
-              <strong>We do not collect your data.</strong> Your content never
-              leaves your device.
+              <strong>We do not collect your data.</strong> Your content does
+              not leave your device.
             </li>
             <li>
-              <strong>We do not use analytics or tracking.</strong> No Google
-              Analytics, no cookies for tracking, no telemetry.
+              <strong>We do not sell or share data.</strong> We have no user
+              data to sell or share.
+            </li>
+            <li>
+              <strong>We do not use analytics or tracking.</strong> No cookies
+              for tracking, no telemetry, no analytics services.
             </li>
             <li>
               <strong>We do not require an account.</strong> No email, no
-              password, no personal information needed.
+              password, no personal information.
             </li>
             <li>
               <strong>Your content stays local.</strong> Writenex Editor stores
-              data in your browser. @writenex/astro stores data in your project
-              files.
+              data in your browser.{" "}
+              <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                @writenex/astro
+              </code>{" "}
+              stores data in your project files.
             </li>
           </ul>
 
@@ -103,8 +112,8 @@ export default function PrivacyPolicyPage(): React.ReactElement {
           <h3>Writenex Editor</h3>
 
           <p>
-            Writenex Editor stores the following data in your browser&apos;s
-            local storage (IndexedDB):
+            Writenex Editor stores the following data locally in your browser
+            using local storage (IndexedDB):
           </p>
 
           <ul>
@@ -113,22 +122,25 @@ export default function PrivacyPolicyPage(): React.ReactElement {
               content
             </li>
             <li>
-              <strong>Version History:</strong> Previous versions of your
-              documents for recovery
+              <strong>Version History:</strong> Previous document versions for
+              recovery
             </li>
             <li>
-              <strong>Images:</strong> Any images you insert into your documents
-              (stored as base64)
+              <strong>Images:</strong> Images inserted into documents, stored as{" "}
+              <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                base64
+              </code>{" "}
+              for local portability
             </li>
             <li>
-              <strong>Preferences:</strong> Theme setting (light/dark/system),
-              view mode, and other UI preferences
+              <strong>Preferences:</strong> Theme selection, view mode, and
+              other interface preferences
             </li>
           </ul>
 
           <p>
-            This data is stored entirely on your device. We have no access to
-            it, and it is never transmitted to any server.
+            All of this data is stored entirely on your device. We do not have
+            access to it, and it is never transmitted to any Writenex server.
           </p>
 
           <h3>@writenex/astro</h3>
@@ -140,185 +152,228 @@ export default function PrivacyPolicyPage(): React.ReactElement {
 
           <ul>
             <li>
-              <strong>Content files:</strong> Your Markdown content in your
-              project&apos;s src/content directory
+              <strong>Content files:</strong> Markdown files inside your
+              project&apos;s{" "}
+              <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                src/content
+              </code>{" "}
+              directory
             </li>
             <li>
               <strong>Version history:</strong> Shadow copies in your
-              project&apos;s .writenex/versions directory
+              project&apos;s{" "}
+              <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                .writenex/versions
+              </code>{" "}
+              directory
             </li>
             <li>
-              <strong>Images:</strong> Uploaded images in your project
-              (colocated with content or in public folder)
+              <strong>Images:</strong> Uploaded images stored within your
+              project, either alongside content or in the public folder
             </li>
           </ul>
 
           <p>
-            All data remains in your local project directory. The package does
-            not send any data to external servers, does not include telemetry,
-            and does not phone home.
+            All data remains inside your local project directory. The package
+            does not include telemetry, does not send data to external servers,
+            and does not communicate with Writenex services.
           </p>
 
           <h3>How to Delete Your Data</h3>
 
-          <p>Since all data is stored locally, you have full control:</p>
+          <p>
+            Because all data is stored locally, you have full control over
+            deletion:
+          </p>
 
           <ul>
             <li>
-              <strong>Writenex Editor:</strong> Use the delete option in the
-              document tabs menu, or clear your browser&apos;s site data for
-              writenex.com
+              <strong>Writenex Editor:</strong> Delete documents using the
+              editor interface or clear site data for writenex.com in your
+              browser settings
             </li>
             <li>
               <strong>@writenex/astro:</strong> Delete files from your project
-              directory, or remove the .writenex folder to clear version history
+              directory or remove the{" "}
+              <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                .writenex
+              </code>{" "}
+              folder to clear version history
             </li>
           </ul>
 
+          <p>Deletion is permanent and cannot be undone.</p>
+
           <h2>No Tracking or Analytics</h2>
 
-          <p>We do not use:</p>
+          <p>Writenex does not use:</p>
 
           <ul>
-            <li>Google Analytics or any analytics service</li>
+            <li>Analytics services of any kind</li>
             <li>Tracking pixels or beacons</li>
             <li>Third-party cookies</li>
-            <li>Fingerprinting or any identification technology</li>
-            <li>Telemetry in our npm packages</li>
+            <li>Fingerprinting or identification technologies</li>
+            <li>Telemetry or usage reporting in npm packages</li>
             <li>Usage data collection of any kind</li>
+            <li>Error tracking or crash reporting services</li>
           </ul>
 
           <h2>Service Worker and Offline Usage</h2>
 
           <p>
-            Writenex Editor uses a Service Worker to enable offline
+            Writenex Editor uses a Service Worker to support offline
             functionality. The Service Worker:
           </p>
 
           <ul>
-            <li>Caches application assets (HTML, CSS, JavaScript, fonts)</li>
-            <li>Enables the app to work without an internet connection</li>
             <li>
-              Does <strong>not</strong> collect or transmit any user data
+              Caches application assets such as HTML, CSS, JavaScript, and fonts
             </li>
+            <li>
+              Allows the editor to function without an internet connection
+            </li>
+            <li>Operates only within the writenex.com origin</li>
+            <li>Does not collect, process, or transmit user data</li>
           </ul>
 
           <h2>npm Package Privacy</h2>
 
-          <p>@writenex/astro is distributed via npm. When you install it:</p>
+          <p>
+            <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              @writenex/astro
+            </code>{" "}
+            is distributed via npm. When installing or using the package:
+          </p>
 
           <ul>
             <li>
-              npm may collect installation statistics (this is npm&apos;s
-              policy, not ours)
+              npm itself may collect installation statistics according to npm's
+              own policies
             </li>
             <li>
-              The package itself does not send any data to Writenex or any third
-              party
+              The package does not send any data to Writenex or third parties
             </li>
+            <li>All execution happens locally on your machine</li>
             <li>
-              The package runs entirely locally and only accesses your local
-              filesystem
-            </li>
-            <li>
-              No network requests are made by the package except to serve the
-              local editor UI
+              Network access is limited to localhost usage required to serve the
+              local editor interface
             </li>
           </ul>
 
           <h2>Third-Party Services</h2>
 
           <p>
-            Writenex is hosted on a server that may log standard web server
-            access logs (IP addresses, timestamps, pages visited). These logs
-            are used solely for server maintenance and security purposes and are
-            not used for tracking individual users.
+            Writenex does not integrate with third party services that collect
+            user data.
           </p>
 
           <p>
-            We do not integrate with any third-party services that collect user
-            data.
+            Our website is hosted on infrastructure that may generate standard
+            web server access logs, such as IP addresses, timestamps, and
+            requested pages. These logs:
           </p>
+
+          <ul>
+            <li>Are used only for basic maintenance and security</li>
+            <li>Do not include document content or editor activity</li>
+            <li>Are not used for analytics or user profiling</li>
+          </ul>
 
           <h2>Data Security</h2>
 
           <h3>Writenex Editor</h3>
 
-          <p>
-            Your data security is ensured by the browser&apos;s built-in
-            security mechanisms:
-          </p>
+          <p>Data security relies on browser built in protections:</p>
 
           <ul>
             <li>
-              IndexedDB data is sandboxed and only accessible by writenex.com
+              IndexedDB data is sandboxed and accessible only to the
+              writenex.com origin
             </li>
+            <li>HTTPS encryption protects application assets during loading</li>
             <li>
-              HTTPS encryption protects data in transit when loading the
-              application
+              No server side database means there is no server side content
+              storage
             </li>
-            <li>No server-side database means no server-side breach risk</li>
           </ul>
 
           <p>
-            <strong>Important:</strong> Since data is stored locally, you are
-            responsible for backing up important documents by exporting them.
-            Clearing browser data or reinstalling will delete your local data.
+            Because data is stored locally, you are responsible for backing up
+            important documents. Clearing browser data, uninstalling the
+            browser, or using a different device will remove access to stored
+            content.
+          </p>
+
+          <p>
+            Browser extensions may have access to local data depending on
+            permissions you grant to them.
           </p>
 
           <h3>@writenex/astro</h3>
 
-          <p>Security considerations for the npm package:</p>
+          <p>Security considerations for the npm package include:</p>
 
           <ul>
             <li>
-              The package only runs during development (disabled in production
-              by default)
+              The package is intended for development use and is disabled in
+              production by default
             </li>
             <li>Filesystem access is limited to your project directory</li>
             <li>
-              The editor UI is served locally and not exposed to the internet
+              The editor interface is served locally and not exposed to the
+              public internet
             </li>
             <li>
-              You should use version control (Git) to track and recover content
-              changes
+              Version control systems such as Git are recommended for backup and
+              recovery
             </li>
           </ul>
 
           <p>
-            <strong>Important:</strong> Do not enable @writenex/astro in
-            production without proper authentication, as it provides filesystem
-            write access.
+            <strong>Important:</strong> Do not enable{" "}
+            <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              @writenex/astro
+            </code>{" "}
+            in production environments without proper authentication, as it
+            provides write access to your filesystem.
           </p>
 
-          <h2>Children&apos;s Privacy</h2>
+          <h2>Children's Privacy</h2>
 
           <p>
-            Writenex does not knowingly collect any information from anyone,
-            including children under 13. Since we do not collect personal
-            information, there is no age-related data concern.
+            Writenex does not knowingly collect information from anyone,
+            including children under the age of 13. Because Writenex does not
+            collect personal data, no age related data is processed.
+          </p>
+
+          <p>
+            If you are a parent or guardian and believe a child has provided
+            personal information through misuse of the service, please contact
+            us.
           </p>
 
           <h2>Changes to This Policy</h2>
 
           <p>
-            We may update this Privacy Policy from time to time. Changes will be
-            posted on this page with an updated &quot;Last updated&quot; date.
-            Since we do not collect email addresses, we cannot notify you
-            directly of changes.
+            We may update this Privacy Policy from time to time. Any changes
+            will be posted on this page with an updated{" "}
+            <strong>"Last updated"</strong> date. Since we do not collect email
+            addresses or user accounts, we cannot provide direct notifications
+            of policy changes.
           </p>
 
           <h2>Contact</h2>
 
           <p>
-            If you have questions about this Privacy Policy, you can reach us
-            through our{" "}
+            If you have questions about this Privacy Policy or Writenex's
+            privacy practices, you can contact us through the Writenex GitHub
+            repository at{" "}
             <a
               href="https://github.com/erlandv/writenex"
               target="_blank"
               rel="nofollow noopener noreferrer"
             >
-              GitHub repository
+              https://github.com/erlandv/writenex
             </a>
             .
           </p>

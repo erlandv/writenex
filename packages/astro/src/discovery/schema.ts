@@ -22,8 +22,8 @@
  * @module @writenex/astro/discovery/schema
  */
 
-import type { CollectionSchema, FieldType, SchemaField } from "../types";
-import { readCollection } from "../filesystem/reader";
+import type { CollectionSchema, FieldType, SchemaField } from "@/types";
+import { readCollection } from "@/filesystem/reader";
 
 /**
  * Maximum number of files to sample for schema detection

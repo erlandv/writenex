@@ -17,6 +17,9 @@ interface VersionApiConfig {
   apiBase: string;
 }
 
+/** Version API client type */
+export type VersionApiClient = ReturnType<typeof createVersionApiClient>;
+
 /**
  * Diff data returned from API
  */
@@ -208,7 +211,7 @@ export interface UseVersionHistoryActions {
  *
  * Provides state and actions for version history operations.
  *
- * @param apiBase - Base URL for API calls
+ * @param apiBaseOrClient - Base URL for API calls or a pre-created version API client
  * @param collection - Collection name
  * @param contentId - Content ID (slug)
  * @returns State and actions for version history
@@ -223,11 +226,16 @@ export interface UseVersionHistoryActions {
  * ```
  */
 export function useVersionHistory(
-  apiBase: string,
+  apiBaseOrClient: string | VersionApiClient,
   collection: string | null,
   contentId: string | null
 ): UseVersionHistoryState & UseVersionHistoryActions {
-  const client = useMemo(() => createVersionApiClient({ apiBase }), [apiBase]);
+  const client = useMemo(() => {
+    if (typeof apiBaseOrClient === "string") {
+      return createVersionApiClient({ apiBase: apiBaseOrClient });
+    }
+    return apiBaseOrClient;
+  }, [apiBaseOrClient]);
 
   const [versions, setVersions] = useState<VersionEntry[]>([]);
   const [loading, setLoading] = useState(false);

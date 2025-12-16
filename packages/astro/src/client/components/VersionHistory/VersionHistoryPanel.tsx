@@ -7,13 +7,24 @@
  * @module @writenex/astro/client/components/VersionHistory/VersionHistoryPanel
  */
 
-import { useEffect, useState } from "react";
-import { X, History, Clock, Tag, RefreshCw, Loader2 } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import {
+  X,
+  History,
+  Clock,
+  Tag,
+  RefreshCw,
+  Loader2,
+  Trash2,
+  AlertTriangle,
+} from "lucide-react";
 import type { VersionEntry } from "../../../types";
 import {
   useVersionHistory,
   type DiffData,
 } from "../../hooks/useVersionHistory";
+import { useSharedVersionApi } from "../../context/ApiContext";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { VersionActions } from "./VersionActions";
 import { DiffViewer } from "./DiffViewer";
 import "./VersionHistoryPanel.css";
@@ -26,8 +37,6 @@ interface VersionHistoryPanelProps {
   isOpen: boolean;
   /** Callback to close the panel */
   onClose: () => void;
-  /** API base URL */
-  apiBase: string;
   /** Collection name */
   collection: string | null;
   /** Content ID (slug) */
@@ -91,12 +100,12 @@ function formatSize(bytes: number): string {
 export function VersionHistoryPanel({
   isOpen,
   onClose,
-  apiBase,
   collection,
   contentId,
   currentContent: _currentContent,
   onRestore,
 }: VersionHistoryPanelProps): React.ReactElement | null {
+  const versionApi = useSharedVersionApi();
   const {
     versions,
     loading,
@@ -104,8 +113,9 @@ export function VersionHistoryPanel({
     refresh,
     restoreVersion,
     deleteVersion,
+    clearVersions,
     getDiff,
-  } = useVersionHistory(apiBase, collection, contentId);
+  } = useVersionHistory(versionApi, collection, contentId);
 
   const [selectedVersionId, setSelectedVersionId] = useState<string | null>(
     null
@@ -113,6 +123,7 @@ export function VersionHistoryPanel({
   const [diffData, setDiffData] = useState<DiffData | null>(null);
   const [showDiff, setShowDiff] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
 
   // Fetch versions when panel opens
   useEffect(() => {
@@ -127,6 +138,7 @@ export function VersionHistoryPanel({
       setSelectedVersionId(null);
       setDiffData(null);
       setShowDiff(false);
+      setShowClearAllConfirm(false);
     }
   }, [isOpen]);
 
@@ -172,6 +184,17 @@ export function VersionHistoryPanel({
     }
   };
 
+  const handleClearAll = async () => {
+    setActionLoading("clearAll");
+    try {
+      await clearVersions();
+      setSelectedVersionId(null);
+      setShowClearAllConfirm(false);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const handleDownload = (version: VersionEntry) => {
     // Create a blob with the version content
     // We need to fetch the full version content first
@@ -204,6 +227,15 @@ export function VersionHistoryPanel({
             Version History
           </h2>
           <div className="wn-version-panel-actions">
+            <button
+              className="wn-version-panel-btn wn-version-panel-btn--danger"
+              onClick={() => setShowClearAllConfirm(true)}
+              disabled={loading || versions.length === 0}
+              title="Clear all history"
+              aria-label="Clear all version history"
+            >
+              <Trash2 size={14} />
+            </button>
             <button
               className="wn-version-panel-btn"
               onClick={() => refresh()}
@@ -279,6 +311,16 @@ export function VersionHistoryPanel({
           onClose={() => setShowDiff(false)}
         />
       )}
+
+      {/* Clear All Confirmation Modal */}
+      {showClearAllConfirm && (
+        <ClearAllConfirmModal
+          versionCount={versions.length}
+          onConfirm={handleClearAll}
+          onCancel={() => setShowClearAllConfirm(false)}
+          loading={actionLoading === "clearAll"}
+        />
+      )}
     </>
   );
 }
@@ -316,5 +358,112 @@ function VersionItem({
       )}
       <p className="wn-version-item-preview">{version.preview}</p>
     </button>
+  );
+}
+
+/**
+ * Props for ClearAllConfirmModal component
+ */
+interface ClearAllConfirmModalProps {
+  /** Number of versions to be deleted */
+  versionCount: number;
+  /** Callback when user confirms */
+  onConfirm: () => void;
+  /** Callback when user cancels */
+  onCancel: () => void;
+  /** Loading state */
+  loading?: boolean;
+}
+
+/**
+ * Confirmation modal for clearing all version history
+ */
+function ClearAllConfirmModal({
+  versionCount,
+  onConfirm,
+  onCancel,
+  loading,
+}: ClearAllConfirmModalProps): React.ReactElement {
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Store the trigger element when modal mounts
+  useEffect(() => {
+    triggerRef.current = document.activeElement as HTMLElement;
+  }, []);
+
+  // Focus trap for accessibility
+  const { containerRef } = useFocusTrap({
+    enabled: true,
+    onEscape: loading ? undefined : onCancel,
+    returnFocusTo: triggerRef.current,
+  });
+
+  // Focus cancel button when modal opens
+  useEffect(() => {
+    setTimeout(() => {
+      cancelButtonRef.current?.focus();
+    }, 50);
+  }, []);
+
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget && !loading) onCancel();
+  };
+
+  return (
+    <div className="wn-confirm-overlay" onClick={handleOverlayClick}>
+      <div
+        ref={containerRef}
+        className="wn-confirm-modal"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="clear-all-modal-title"
+        aria-describedby="clear-all-modal-message"
+      >
+        <div className="wn-confirm-header">
+          <AlertTriangle size={20} className="wn-confirm-icon" />
+          <h3 id="clear-all-modal-title" className="wn-confirm-title">
+            Clear All History
+          </h3>
+          <button
+            className="wn-confirm-close"
+            onClick={onCancel}
+            disabled={loading}
+            aria-label="Close"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <p id="clear-all-modal-message" className="wn-confirm-message">
+          Are you sure you want to delete all {versionCount} version
+          {versionCount !== 1 ? "s" : ""} for this content? This action cannot
+          be undone.
+        </p>
+        <div className="wn-confirm-actions">
+          <button
+            ref={cancelButtonRef}
+            className="wn-confirm-btn wn-confirm-btn--cancel"
+            onClick={onCancel}
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button
+            className="wn-confirm-btn wn-confirm-btn--danger"
+            onClick={onConfirm}
+            disabled={loading}
+          >
+            {loading ? (
+              <>
+                <Loader2 size={14} className="wn-spin" />
+                Clearing...
+              </>
+            ) : (
+              "Clear All"
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

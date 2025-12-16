@@ -114,7 +114,7 @@ const features = [
     icon: Keyboard,
     title: "Keyboard Shortcuts",
     description:
-      "Use familiar shortcuts for common actions. Press Ctrl+S to save, Ctrl+N to create new content, and more.",
+      "Speed up your workflow with keyboard shortcuts. Press Ctrl+S to save, Alt+N to create new content, and more.",
   },
 ];
 
@@ -134,8 +134,8 @@ const schemaTypes = [
  * Keyboard shortcuts for the shortcuts section.
  */
 const shortcuts = [
+  { keys: "Alt + N", action: "New content" },
   { keys: "Ctrl/Cmd + S", action: "Save" },
-  { keys: "Ctrl/Cmd + N", action: "New content" },
   { keys: "Ctrl/Cmd + P", action: "Open preview" },
   { keys: "Ctrl/Cmd + /", action: "Show shortcuts help" },
   { keys: "Ctrl/Cmd + Shift + R", action: "Refresh content" },

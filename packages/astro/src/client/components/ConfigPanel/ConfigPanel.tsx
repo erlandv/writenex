@@ -8,10 +8,28 @@
  * @module @writenex/astro/client/components/ConfigPanel
  */
 
-import { useEffect, useRef } from "react";
-import { X, Settings, Folder, Image, Info } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  X,
+  Settings,
+  Folder,
+  Image,
+  Info,
+  ExternalLink,
+  Copy,
+  Check,
+  ChevronDown,
+} from "lucide-react";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import type { Collection, WritenexClientConfig } from "../../hooks/useApi";
+import { useSharedApi } from "../../context/ApiContext";
+import {
+  openInEditor,
+  getAvailableEditors,
+  getPreferredEditor,
+  setPreferredEditor,
+  type EditorType,
+} from "../../utils/openInEditor";
 import "./ConfigPanel.css";
 
 /**
@@ -48,7 +66,30 @@ export function ConfigPanel({
   isOpen,
   onClose,
 }: ConfigPanelProps): React.ReactElement | null {
+  const api = useSharedApi();
   const triggerRef = useRef<HTMLElement | null>(null);
+  const [configPath, setConfigPath] = useState<string | null>(null);
+  const [hasConfigFile, setHasConfigFile] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [selectedEditor, setSelectedEditor] =
+    useState<EditorType>(getPreferredEditor());
+  const [showEditorDropdown, setShowEditorDropdown] = useState(false);
+
+  // Fetch config path when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      api
+        .getConfigPath()
+        .then((data) => {
+          setConfigPath(data.configPath);
+          setHasConfigFile(data.hasConfigFile);
+        })
+        .catch(() => {
+          setConfigPath(null);
+          setHasConfigFile(false);
+        });
+    }
+  }, [isOpen, api]);
 
   // Store the trigger element when modal opens
   useEffect(() => {
@@ -63,6 +104,28 @@ export function ConfigPanel({
     onEscape: onClose,
     returnFocusTo: triggerRef.current,
   });
+
+  const handleOpenInEditor = useCallback(() => {
+    if (configPath) {
+      openInEditor(configPath, selectedEditor);
+      setPreferredEditor(selectedEditor);
+    }
+  }, [configPath, selectedEditor]);
+
+  const handleCopyPath = useCallback(() => {
+    if (configPath) {
+      navigator.clipboard.writeText(configPath).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    }
+  }, [configPath]);
+
+  const handleEditorSelect = useCallback((editor: EditorType) => {
+    setSelectedEditor(editor);
+    setPreferredEditor(editor);
+    setShowEditorDropdown(false);
+  }, []);
 
   if (!isOpen) return null;
 
@@ -97,6 +160,72 @@ export function ConfigPanel({
 
         {/* Content */}
         <div className="wn-config-content">
+          {/* Configuration File - Primary action at top */}
+          <section className="wn-config-section">
+            <div className="wn-config-help">
+              <h3 className="wn-config-help-title">Configuration File</h3>
+              {hasConfigFile && configPath ? (
+                <>
+                  <p className="wn-config-help-text">
+                    Configuration loaded from{" "}
+                    <code className="wn-config-help-code">
+                      {configPath.split("/").pop()}
+                    </code>
+                  </p>
+                  <div className="wn-config-actions">
+                    <div className="wn-config-editor-select">
+                      <button
+                        className="wn-config-btn wn-config-btn--primary"
+                        onClick={handleOpenInEditor}
+                        title={`Open in ${getAvailableEditors().find((e) => e.name === selectedEditor)?.displayName}`}
+                      >
+                        <ExternalLink size={14} />
+                        Open in Editor
+                      </button>
+                      <button
+                        className="wn-config-btn wn-config-btn--dropdown"
+                        onClick={() =>
+                          setShowEditorDropdown(!showEditorDropdown)
+                        }
+                        aria-label="Select editor"
+                        aria-expanded={showEditorDropdown}
+                      >
+                        <ChevronDown size={14} />
+                      </button>
+                      {showEditorDropdown && (
+                        <div className="wn-config-dropdown">
+                          {getAvailableEditors().map((editor) => (
+                            <button
+                              key={editor.name}
+                              className={`wn-config-dropdown-item ${selectedEditor === editor.name ? "wn-config-dropdown-item--active" : ""}`}
+                              onClick={() =>
+                                handleEditorSelect(editor.name as EditorType)
+                              }
+                            >
+                              {editor.displayName}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <button
+                      className="wn-config-btn wn-config-btn--secondary"
+                      onClick={handleCopyPath}
+                      title="Copy file path"
+                    >
+                      {copied ? <Check size={14} /> : <Copy size={14} />}
+                      {copied ? "Copied" : "Copy Path"}
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <p className="wn-config-help-text">
+                  No configuration file found. Using default settings.
+                </p>
+              )}
+            </div>
+          </section>
+
           {/* Image Settings */}
           <section className="wn-config-section">
             <h3 className="wn-config-section-title">
@@ -165,30 +294,6 @@ export function ConfigPanel({
                 ))}
               </div>
             )}
-          </section>
-
-          {/* Help */}
-          <section className="wn-config-section">
-            <div className="wn-config-help">
-              <h3 className="wn-config-help-title">Configuration File</h3>
-              <p className="wn-config-help-text">
-                Create{" "}
-                <code className="wn-config-help-code">writenex.config.ts</code>{" "}
-                in your project root to customize settings.
-              </p>
-              <pre className="wn-config-help-pre">{`import { defineConfig } from '@writenex/astro';
-
-export default defineConfig({
-  collections: [{
-    name: 'blog',
-    path: 'src/content/blog',
-    previewUrl: '/blog/{slug}',
-  }],
-  images: {
-    strategy: 'colocated',
-  },
-});`}</pre>
-            </div>
           </section>
         </div>
       </div>

@@ -18,7 +18,7 @@ import type {
   DiscoveredCollection,
   ContentSummary,
   DiscoveredImage,
-} from "../types";
+} from "@/types";
 
 /**
  * Cache entry with timestamp and data

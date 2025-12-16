@@ -2,10 +2,21 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "extends": "@writenex/tsconfig/react-library.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "baseUrl": ".",
+    "baseUrl": "./src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./*"],
+      "@/types": ["./types/index.ts"],
+      "@/types/*": ["./types/*"],
+      "@/core": ["./core/index.ts"],
+      "@/core/*": ["./core/*"],
+      "@/config": ["./config/index.ts"],
+      "@/config/*": ["./config/*"],
+      "@/discovery": ["./discovery/index.ts"],
+      "@/discovery/*": ["./discovery/*"],
+      "@/filesystem": ["./filesystem/index.ts"],
+      "@/filesystem/*": ["./filesystem/*"],
+      "@/server": ["./server/index.ts"],
+      "@/server/*": ["./server/*"]
     }
   },
   "include": ["src/**/*"],

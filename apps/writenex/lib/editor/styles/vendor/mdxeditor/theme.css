@@ -89,10 +89,23 @@
 .mdxeditor {
   /* Light mode text - darker than default for better readability */
   --baseTextContrast: #18181b; /* zinc-900 */
+
+  /* Selection - light mode default */
+  --selectionBg: rgba(
+    99,
+    102,
+    241,
+    0.2
+  ); /* indigo selection - lighter for light mode */
 }
 
 .mdxeditor [data-lexical-editor] {
   color: #27272a; /* zinc-800 */
+}
+
+/* Global selection styling for CodeMirror (applies to both light and dark modes) */
+.mdxeditor .cm-selectionBackground {
+  background-color: var(--selectionBg) !important;
 }
 
 /* ============================================================================

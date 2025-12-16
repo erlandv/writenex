@@ -68,13 +68,12 @@ pnpm clean
 ### Working with Specific Packages
 
 ```bash
-# Run command in specific package
-pnpm --filter @writenex/astro build
-pnpm --filter writenex build
-pnpm --filter writenex dev
+# Writenex Editor
+pnpm dev:writenex
+pnpm build:writenex
 
-# Type check specific package
-pnpm --filter @writenex/astro type-check
+# @writenex/astro
+pnpm build:astro
 ```
 
 ## Tech Stack

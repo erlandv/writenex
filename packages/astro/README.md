@@ -408,8 +408,8 @@ When creating content with frontmatter `{ project: "my-app", title: "Getting Sta
 
 | Shortcut               | Action              |
 | ---------------------- | ------------------- |
+| `Alt + N`              | New Content         |
 | `Ctrl/Cmd + S`         | Save                |
-| `Ctrl/Cmd + N`         | New content         |
 | `Ctrl/Cmd + P`         | Open preview        |
 | `Ctrl/Cmd + /`         | Show shortcuts help |
 | `Ctrl/Cmd + Shift + R` | Refresh content     |

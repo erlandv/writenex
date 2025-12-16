@@ -19,8 +19,8 @@ import type {
   SaveVersionOptions,
   RestoreVersionOptions,
   RestoreResult,
-} from "../types";
-import { DEFAULT_VERSION_HISTORY_CONFIG } from "../config/defaults";
+} from "@/types";
+import { DEFAULT_VERSION_HISTORY_CONFIG } from "@/config/defaults";
 import {
   saveVersion as coreSaveVersion,
   getVersions as coreGetVersions,

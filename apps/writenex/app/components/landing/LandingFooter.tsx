@@ -44,16 +44,16 @@ export function LandingFooter(): React.ReactElement {
         </p>
         <div className="flex items-center gap-6">
           <Link
-            href="/terms"
-            className="text-sm text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
-          >
-            Terms
-          </Link>
-          <Link
             href="/privacy"
             className="text-sm text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
           >
             Privacy
+          </Link>
+          <Link
+            href="/terms"
+            className="text-sm text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+          >
+            Terms
           </Link>
           <a
             href="https://github.com/erlandv/writenex"

@@ -11,6 +11,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { ThemeProvider } from "./context/ThemeContext";
+import { ApiProvider } from "./context/ApiContext";
 
 /**
  * Configuration injected by the server
@@ -53,7 +54,9 @@ function mount() {
   root.render(
     <StrictMode>
       <ThemeProvider>
-        <App basePath={config.basePath} apiBase={config.apiBase} />
+        <ApiProvider apiBase={config.apiBase}>
+          <App />
+        </ApiProvider>
       </ThemeProvider>
     </StrictMode>
   );

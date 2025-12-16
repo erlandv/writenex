@@ -17,7 +17,7 @@ import { readFile, readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, basename, extname, relative } from "node:path";
 import matter from "gray-matter";
-import type { ContentItem, ContentSummary } from "../types";
+import type { ContentItem, ContentSummary } from "@/types";
 
 /**
  * Supported content file extensions
@@ -176,8 +176,11 @@ export async function readContentFile(
       };
     }
 
-    // Read file content
-    const raw = await readFile(filePath, "utf-8");
+    // Read file content and stats in parallel
+    const [raw, stats] = await Promise.all([
+      readFile(filePath, "utf-8"),
+      stat(filePath),
+    ]);
 
     // Parse frontmatter
     const { data: frontmatter, content: body } = matter(raw);
@@ -193,6 +196,7 @@ export async function readContentFile(
         frontmatter,
         body: body.trim(),
         raw,
+        mtime: stats.mtimeMs,
       },
     };
   } catch (error) {
@@ -397,4 +401,52 @@ export async function getFileStats(filePath: string): Promise<{
   } catch {
     return null;
   }
+}
+
+/**
+ * Get the file path for a content item by ID
+ *
+ * Searches for the content file in the collection directory,
+ * handling different content structures:
+ * - Folder-based: `slug/index.md` or `slug/index.mdx`
+ * - Flat file: `slug.md` or `slug.mdx`
+ *
+ * @param collectionPath - Path to the collection directory
+ * @param contentId - Content ID (slug)
+ * @returns File path if found, null otherwise
+ *
+ * @example
+ * ```typescript
+ * const filePath = getContentFilePath('/project/src/content/blog', 'my-post');
+ * // Returns: '/project/src/content/blog/my-post.md' or
+ * //          '/project/src/content/blog/my-post/index.md'
+ * ```
+ */
+export function getContentFilePath(
+  collectionPath: string,
+  contentId: string
+): string | null {
+  // Try folder-based structure first (slug/index.md or slug/index.mdx)
+  const indexMdPath = join(collectionPath, contentId, "index.md");
+  if (existsSync(indexMdPath)) {
+    return indexMdPath;
+  }
+
+  const indexMdxPath = join(collectionPath, contentId, "index.mdx");
+  if (existsSync(indexMdxPath)) {
+    return indexMdxPath;
+  }
+
+  // Try flat file structure (slug.md or slug.mdx)
+  const flatMdPath = join(collectionPath, `${contentId}.md`);
+  if (existsSync(flatMdPath)) {
+    return flatMdPath;
+  }
+
+  const flatMdxPath = join(collectionPath, `${contentId}.mdx`);
+  if (existsSync(flatMdxPath)) {
+    return flatMdxPath;
+  }
+
+  return null;
 }

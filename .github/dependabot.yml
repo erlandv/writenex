@@ -19,7 +19,7 @@ updates:
           - "prettier"
           - "prettier-plugin-*"
 
-  # Main app dependencies
+  # Writenex Editor app
   - package-ecosystem: "npm"
     directory: "/apps/writenex"
     schedule:
@@ -48,6 +48,19 @@ updates:
         patterns:
           - "tailwindcss"
           - "@tailwindcss/*"
+      # Group MDXEditor updates
+      mdxeditor:
+        patterns:
+          - "@mdxeditor/*"
+      # Group Lexical editor updates
+      lexical:
+        patterns:
+          - "lexical"
+          - "@lexical/*"
+      # Group Radix UI updates
+      radix-ui:
+        patterns:
+          - "@radix-ui/*"
       # Group development tools
       dev-tools:
         patterns:
@@ -64,9 +77,9 @@ updates:
       - dependency-name: "react-dom"
         update-types: ["version-update:semver-major"]
 
-  # @writenex/editor package
+  # @writenex/astro package
   - package-ecosystem: "npm"
-    directory: "/packages/editor"
+    directory: "/packages/astro"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -90,41 +103,10 @@ updates:
         patterns:
           - "unified"
           - "remark-*"
-          - "marked"
-          - "shiki"
-      # Group UI utilities
-      ui-utils:
-        patterns:
-          - "lucide-react"
-          - "react-diff-viewer-continued"
 
-  # @writenex/ui package
+  # @writenex/config packages (tsconfig, eslint)
   - package-ecosystem: "npm"
-    directory: "/packages/ui"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "Asia/Jakarta"
-    open-pull-requests-limit: 5
-    commit-message:
-      prefix: "chore(deps)"
-    groups:
-      # Group Radix UI updates
-      radix-ui:
-        patterns:
-          - "@radix-ui/*"
-      # Group UI utilities
-      ui-utils:
-        patterns:
-          - "class-variance-authority"
-          - "clsx"
-          - "tailwind-merge"
-          - "lucide-react"
-
-  # @writenex/db package
-  - package-ecosystem: "npm"
-    directory: "/packages/db"
+    directory: "/packages/config"
     schedule:
       interval: "weekly"
       day: "monday"
@@ -134,55 +116,13 @@ updates:
     commit-message:
       prefix: "chore(deps)"
     groups:
-      database:
+      eslint:
         patterns:
-          - "dexie"
+          - "eslint"
+          - "@eslint/*"
+          - "typescript-eslint"
 
-  # @writenex/store package
-  - package-ecosystem: "npm"
-    directory: "/packages/store"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "Asia/Jakarta"
-    open-pull-requests-limit: 3
-    commit-message:
-      prefix: "chore(deps)"
-    groups:
-      state:
-        patterns:
-          - "zustand"
-
-  # @writenex/hooks package
-  - package-ecosystem: "npm"
-    directory: "/packages/hooks"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "Asia/Jakarta"
-    open-pull-requests-limit: 3
-    commit-message:
-      prefix: "chore(deps)"
-
-  # @writenex/utils package
-  - package-ecosystem: "npm"
-    directory: "/packages/utils"
-    schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-      timezone: "Asia/Jakarta"
-    open-pull-requests-limit: 3
-    commit-message:
-      prefix: "chore(deps)"
-    groups:
-      utils:
-        patterns:
-          - "clsx"
-          - "tailwind-merge"
-
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
