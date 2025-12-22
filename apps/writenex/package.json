@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
-    "@next/eslint-plugin-next": "^16.0.10",
+    "@next/eslint-plugin-next": "^16.1.0",
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^22.19.1",
