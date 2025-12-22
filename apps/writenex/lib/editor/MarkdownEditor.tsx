@@ -553,9 +553,9 @@ export function MarkdownEditor(): React.ReactElement {
       codeBlockPlugin({ defaultCodeBlockLanguage: "javascript" }),
       codeMirrorPlugin({
         codeBlockLanguages: {
-          js: "JavaScript",
+          js: "JS",
           javascript: "JavaScript",
-          ts: "TypeScript",
+          ts: "TS",
           typescript: "TypeScript",
           jsx: "JSX",
           tsx: "TSX",
@@ -565,12 +565,25 @@ export function MarkdownEditor(): React.ReactElement {
           python: "Python",
           rust: "Rust",
           go: "Go",
+          java: "Java",
+          c: "C",
+          cpp: "C++",
+          csharp: "C#",
+          php: "PHP",
+          ruby: "Ruby",
+          swift: "Swift",
+          kotlin: "Kotlin",
+          r: "R",
+          scala: "Scala",
           bash: "Bash",
           shell: "Shell",
           sql: "SQL",
           yaml: "YAML",
-          markdown: "Markdown",
-          text: "Plain Text",
+          mermaid: "Mermaid",
+          xml: "XML",
+          txt: "Txt",
+          text: "Text",
+          markdown: "MD",
         },
       }),
       markdownShortcutPlugin(),
@@ -657,6 +670,14 @@ export function MarkdownEditor(): React.ReactElement {
         /* Focus Mode: Hide MDXEditor toolbar */
         .focus-mode .mdxeditor [role="toolbar"] {
           display: none !important;
+        }
+
+        /* Fix for long dropdown lists (like code block languages) */
+        [class*="_selectContainer_"],
+        [class*="_toolbarNodeKindSelectContainer_"],
+        [class*="_toolbarButtonDropdownContainer_"] {
+          max-height: 300px !important;
+          overflow-y: auto !important;
         }
       `,
         }}
