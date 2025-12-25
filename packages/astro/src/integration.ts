@@ -49,7 +49,6 @@ const PACKAGE_NAME = "@writenex/astro";
  *
  * @param options - Integration options
  * @param options.allowProduction - Allow running in production (default: false)
- * @param options.basePath - Base path for editor UI (default: '/_writenex')
  * @returns Astro integration object
  *
  * @example
@@ -64,15 +63,16 @@ const PACKAGE_NAME = "@writenex/astro";
  *   integrations: [
  *     writenex({
  *       allowProduction: true,  // Enable in production (use with caution)
- *       basePath: '/_admin',    // Custom base path
  *     }),
  *   ],
  * });
  * ```
  */
 export default function writenex(options?: WritenexOptions): AstroIntegration {
-  const { allowProduction = false, basePath = DEFAULT_BASE_PATH } =
-    options ?? {};
+  const { allowProduction = false } = options ?? {};
+
+  // Use fixed base path for consistency and branding
+  const basePath = DEFAULT_BASE_PATH;
 
   // Track if we should be active
   let isActive = true;

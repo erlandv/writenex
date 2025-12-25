@@ -123,11 +123,6 @@ export interface WritenexOptions {
    * @default false
    */
   allowProduction?: boolean;
-  /**
-   * Base path for the Writenex editor UI
-   * @default '/_writenex'
-   */
-  basePath?: string;
 }
 
 /**

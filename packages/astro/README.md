@@ -128,18 +128,18 @@ export default defineConfig({
 
 ## Integration Options
 
-| Option            | Type      | Default        | Description                                    |
-| ----------------- | --------- | -------------- | ---------------------------------------------- |
-| `allowProduction` | `boolean` | `false`        | Enable in production builds (use with caution) |
-| `basePath`        | `string`  | `'/_writenex'` | Base path for the editor UI                    |
+| Option            | Type      | Default | Description                                    |
+| ----------------- | --------- | ------- | ---------------------------------------------- |
+| `allowProduction` | `boolean` | `false` | Enable in production builds (use with caution) |
 
 ```typescript
 // astro.config.mjs
 writenex({
   allowProduction: false, // Keep false for security
-  basePath: "/_writenex", // Change if needed
 });
 ```
+
+The editor is always available at `/_writenex` during development.
 
 ## Collection Configuration
 

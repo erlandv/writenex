@@ -106,7 +106,6 @@ export const writenexConfigSchema = z.object({
  */
 export const writenexOptionsSchema = z.object({
   allowProduction: z.boolean().optional(),
-  basePath: z.string().optional(),
 });
 
 /**
