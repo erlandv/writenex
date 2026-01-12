@@ -44,7 +44,7 @@
     "@tailwindcss/postcss": "^4.1.18",
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^22.19.1",
-    "@types/react": "^19.1.8",
+    "@types/react": "^19.2.8",
     "@types/react-dom": "^19.1.6",
     "eslint": "^9.39.2",
     "eslint-config-next": "^15.5.7",
