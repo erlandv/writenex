@@ -33,7 +33,7 @@
     "react-dom": "^19.2.3",
     "remark-parse": "^11.0.0",
     "remark-stringify": "^11.0.0",
-    "shiki": "^3.20.0",
+    "shiki": "^3.22.0",
     "tailwind-merge": "^3.4.0",
     "unified": "^11.0.5",
     "zustand": "^5.0.8"
