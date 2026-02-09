@@ -36,7 +36,7 @@
     "shiki": "^3.20.0",
     "tailwind-merge": "^3.4.0",
     "unified": "^11.0.5",
-    "zustand": "^5.0.8"
+    "zustand": "^5.0.11"
   },
   "devDependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",
