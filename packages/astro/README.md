@@ -13,7 +13,6 @@ Visual editor for Astro content collections - WYSIWYG editing for your Astro sit
 - **Smart Schema Detection** - Automatically infers frontmatter schema from existing content
 - **Dynamic Forms** - Auto-generated forms based on detected or configured schema
 - **Image Upload** - Drag-and-drop image upload with colocated or public storage
-- **Version History** - Creates automatic shadow copies on save
 - **Autosave** - Automatic saving with configurable interval
 - **Keyboard Shortcuts** - Familiar shortcuts for common actions
 - **Draft Management** - Toggle draft/published status with visual indicators
