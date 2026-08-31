@@ -13,7 +13,14 @@ export {
   hasClientBundle,
   serveAsset,
   serveEditorHtml,
+  serveLoginHtml,
 } from "./assets";
+// Auth (remote CMS)
+export {
+  createSessionManager,
+  SESSION_COOKIE_NAME,
+  SessionManager,
+} from "./auth";
 // Cache
 export { getCache, resetCache, ServerCache } from "./cache";
 export type { MiddlewareContext } from "./middleware";
@@ -26,5 +33,15 @@ export {
   sendJson,
   sendWritenexError,
 } from "./middleware";
+export type { RemoteRuntimeConfig } from "./remote";
+// Remote CMS production runtime
+export { handleRemoteRequest } from "./remote";
+// Generated production route modules
+export {
+  API_ROUTE_FILE,
+  EDITOR_ROUTE_FILE,
+  generateApiRouteModule,
+  generateEditorRouteModule,
+} from "./route-modules";
 // Routes
 export { createApiRouter } from "./routes";

@@ -89,6 +89,30 @@ export interface ConfigPathResponse {
 }
 
 /**
+ * Session status response from the API
+ */
+export interface SessionResponse {
+  authenticated: boolean;
+  username?: string;
+}
+
+/**
+ * Guard against expired sessions
+ *
+ * When the remote CMS auth gate returns 401, the session has expired.
+ * Redirect to the editor root so the server serves the login screen.
+ */
+async function ensureAuthorized(
+  response: Response,
+  basePath: string
+): Promise<void> {
+  if (response.status === 401) {
+    window.location.href = basePath;
+    throw new Error("Session expired");
+  }
+}
+
+/**
  * Create API client functions
  */
 export function createApiClient(config: ApiConfig) {
@@ -105,6 +129,7 @@ export function createApiClient(config: ApiConfig) {
      */
     async getConfig(): Promise<WritenexClientConfig> {
       const response = await fetch(`${apiBase}/config`);
+      await ensureAuthorized(response, basePath);
       if (!response.ok) {
         throw new Error("Failed to fetch config");
       }
@@ -116,6 +141,7 @@ export function createApiClient(config: ApiConfig) {
      */
     async getConfigPath(): Promise<ConfigPathResponse> {
       const response = await fetch(`${apiBase}/config/path`);
+      await ensureAuthorized(response, basePath);
       if (!response.ok) {
         throw new Error("Failed to fetch config path");
       }
@@ -127,6 +153,7 @@ export function createApiClient(config: ApiConfig) {
      */
     async getCollections(): Promise<Collection[]> {
       const response = await fetch(`${apiBase}/collections`);
+      await ensureAuthorized(response, basePath);
       if (!response.ok) {
         throw new Error("Failed to fetch collections");
       }
@@ -152,6 +179,7 @@ export function createApiClient(config: ApiConfig) {
 
       const url = `${apiBase}/content/${collection}${params.toString() ? `?${params}` : ""}`;
       const response = await fetch(url);
+      await ensureAuthorized(response, basePath);
       if (!response.ok) {
         throw new Error("Failed to fetch content list");
       }
@@ -164,6 +192,7 @@ export function createApiClient(config: ApiConfig) {
      */
     async getContent(collection: string, id: string): Promise<ContentItem> {
       const response = await fetch(`${apiBase}/content/${collection}/${id}`);
+      await ensureAuthorized(response, basePath);
       if (!response.ok) {
         throw new Error("Failed to fetch content");
       }
@@ -191,6 +220,7 @@ export function createApiClient(config: ApiConfig) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+      await ensureAuthorized(response, basePath);
       return response.json();
     },
 
@@ -207,6 +237,7 @@ export function createApiClient(config: ApiConfig) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+      await ensureAuthorized(response, basePath);
       return response.json();
     },
 
@@ -220,6 +251,7 @@ export function createApiClient(config: ApiConfig) {
       const response = await fetch(`${apiBase}/content/${collection}/${id}`, {
         method: "DELETE",
       });
+      await ensureAuthorized(response, basePath);
       return response.json();
     },
 
@@ -245,7 +277,52 @@ export function createApiClient(config: ApiConfig) {
         method: "POST",
         body: formData,
       });
+      await ensureAuthorized(response, basePath);
       return response.json();
+    },
+
+    /**
+     * Check the current remote CMS session
+     */
+    async getSession(): Promise<SessionResponse> {
+      const response = await fetch(`${apiBase}/auth/session`);
+      if (!response.ok) {
+        return { authenticated: false };
+      }
+      return response.json();
+    },
+
+    /**
+     * Sign in to the remote CMS
+     */
+    async login(
+      username: string,
+      password: string
+    ): Promise<{ success: boolean; error?: string }> {
+      const response = await fetch(`${apiBase}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ username, password }),
+      });
+      const data = (await response.json()) as {
+        success?: boolean;
+        error?: string;
+      };
+      if (!response.ok) {
+        return { success: false, error: data.error };
+      }
+      return { success: true };
+    },
+
+    /**
+     * Sign out of the remote CMS
+     */
+    async logout(): Promise<void> {
+      await fetch(`${apiBase}/auth/logout`, {
+        method: "POST",
+        credentials: "same-origin",
+      });
     },
   };
 }

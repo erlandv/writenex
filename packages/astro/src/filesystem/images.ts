@@ -196,11 +196,7 @@ function getPublicPath(
     projectRoot,
     config.storagePath ?? "public/images"
   );
-  const storagePath = resolve(
-    storageRoot,
-    collection,
-    filename
-  );
+  const storagePath = resolve(storageRoot, collection, filename);
 
   if (!isPathInside(storageRoot, storagePath)) {
     throw new Error("Invalid public image upload path");

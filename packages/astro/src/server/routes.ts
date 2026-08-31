@@ -5,6 +5,9 @@
  * for content collections.
  *
  * ## API Endpoints:
+ * - POST /api/auth/login - Authenticate and create a session
+ * - POST /api/auth/logout - Clear the session
+ * - GET  /api/auth/session - Check session status
  * - GET /api/collections - List all collections
  * - GET /api/content/:collection - List content in collection
  * - GET /api/content/:collection/:id - Get single content item
@@ -114,6 +117,25 @@ export function createApiRouter(
     // Parse route segments
     const segments = pathWithoutQuery.split("/").filter(Boolean);
     const params: RouteParams = { query };
+
+    // Route: /auth/login | /auth/logout | /auth/session
+    if (segments[0] === "auth") {
+      const action = segments[1];
+
+      if (action === "login" && method === "POST") {
+        return handleLogin(req, res, params, context);
+      }
+      if (action === "logout" && method === "POST") {
+        return handleLogout(req, res, params, context);
+      }
+      if (action === "session" && method === "GET") {
+        return handleGetSession(req, res, params, context);
+      }
+      return sendWritenexError(
+        res,
+        new ApiMethodNotAllowedError(method, ["GET", "POST"])
+      );
+    }
 
     // Route: /collections
     if (segments[0] === "collections") {
@@ -294,6 +316,108 @@ const handleGetConfigPath: RouteHandler = async (
     configPath,
     projectRoot,
     hasConfigFile: configPath !== null,
+  });
+};
+
+/**
+ * POST /api/auth/login - Authenticate and create a session
+ *
+ * Request body:
+ * {
+ *   username: string;
+ *   password: string;
+ * }
+ *
+ * On success sets an HttpOnly session cookie.
+ *
+ * Responses:
+ * - 200: { success: true, username }
+ * - 400: Missing/invalid body or auth not configured
+ * - 401: Invalid credentials
+ * - 429: Too many failed attempts (rate limited)
+ */
+const handleLogin: RouteHandler = async (req, res, _params, context) => {
+  const { auth } = context;
+
+  if (!auth) {
+    return sendWritenexError(
+      res,
+      new ApiBadRequestError("Remote CMS authentication is not configured")
+    );
+  }
+
+  if (auth.isRateLimited(req)) {
+    res.setHeader("Retry-After", String(auth.rateLimitRetryAfter(req)));
+    return sendJson(
+      res,
+      { error: "Too many login attempts. Try again later." },
+      429
+    );
+  }
+
+  const body = await parseJsonBody(req);
+
+  if (
+    !body ||
+    typeof body !== "object" ||
+    typeof (body as Record<string, unknown>).username !== "string" ||
+    typeof (body as Record<string, unknown>).password !== "string"
+  ) {
+    return sendWritenexError(
+      res,
+      new ApiBadRequestError("username and password are required")
+    );
+  }
+
+  const { username, password } = body as {
+    username: string;
+    password: string;
+  };
+
+  if (!auth.verifyCredentials(username, password)) {
+    auth.recordFailedAttempt(req);
+    return sendJson(res, { error: "Invalid username or password" }, 401);
+  }
+
+  auth.resetFailedAttempts(req);
+  auth.setSessionCookie(res, auth.createSessionToken(username), req);
+
+  sendJson(res, { success: true, username });
+};
+
+/**
+ * POST /api/auth/logout - Clear the session cookie
+ */
+const handleLogout: RouteHandler = async (_req, res, _params, context) => {
+  const { auth } = context;
+
+  if (!auth) {
+    return sendWritenexError(
+      res,
+      new ApiBadRequestError("Remote CMS authentication is not configured")
+    );
+  }
+
+  auth.clearSessionCookie(res);
+  sendJson(res, { success: true });
+};
+
+/**
+ * GET /api/auth/session - Check the current session status
+ */
+const handleGetSession: RouteHandler = async (req, res, _params, context) => {
+  const { auth } = context;
+
+  if (!auth) {
+    return sendJson(res, { authenticated: false });
+  }
+
+  const token = auth.extractToken(req);
+  const username = token ? auth.verifySessionToken(token) : null;
+
+  sendJson(res, {
+    authenticated: username !== null,
+    username: username ?? undefined,
   });
 };
 
@@ -920,7 +1044,10 @@ const handleServeImage = async (
     // Security check: ensure the path is within the content folder
     const normalizedPath = resolve(fullImagePath);
     const normalizedCollectionPath = resolve(collectionPath);
-    const relativeImagePath = relative(normalizedCollectionPath, normalizedPath);
+    const relativeImagePath = relative(
+      normalizedCollectionPath,
+      normalizedPath
+    );
     if (relativeImagePath.startsWith("..") || isAbsolute(relativeImagePath)) {
       return sendWritenexError(
         res,

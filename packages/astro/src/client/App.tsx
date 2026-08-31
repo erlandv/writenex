@@ -200,6 +200,32 @@ export function App(): React.ReactElement {
   const [isFrontmatterOpen, setIsFrontmatterOpen] = useState(true);
   const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
 
+  // Remote CMS session state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .getSession()
+      .then((session) => {
+        if (!cancelled) setIsAuthenticated(session.authenticated);
+      })
+      .catch(() => {
+        if (!cancelled) setIsAuthenticated(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [api]);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await api.logout();
+    } finally {
+      window.location.href = api.basePath;
+    }
+  }, [api]);
+
   // Unsaved changes modal state
   const [showUnsavedModal, setShowUnsavedModal] = useState(false);
   const [pendingContentId, setPendingContentId] = useState<string | null>(null);
@@ -729,6 +755,8 @@ export function App(): React.ReactElement {
         onKeyboardShortcuts={toggleHelp}
         onSettings={() => setShowConfigPanel(true)}
         onNewContent={handleNewContentShortcut}
+        isAuthenticated={isAuthenticated}
+        onLogout={handleLogout}
       />
 
       {/* Secondary Header - Content Actions Bar */}

@@ -15,9 +15,15 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import type { Connect } from "vite";
 import type { WritenexError } from "@/core/errors";
-import { isWritenexError, WritenexErrorCode, wrapError } from "@/core/errors";
+import {
+  ApiUnauthorizedError,
+  isWritenexError,
+  WritenexErrorCode,
+  wrapError,
+} from "@/core/errors";
 import type { WritenexConfig } from "@/types";
-import { serveAsset, serveEditorHtml } from "./assets";
+import { serveAsset, serveEditorHtml, serveLoginHtml } from "./assets";
+import type { SessionManager } from "./auth";
 import { createApiRouter } from "./routes";
 
 /**
@@ -32,6 +38,8 @@ export interface MiddlewareContext {
   config: Required<WritenexConfig>;
   /** Astro trailingSlash setting for preview URLs */
   trailingSlash: "always" | "never" | "ignore";
+  /** Remote CMS session manager (present when the auth gate is enabled) */
+  auth?: SessionManager;
 }
 
 /**
@@ -74,6 +82,27 @@ export function createMiddleware(
     const path = pathname.slice(basePath.length) || "/";
 
     try {
+      // Remote CMS auth gate: everything except /api/auth/* requires a
+      // valid session. Unauthenticated API calls get 401 JSON; page and
+      // asset requests get the login screen.
+      const { auth } = context;
+      if (
+        auth &&
+        !path.startsWith("/api/auth/") &&
+        !auth.isAuthenticated(req)
+      ) {
+        if (path.startsWith("/api/")) {
+          return sendWritenexError(res, new ApiUnauthorizedError());
+        }
+        if (path.startsWith("/assets/")) {
+          res.statusCode = 401;
+          res.setHeader("Content-Type", "text/plain");
+          res.end("Unauthorized");
+          return;
+        }
+        return serveLoginHtml(res, basePath);
+      }
+
       // Handle API routes
       if (path.startsWith("/api/")) {
         return await apiRouter(req, res, path.slice(4)); // Remove '/api' prefix

@@ -12,6 +12,7 @@ import {
   History,
   Info,
   Keyboard,
+  LogOut,
   Monitor,
   Moon,
   Plus,
@@ -69,6 +70,10 @@ interface HeaderProps {
   onSettings?: () => void;
   /** Callback when new content button is clicked */
   onNewContent?: () => void;
+  /** Whether the remote CMS session is active (shows sign out button) */
+  isAuthenticated?: boolean;
+  /** Callback when sign out button is clicked */
+  onLogout?: () => void;
 }
 
 /**
@@ -223,6 +228,8 @@ export function Header({
   onKeyboardShortcuts,
   onSettings,
   onNewContent,
+  isAuthenticated = false,
+  onLogout,
 }: HeaderProps): React.ReactElement {
   return (
     <header className="wn-header">
@@ -294,6 +301,16 @@ export function Header({
           label="Settings"
           onClick={onSettings}
         />
+        {isAuthenticated && (
+          <>
+            <ToolbarSeparator />
+            <ToolbarButton
+              icon={<LogOut size={16} />}
+              label="Sign out"
+              onClick={onLogout}
+            />
+          </>
+        )}
       </div>
     </header>
   );

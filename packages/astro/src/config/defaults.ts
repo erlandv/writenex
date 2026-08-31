@@ -13,6 +13,8 @@ import type {
   DiscoveryConfig,
   EditorConfig,
   ImageConfig,
+  RemoteCmsConfig,
+  ResolvedRemoteCmsConfig,
   VersionHistoryConfig,
   WritenexConfig,
 } from "@/types";
@@ -50,6 +52,46 @@ export const DEFAULT_VERSION_HISTORY_CONFIG: Required<VersionHistoryConfig> = {
   maxVersions: 20,
   storagePath: ".writenex/versions",
 };
+
+/**
+ * Default remote CMS configuration
+ */
+export const DEFAULT_REMOTE_CMS_CONFIG: Required<RemoteCmsConfig> = {
+  enabled: false,
+  username: "",
+  password: "",
+  secret: "",
+  sessionTtl: 7 * 24 * 60 * 60,
+};
+
+/**
+ * Environment variable names for remote CMS credentials
+ */
+export const REMOTE_CMS_ENV_VARS = {
+  username: "WRITENEX_CMS_USER",
+  password: "WRITENEX_CMS_PASS",
+  secret: "WRITENEX_SECRET",
+} as const;
+
+/**
+ * Apply defaults to the remote CMS configuration
+ *
+ * Explicit config values take precedence over environment variables.
+ * Credentials not set in either place resolve to empty strings; the
+ * integration treats those as "not configured" and fails closed.
+ */
+export function applyRemoteCmsDefaults(
+  remoteCms: RemoteCmsConfig | undefined
+): ResolvedRemoteCmsConfig {
+  const base = remoteCms ?? DEFAULT_REMOTE_CMS_CONFIG;
+  return {
+    enabled: base.enabled ?? DEFAULT_REMOTE_CMS_CONFIG.enabled,
+    username: base.username ?? process.env[REMOTE_CMS_ENV_VARS.username] ?? "",
+    password: base.password ?? process.env[REMOTE_CMS_ENV_VARS.password] ?? "",
+    secret: base.secret ?? process.env[REMOTE_CMS_ENV_VARS.secret] ?? "",
+    sessionTtl: base.sessionTtl ?? DEFAULT_REMOTE_CMS_CONFIG.sessionTtl,
+  };
+}
 
 /**
  * Default file pattern for content files
@@ -106,5 +148,6 @@ export function applyConfigDefaults(
     versionHistory: config.versionHistory
       ? { ...DEFAULT_VERSION_HISTORY_CONFIG, ...config.versionHistory }
       : DEFAULT_VERSION_HISTORY_CONFIG,
+    remoteCms: applyRemoteCmsDefaults(config.remoteCms),
   };
 }

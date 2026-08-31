@@ -24,18 +24,48 @@
  * @module @writenex/astro/integration
  */
 
-import type { AstroIntegration } from "astro";
+import { randomBytes } from "node:crypto";
+import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
+import type { AstroIntegration } from "astro";
+import { applyRemoteCmsDefaults } from "@/config/defaults";
 import { loadConfig } from "@/config/loader";
 import { ContentWatcher } from "@/filesystem/watcher";
+import { createSessionManager } from "@/server/auth";
 import { getCache } from "@/server/cache";
 import { createMiddleware } from "@/server/middleware";
+import {
+  API_ROUTE_FILE,
+  EDITOR_ROUTE_FILE,
+  generateApiRouteModule,
+  generateEditorRouteModule,
+} from "@/server/route-modules";
 import type { WritenexConfig, WritenexOptions } from "@/types";
 
 /**
  * Default base path for the Writenex editor UI
  */
 const DEFAULT_BASE_PATH = "/_writenex";
+
+/**
+ * Resolve the effective base path, respecting Astro's `base` option
+ *
+ * @param astroBase - Astro's configured base (may be "/" or undefined)
+ * @returns Base path for Writenex routes (e.g. "/_writenex" or "/blog/_writenex")
+ */
+function resolveBasePath(astroBase?: string): string {
+  // Strip trailing slashes; ignore "/" and ""
+  const trimmed =
+    astroBase && astroBase !== "/" && astroBase !== ""
+      ? astroBase.replace(/\/+$/, "")
+      : "";
+
+  // Ensure there is always a leading slash on the prefix
+  const prefix =
+    trimmed && !trimmed.startsWith("/") ? `/${trimmed}` : trimmed;
+
+  return `${prefix}${DEFAULT_BASE_PATH}`;
+}
 
 /**
  * Package name for logging
@@ -50,6 +80,7 @@ const PACKAGE_NAME = "@writenex/astro";
  *
  * @param options - Integration options
  * @param options.allowProduction - Allow running in production (default: false)
+ * @param options.remoteCms - Remote CMS auth settings (overrides writenex.config.ts)
  * @returns Astro integration object
  *
  * @example
@@ -59,27 +90,35 @@ const PACKAGE_NAME = "@writenex/astro";
  *   integrations: [writenex()],
  * });
  *
- * // With options
+ * // With remote CMS authentication enabled
  * export default defineConfig({
  *   integrations: [
  *     writenex({
- *       allowProduction: true,  // Enable in production (use with caution)
+ *       remoteCms: {
+ *         enabled: true,
+ *         username: process.env.WRITENEX_CMS_USER,
+ *         password: process.env.WRITENEX_CMS_PASS,
+ *       },
  *     }),
  *   ],
  * });
  * ```
  */
 export default function writenex(options?: WritenexOptions): AstroIntegration {
-  const { allowProduction = false } = options ?? {};
+  const { allowProduction = false, remoteCms } = options ?? {};
 
-  // Use fixed base path for consistency and branding
-  const basePath = DEFAULT_BASE_PATH;
+  // Base path for Writenex routes (resolved from Astro's `base` in config setup)
+  let basePath = DEFAULT_BASE_PATH;
 
   // Track if we should be active
   let isActive = true;
 
   // Store loaded configuration
   let resolvedConfig: Required<WritenexConfig> | null = null;
+
+  // Fully-resolved remote CMS config (always has all fields set, no optionals)
+  let resolvedRemoteCms: import("@/types").ResolvedRemoteCmsConfig | null =
+    null;
 
   // Store project root
   let projectRoot = "";
@@ -89,6 +128,9 @@ export default function writenex(options?: WritenexOptions): AstroIntegration {
 
   // File watcher instance
   let watcher: ContentWatcher | null = null;
+
+  // Remote CMS session manager (only set when the auth gate is enabled)
+  let auth: ReturnType<typeof createSessionManager> | null = null;
 
   // Track if editor URL has been logged (to avoid duplicate logs)
   let hasLoggedEditorUrl = false;
@@ -105,7 +147,13 @@ export default function writenex(options?: WritenexOptions): AstroIntegration {
        * 2. Load Writenex configuration
        * 3. Register any necessary Vite plugins
        */
-      "astro:config:setup": async ({ command, logger, config }) => {
+      "astro:config:setup": async ({
+        command,
+        logger,
+        config,
+        createCodegenDir,
+        injectRoute,
+      }) => {
         // Production guard: disable in production unless explicitly allowed
         if (command === "build" && !allowProduction) {
           logger.warn(
@@ -120,10 +168,112 @@ export default function writenex(options?: WritenexOptions): AstroIntegration {
         // Capture Astro's trailingSlash setting for preview URLs
         astroTrailingSlash = config.trailingSlash ?? "ignore";
 
+        // Resolve the effective base path (respects Astro's `base` option)
+        basePath = resolveBasePath(config.base);
+
         // Load Writenex configuration
         const { config: loadedConfig, warnings } =
           await loadConfig(projectRoot);
-        resolvedConfig = loadedConfig;
+
+        // Integration-level remoteCms options override the config file;
+        // always fully resolve so resolvedConfig.remoteCms is a
+        // ResolvedRemoteCmsConfig (no optional fields).
+        const mergedRemoteCms = applyRemoteCmsDefaults(
+          remoteCms
+            ? { ...loadedConfig.remoteCms, ...remoteCms }
+            : loadedConfig.remoteCms
+        );
+
+        resolvedConfig = { ...loadedConfig, remoteCms: mergedRemoteCms };
+        resolvedRemoteCms = mergedRemoteCms;
+
+        // Fail closed: never run an unauthenticated writable editor when
+        // the remote CMS is requested but credentials are missing.
+        if (
+          mergedRemoteCms.enabled &&
+          (!mergedRemoteCms.username || !mergedRemoteCms.password)
+        ) {
+          logger.error(
+            "[writenex] Remote CMS is enabled but credentials are missing. " +
+              "Set remoteCms.username/password in writenex.config.ts or the " +
+              "WRITENEX_CMS_USER / WRITENEX_CMS_PASS environment variables. " +
+              "Disabling the editor to avoid exposing unauthenticated write access."
+          );
+          isActive = false;
+          return;
+        }
+
+        // Production serving: inject the remote CMS routes so the editor
+        // works on the deployed site through an SSR adapter.
+        if (command === "build") {
+          if (!mergedRemoteCms.enabled) {
+            logger.warn(
+              "Production build: editor not injected. Enable remoteCms " +
+                "(with credentials) to use the remote CMS in production."
+            );
+            isActive = false;
+            return;
+          }
+
+          if (config.output === "static") {
+            logger.error(
+              "[writenex] The remote CMS requires server-side rendering. " +
+                "Set output: 'server' in your Astro config and add an SSR " +
+                "adapter (e.g. @astrojs/node). Editor not injected."
+            );
+            isActive = false;
+            return;
+          }
+
+          // Generate route modules in Astro's codegen directory and inject
+          // them as server-rendered routes.
+          const codegenDir = createCodegenDir();
+          const editorEntry = new URL(EDITOR_ROUTE_FILE, codegenDir);
+          const apiEntry = new URL(API_ROUTE_FILE, codegenDir);
+
+          // Build a sanitized runtime config: strip credentials so they are
+          // never baked into the generated source files. remote.ts re-reads
+          // them from environment variables at runtime.
+          const sanitizedConfig = {
+            ...resolvedConfig,
+            remoteCms: {
+              ...resolvedConfig.remoteCms,
+              username: "",
+              password: "",
+              secret: "",
+            },
+          } satisfies Required<WritenexConfig>;
+
+          const runtime = {
+            basePath,
+            projectRoot,
+            config: sanitizedConfig,
+            trailingSlash: astroTrailingSlash,
+          };
+
+          writeFileSync(
+            editorEntry,
+            generateEditorRouteModule(runtime),
+            "utf8"
+          );
+          writeFileSync(apiEntry, generateApiRouteModule(runtime), "utf8");
+
+          injectRoute({
+            pattern: basePath,
+            entrypoint: editorEntry,
+            prerender: false,
+          });
+          injectRoute({
+            pattern: `${basePath}/[...writenex]`,
+            entrypoint: apiEntry,
+            prerender: false,
+          });
+
+          logger.info(
+            `Writenex remote CMS will be served at ${basePath} in production.`
+          );
+          return;
+        }
 
         // Log any configuration warnings
         for (const warning of warnings) {
@@ -142,9 +292,23 @@ export default function writenex(options?: WritenexOptions): AstroIntegration {
        */
       "astro:server:setup": ({ server }) => {
         // Skip if disabled (production guard triggered)
-        if (!isActive || !resolvedConfig) {
+        if (!isActive || !resolvedConfig || !resolvedRemoteCms) {
           return;
         }
+
+        // Create the session manager when the remote CMS gate is enabled.
+        // resolvedRemoteCms is the fully-resolved config (no optional fields).
+        // An explicit secret keeps sessions valid across restarts; falling back
+        // to a random per-process secret means sessions reset on every restart.
+        auth =
+          resolvedRemoteCms.enabled &&
+          resolvedRemoteCms.username &&
+          resolvedRemoteCms.password
+            ? createSessionManager(
+                resolvedRemoteCms,
+                resolvedRemoteCms.secret || randomBytes(32).toString("hex")
+              )
+            : null;
 
         // Create and register the middleware
         const middleware = createMiddleware({
@@ -152,6 +316,7 @@ export default function writenex(options?: WritenexOptions): AstroIntegration {
           projectRoot,
           config: resolvedConfig,
           trailingSlash: astroTrailingSlash,
+          auth: auth ?? undefined,
         });
 
         server.middlewares.use(middleware);
@@ -195,6 +360,12 @@ export default function writenex(options?: WritenexOptions): AstroIntegration {
 
         logger.info(`Writenex editor running at: ${editorUrl}`);
         hasLoggedEditorUrl = true;
+
+        if (auth) {
+          logger.info(
+            "Remote CMS authentication is enabled. Sign in with your configured credentials."
+          );
+        }
       },
 
       /**

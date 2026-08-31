@@ -14,11 +14,11 @@
 
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { pathToFileURL, fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { createJiti } from "jiti";
 import type { WritenexConfig } from "@/types";
 import { applyConfigDefaults } from "./defaults";
-import { validateConfig, resolveConfigInput } from "./schema";
+import { resolveConfigInput, validateConfig } from "./schema";
 
 /**
  * Normalize a project root path that may have come from URL.pathname.

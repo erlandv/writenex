@@ -176,6 +176,14 @@ const versionHistoryConfigSchema = z.object({
   storagePath: z.string().optional(),
 });
 
+const remoteCmsConfigSchema = z.object({
+  enabled: z.boolean(),
+  username: z.string().min(1).optional(),
+  password: z.string().min(1).optional(),
+  secret: z.string().min(8).optional(),
+  sessionTtl: z.number().int().positive().optional(),
+});
+
 export const writenexConfigSchema = z.object({
   collections: z.array(collectionConfigSchema).optional(),
   singletons: z.array(singletonConfigSchema).optional(),
@@ -183,6 +191,7 @@ export const writenexConfigSchema = z.object({
   editor: editorConfigSchema.optional(),
   discovery: discoveryConfigSchema.optional(),
   versionHistory: versionHistoryConfigSchema.optional(),
+  remoteCms: remoteCmsConfigSchema.optional(),
 });
 
 export const writenexOptionsSchema = z.object({
@@ -233,7 +242,9 @@ function resolveSchemaInput(schema: SchemaInput): Record<string, SchemaField> {
   return result;
 }
 
-export function resolveConfigInput(config: WritenexConfigInput): WritenexConfig {
+export function resolveConfigInput(
+  config: WritenexConfigInput
+): WritenexConfig {
   return {
     ...config,
     collections: config.collections?.map((coll) => ({

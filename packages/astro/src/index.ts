@@ -50,6 +50,7 @@ export type {
   FieldType,
   ImageConfig,
   ImageStrategy,
+  RemoteCmsConfig,
   SchemaField,
   ValidationOptions,
   VersionHistoryConfig,

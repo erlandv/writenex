@@ -139,6 +139,31 @@ export interface EditorConfig {
   autosaveInterval?: number;
 }
 
+/**
+ * Remote CMS configuration
+ *
+ * When enabled, all `/_writenex/*` routes are protected behind a login
+ * screen (username + password). Credentials can be provided directly or
+ * via environment variables (`WRITENEX_CMS_USER` / `WRITENEX_CMS_PASS`).
+ */
+export interface RemoteCmsConfig {
+  /** Enable the remote CMS auth gate */
+  enabled: boolean;
+  /** Admin username (falls back to WRITENEX_CMS_USER env var) */
+  username?: string;
+  /** Admin password (falls back to WRITENEX_CMS_PASS env var) */
+  password?: string;
+  /** Secret used to sign session tokens (falls back to WRITENEX_SECRET env var, otherwise auto-generated) */
+  secret?: string;
+  /** Session lifetime in seconds (default: 7 days) */
+  sessionTtl?: number;
+}
+
+/**
+ * Remote CMS configuration with all fields resolved (defaults applied)
+ */
+export interface ResolvedRemoteCmsConfig extends Required<RemoteCmsConfig> {}
+
 export interface WritenexConfig {
   collections?: CollectionConfig[];
   singletons?: SingletonConfig[];
@@ -146,13 +171,17 @@ export interface WritenexConfig {
   editor?: EditorConfig;
   discovery?: DiscoveryConfig;
   versionHistory?: VersionHistoryConfig;
+  remoteCms?: RemoteCmsConfig;
 }
 
 export interface WritenexOptions {
   allowProduction?: boolean;
+  /** Remote CMS auth settings (overrides writenex.config.ts remoteCms section) */
+  remoteCms?: RemoteCmsConfig;
 }
 
 export interface ResolvedConfig extends Required<WritenexConfig> {
   collections: Required<CollectionConfig>[];
   singletons: Required<SingletonConfig>[];
+  remoteCms: ResolvedRemoteCmsConfig;
 }

@@ -46,6 +46,7 @@ export enum WritenexErrorCode {
 
   // API errors (5xx)
   API_BAD_REQUEST = "API_BAD_REQUEST",
+  API_UNAUTHORIZED = "API_UNAUTHORIZED",
   API_METHOD_NOT_ALLOWED = "API_METHOD_NOT_ALLOWED",
   API_INTERNAL_ERROR = "API_INTERNAL_ERROR",
   API_TIMEOUT = "API_TIMEOUT",
@@ -103,6 +104,7 @@ export const ERROR_HTTP_STATUS: Record<WritenexErrorCode, number> = {
 
   // API errors
   [WritenexErrorCode.API_BAD_REQUEST]: 400,
+  [WritenexErrorCode.API_UNAUTHORIZED]: 401,
   [WritenexErrorCode.API_METHOD_NOT_ALLOWED]: 405,
   [WritenexErrorCode.API_INTERNAL_ERROR]: 500,
   [WritenexErrorCode.API_TIMEOUT]: 504,
@@ -477,6 +479,16 @@ export class ApiMethodNotAllowedError extends WritenexError {
       { context: { method, allowedMethods } }
     );
     this.name = "ApiMethodNotAllowedError";
+  }
+}
+
+/**
+ * Error thrown when a request is not authenticated (remote CMS gate)
+ */
+export class ApiUnauthorizedError extends WritenexError {
+  constructor(message = "Authentication required") {
+    super(WritenexErrorCode.API_UNAUTHORIZED, message);
+    this.name = "ApiUnauthorizedError";
   }
 }
 
