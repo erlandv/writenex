@@ -35,11 +35,7 @@
       "import": "./dist/fields/index.js"
     }
   },
-  "files": [
-    "dist",
-    "src",
-    "README.md"
-  ],
+  "files": ["dist", "src", "README.md"],
   "scripts": {
     "build": "tsup",
     "prepublishOnly": "pnpm build",

@@ -20,6 +20,7 @@ Visual editor for Astro content collections - WYSIWYG editing for your Astro sit
 - **Draft Management** - Toggle draft/published status with visual indicators
 - **Search & Filter** - Find content quickly with search and draft filters
 - **Preview Links** - Quick access to preview your content in the browser
+- **Remote CMS (optional)** - Password-protected editor on your live site — manage content from anywhere, no database required
 - **Production Safe** - Disabled by default in production builds
 
 ## Quick Start
@@ -131,9 +132,12 @@ export default defineConfig({
 
 ## Integration Options
 
-| Option            | Type      | Default | Description                                    |
-| ----------------- | --------- | ------- | ---------------------------------------------- |
-| `allowProduction` | `boolean` | `false` | Enable in production builds (use with caution) |
+Options are passed directly to the integration in `astro.config.mjs`:
+
+| Option           | Type              | Default | Description                                                                 |
+| ---------------- | ----------------- | ------- | --------------------------------------------------------------------------- |
+| `allowProduction` | `boolean`        | `false` | Enable in production builds (required for the Remote CMS)                   |
+| `remoteCms`      | `RemoteCmsConfig` | —       | Remote CMS auth settings (overrides the `remoteCms` section of `writenex.config.ts`) |
 
 ```typescript
 // astro.config.mjs
@@ -143,6 +147,8 @@ writenex({
 ```
 
 The editor is always available at `/_writenex` during development.
+
+See [Remote CMS](#remote-cms-optional) and the [full Remote CMS guide](./docs/remote-cms.md) for the complete option reference.
 
 ## Fields API
 
@@ -1268,16 +1274,23 @@ Press `Ctrl/Cmd + /` in the editor to see all available shortcuts.
 
 The integration provides REST API endpoints for programmatic access:
 
-| Method | Endpoint                                 | Description                |
-| ------ | ---------------------------------------- | -------------------------- |
-| GET    | `/_writenex/api/collections`             | List all collections       |
-| GET    | `/_writenex/api/config`                  | Get current configuration  |
-| GET    | `/_writenex/api/content/:collection`     | List content in collection |
-| GET    | `/_writenex/api/content/:collection/:id` | Get single content item    |
-| POST   | `/_writenex/api/content/:collection`     | Create new content         |
-| PUT    | `/_writenex/api/content/:collection/:id` | Update content             |
-| DELETE | `/_writenex/api/content/:collection/:id` | Delete content             |
-| POST   | `/_writenex/api/images`                  | Upload image               |
+| Method | Endpoint                                 | Description                          |
+| ------ | ---------------------------------------- | ------------------------------------ |
+| POST   | `/_writenex/api/auth/login`              | Sign in (Remote CMS)                 |
+| POST   | `/_writenex/api/auth/logout`             | Sign out (Remote CMS)                |
+| GET    | `/_writenex/api/auth/session`            | Check session status (Remote CMS)    |
+| GET    | `/_writenex/api/collections`             | List all collections                 |
+| GET    | `/_writenex/api/config`                  | Get current configuration            |
+| GET    | `/_writenex/api/content/:collection`     | List content in collection           |
+| GET    | `/_writenex/api/content/:collection/:id` | Get single content item              |
+| POST   | `/_writenex/api/content/:collection`     | Create new content                   |
+| PUT    | `/_writenex/api/content/:collection/:id` | Update content                       |
+| DELETE | `/_writenex/api/content/:collection/:id` | Delete content                       |
+| GET    | `/_writenex/api/images/:collection/:id`  | Discover images for a content item   |
+| GET    | `/_writenex/api/images/:collection/:id/*`| Serve an image file                  |
+| POST   | `/_writenex/api/images`                  | Upload image (multipart/form-data)   |
+
+> **Note:** When the Remote CMS is enabled, all endpoints except `/api/auth/*` require an authenticated session — see [Remote CMS Auth API](#remote-cms-auth-api).
 
 ### Example: List Collections
 
@@ -1324,18 +1337,162 @@ curl http://localhost:4321/_writenex/api/content/blog/my-post
 
 The integration is **disabled by default in production** to prevent accidental exposure. When you run `astro build`, Writenex will not be included.
 
+### Remote CMS Auth Gate
+
+The optional Remote CMS adds a password-protected login screen in front of the editor and every API endpoint. It is fully opt-in — without `remoteCms.enabled: true` nothing changes from the default behavior.
+
+Defense layers when enabled:
+
+- **HttpOnly, SameSite=Lax session cookie** (auto `Secure` on HTTPS) signed with HMAC-SHA256
+- **Timing-safe credential comparison** (no timing side-channel on username/password)
+- **Login rate limiting** — 8 failed attempts per IP per 15 minutes, then HTTP 429 with `Retry-After`
+- **Astro CSRF origin check** — in production, Astro's built-in origin verification rejects cross-site form submissions on mutating requests
+- **Fail-closed everywhere** — missing credentials, disabled config, or static output all disable the editor instead of running it unauthenticated
+
+See the [full Remote CMS guide](./docs/remote-cms.md#security-checklist) for the deployment security checklist.
+
 ### Enabling in Production
 
-Only enable for staging/preview environments with proper authentication:
+Production serving requires the Remote CMS (a writable editor must never run unauthenticated), server-side rendering, and an SSR adapter:
 
 ```typescript
-// astro.config.mjs - USE WITH CAUTION
-writenex({
-  allowProduction: true,
+// astro.config.mjs - requires authentication via remoteCms
+import node from "@astrojs/node";
+
+export default defineConfig({
+  output: "server",
+  adapter: node({ mode: "standalone" }),
+  integrations: [
+    writenex({
+      allowProduction: true,
+      remoteCms: {
+        enabled: true,
+        username: process.env.WRITENEX_CMS_USER,
+        password: process.env.WRITENEX_CMS_PASS,
+      },
+    }),
+  ],
 });
 ```
 
-**Warning:** Enabling in production exposes filesystem write access. Only use behind authentication or in trusted environments.
+**Warning:** This exposes filesystem write access on your server. Always use HTTPS, keep credentials in environment variables (not committed to Git), and see the [deployment guide](./docs/remote-cms.md#production-deployment) for hardening steps.
+
+## Remote CMS (Optional)
+
+Turn your live Astro site into a headless-CMS-style admin: visit `https://yourdomain.com/_writenex`, sign in with a username and password, and manage all your content collections — list, edit, create, delete, upload images — directly from the browser. No database is involved: everything stays as markdown files on your server, and every save creates an automatic version snapshot.
+
+This feature is **completely optional and opt-in**. Without it, Writenex behaves exactly as it always has.
+
+- 📘 Full guide with deployment recipes (systemd, Docker, reverse proxy): [`docs/remote-cms.md`](./docs/remote-cms.md)
+
+### Modes
+
+| Mode            | Where it works          | Requirement                                        |
+| --------------- | ----------------------- | -------------------------------------------------- |
+| **Dev auth**    | `astro dev`             | Nothing extra — just enable `remoteCms`            |
+| **Remote CMS**  | Your deployed domain    | `output: 'server'` + an SSR adapter (e.g. `@astrojs/node`) + `allowProduction: true` |
+
+### 1. Enable it
+
+```typescript
+// astro.config.mjs
+import { defineConfig } from "astro/config";
+import node from "@astrojs/node";
+import writenex from "@imjp/writenex-astro";
+
+export default defineConfig({
+  output: "server",
+  adapter: node({ mode: "standalone" }),
+  integrations: [
+    writenex({
+      allowProduction: true,
+      remoteCms: {
+        enabled: true, // credentials come from env vars (recommended)
+      },
+    }),
+  ],
+});
+```
+
+### 2. Set credentials on the server
+
+```bash
+export WRITENEX_CMS_USER="admin"
+export WRITENEX_CMS_PASS="use-a-long-random-password"
+export WRITENEX_SECRET="$(openssl rand -hex 32)"   # signs session tokens
+```
+
+| Env var               | Purpose                                    | Required                    |
+| --------------------- | ------------------------------------------ | --------------------------- |
+| `WRITENEX_CMS_USER`   | Login username                             | Yes (when enabled)          |
+| `WRITENEX_CMS_PASS`   | Login password                             | Yes (when enabled)          |
+| `WRITENEX_SECRET`     | Session signing secret                     | Recommended (see below)     |
+
+> Prefer environment variables over writing credentials in config files — values placed directly in `writenex.config.ts` or `astro.config.mjs` get baked into the build output. Runtime env vars also override baked values, so you can rotate credentials without rebuilding.
+
+Setting `WRITENEX_SECRET` keeps sessions valid across server restarts and lets multiple instances share sessions. Without it, a random per-process secret is generated and everyone is logged out on restart (fine for dev, annoying in production).
+
+### 3. Build and run
+
+```bash
+WRITENEX_CMS_USER=admin WRITENEX_CMS_PASS=... astro build
+WRITENEX_CMS_USER=admin WRITENEX_CMS_PASS=... node dist/server/entry.mjs
+```
+
+Visit `https://yourdomain.com/_writenex` → sign in → manage content. That's it.
+
+### Fail-closed Behavior
+
+Writenex refuses to expose an unauthenticated writable editor. If the Remote CMS is enabled but something is missing, the editor is **disabled with a clear log message** rather than silently left open:
+
+| Situation                                   | Result                                        |
+| ------------------------------------------- | --------------------------------------------- |
+| `remoteCms.enabled` but no username/password | Editor disabled (build or dev) + error logged |
+| `allowProduction` without `remoteCms`        | Routes not injected + hint logged             |
+| `output: 'static'` (no SSR)                  | Editor disabled + hint to add an SSR adapter  |
+| Runtime env vars missing on the server       | API returns 503 "not configured"              |
+
+### Remote CMS Auth API
+
+| Method | Endpoint                     | Description                                  |
+| ------ | ---------------------------- | -------------------------------------------- |
+| POST   | `/api/auth/login`            | Sign in → sets session cookie                |
+| POST   | `/api/auth/logout`           | Clears the session cookie                    |
+| GET    | `/api/auth/session`          | `{ authenticated, username }` status check   |
+
+```bash
+# Sign in (cookie is returned in the Set-Cookie header)
+curl -X POST https://yourdomain.com/_writenex/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"..."}'
+
+# Check session
+curl -b "wn_session=..." https://yourdomain.com/_writenex/api/auth/session
+
+# Authenticated API call
+curl -b "wn_session=..." https://yourdomain.com/_writenex/api/collections
+```
+
+Responses: `200` on success, `401` invalid credentials, `429` rate-limited (with `Retry-After`), `503` not configured.
+
+### Session Details
+
+- Cookie: `wn_session`, `HttpOnly`, `SameSite=Lax` (+ `Secure` automatically on HTTPS)
+- Token: HMAC-SHA256–signed payload (`username`, `iat`, `exp`) — stateless, no session store needed
+- Default lifetime: 7 days (configurable via `remoteCms.sessionTtl`, in seconds)
+- Login rate limit: 8 failed attempts per IP per 15 minutes
+
+### Remote CMS Configuration Reference
+
+All fields are optional except `enabled`:
+
+| Option       | Type      | Default          | Description                                            |
+| ------------ | --------- | ---------------- | ------------------------------------------------------ |
+| `enabled`    | `boolean` | `false`          | Enable the auth gate + login UI                        |
+| `username`   | `string`  | env fallback     | Admin username                                         |
+| `password`   | `string`  | env fallback     | Admin password                                         |
+| `secret`     | `string`  | env fallback     | Session signing secret (min 8 chars if set explicitly) |
+| `sessionTtl` | `number`  | `604800` (7d)    | Session lifetime in seconds                            |
 
 ## Troubleshooting
 
@@ -1396,11 +1553,33 @@ This error appears on older versions of `@imjp/writenex-astro`. Upgrade to the l
 2. Verify there are actual changes to save
 3. Look for errors in the browser console
 
+### Remote CMS: editor disabled at build/dev
+
+Look for the logged reason:
+- **"credentials are missing"** — set `WRITENEX_CMS_USER` and `WRITENEX_CMS_PASS` (or fill `remoteCms.username`/`password` in `writenex.config.ts`)
+- **"editor not injected. Enable remoteCms"** — you set `allowProduction: true` but didn't enable `remoteCms`
+- **"requires server-side rendering"** — set `output: 'server'` and add an SSR adapter (e.g. `@astrojs/node`)
+
+### Remote CMS: 401 even after signing in
+
+1. Check the cookie was set (browser devtools → Application → Cookies → `wn_session`)
+2. Make sure `WRITENEX_SECRET` is the same value the server was started with (a different secret invalidates existing tokens)
+3. If the session expired (default 7 days), sign in again
+
+### Remote CMS: 429 on login
+
+Too many failed attempts — wait 15 minutes or restart the server process (rate limits are in-memory per IP). Behind a reverse proxy, make sure it sets `X-Forwarded-For` so per-IP limiting works correctly (see the [security checklist](./docs/remote-cms.md#security-checklist)).
+
+### Remote CMS: 503 "not configured"
+
+The server is running a build where credentials were stripped (they are never baked into builds) but the runtime env vars are missing. Set `WRITENEX_CMS_USER` / `WRITENEX_CMS_PASS` when starting the server.
+
 ## Requirements
 
 - Astro 4.x, 5.x, 6.x, or 7.x
 - React 18.x or 19.x
 - Node.js 22.12.0+ (Node 18 and 20 are no longer supported)
+- For the Remote CMS in production: `output: 'server'` and an SSR adapter (e.g. `@astrojs/node`)
 
 ## License
 

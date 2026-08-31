@@ -61,8 +61,7 @@ function resolveBasePath(astroBase?: string): string {
       : "";
 
   // Ensure there is always a leading slash on the prefix
-  const prefix =
-    trimmed && !trimmed.startsWith("/") ? `/${trimmed}` : trimmed;
+  const prefix = trimmed && !trimmed.startsWith("/") ? `/${trimmed}` : trimmed;
 
   return `${prefix}${DEFAULT_BASE_PATH}`;
 }

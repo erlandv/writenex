@@ -11,7 +11,7 @@ This major release includes significant improvements and breaking changes for be
 | **Product**                          | **Description**                                                      |
 | ------------------------------------ | -------------------------------------------------------------------- |
 | [Writenex Editor](./apps/writenex/)  | WYSIWYG Markdown editor that works offline and keeps your data local |
-| [@imjp/writenex-astro](./packages/astro/) | WYSIWYG Markdown editor for Astro Content Collections                |
+| [@imjp/writenex-astro](./packages/astro/) | WYSIWYG Markdown editor for Astro Content Collections — includes an optional [Remote CMS](./packages/astro/docs/remote-cms.md) for editing content on your live site |
 
 ## Project Structure
 
