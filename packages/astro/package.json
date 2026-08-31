@@ -1,6 +1,6 @@
 {
   "name": "@imjp/writenex-astro",
-  "version": "1.11.1",
+  "version": "1.11.2",
   "description": "Visual editor for Astro content collections - WYSIWYG editing for your Astro site.",
   "type": "module",
   "main": "./dist/index.js",

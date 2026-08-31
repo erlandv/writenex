@@ -1,3 +1,10 @@
+## [1.11.2](https://github.com/jaainil/writenex/compare/@imjp/writenex-astro@1.11.1...@imjp/writenex-astro@1.11.2) (2026-08-31)
+
+
+### Bug Fixes
+
+* Refactor code structure for improved readability and maintainability ([75d037d](https://github.com/jaainil/writenex/commit/75d037d5d76afda32035e5425d0ce11c63d1060a))
+
 ## [1.11.1](https://github.com/jaainil/writenex/compare/@imjp/writenex-astro@1.11.0...@imjp/writenex-astro@1.11.1) (2026-08-31)
 
 
