@@ -3,5 +3,5 @@
  * @module @writenex/astro/client/components/LiveRegion
  */
 
-export { LiveRegion } from "./LiveRegion";
 export type { LiveRegionProps } from "./LiveRegion";
+export { LiveRegion } from "./LiveRegion";

@@ -479,6 +479,8 @@
   border: 1px solid var(--wn-zinc-700) !important;
   color: var(--wn-zinc-300) !important;
   box-shadow: 0 4px 6px -1px var(--wn-backdrop-light) !important;
+  max-height: 300px !important;
+  overflow-y: auto !important;
 }
 
 [class*="_selectItem_"] {

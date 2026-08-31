@@ -12,12 +12,20 @@
  * @module @writenex/astro/filesystem/images
  */
 
-import { writeFile, mkdir, readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { join, dirname, basename, extname, relative } from "node:path";
+import { mkdir, readdir, stat, writeFile } from "node:fs/promises";
+import {
+  basename,
+  dirname,
+  extname,
+  isAbsolute,
+  join,
+  relative,
+  resolve,
+} from "node:path";
 import type {
-  ImageConfig,
   DiscoveredImage,
+  ImageConfig,
   ImageDiscoveryOptions,
   ImageDiscoveryResult,
 } from "@/types";
@@ -44,6 +52,15 @@ const SUPPORTED_EXTENSIONS = new Set([
   ".avif",
   ".svg",
 ]);
+
+function toMarkdownPath(path: string): string {
+  return path.replace(/\\/g, "/");
+}
+
+function isPathInside(parentPath: string, targetPath: string): boolean {
+  const relativePath = relative(parentPath, targetPath);
+  return !relativePath.startsWith("..") && !isAbsolute(relativePath);
+}
 
 /**
  * Result of image upload operation
@@ -129,9 +146,19 @@ function getColocatedPath(
   contentId: string,
   filename: string
 ): { storagePath: string; markdownPath: string } {
-  const collectionPath = join(projectRoot, "src/content", collection);
-  const imageDir = join(collectionPath, contentId);
-  const storagePath = join(imageDir, filename);
+  const contentRoot = resolve(projectRoot, "src/content");
+  const collectionPath = resolve(contentRoot, collection);
+
+  if (!isPathInside(contentRoot, collectionPath)) {
+    throw new Error("Invalid collection path for image upload");
+  }
+
+  const imageDir = resolve(collectionPath, contentId);
+  const storagePath = resolve(imageDir, filename);
+
+  if (!isPathInside(collectionPath, storagePath)) {
+    throw new Error("Invalid content path for image upload");
+  }
 
   // Detect content structure to determine correct markdown path
   // Check if content is folder-based (slug/index.md or slug/index.mdx)
@@ -143,7 +170,7 @@ function getColocatedPath(
   // For flat file: image is in sibling folder, so path is ./contentId/filename
   const markdownPath = isFolderBased
     ? `./${filename}`
-    : `./${contentId}/${filename}`;
+    : `./${toMarkdownPath(`${contentId}/${filename}`)}`;
 
   return { storagePath, markdownPath };
 }
@@ -165,14 +192,18 @@ function getPublicPath(
   filename: string,
   config: ImageConfig
 ): { storagePath: string; markdownPath: string; url: string } {
-  const storagePath = join(
+  const storageRoot = resolve(
     projectRoot,
-    config.storagePath ?? "public/images",
-    collection,
-    filename
+    config.storagePath ?? "public/images"
   );
+  const storagePath = resolve(storageRoot, collection, filename);
+
+  if (!isPathInside(storageRoot, storagePath)) {
+    throw new Error("Invalid public image upload path");
+  }
+
   const publicPath = config.publicPath ?? "/images";
-  const url = `${publicPath}/${collection}/${filename}`;
+  const url = toMarkdownPath(`${publicPath}/${collection}/${filename}`);
 
   return { storagePath, markdownPath: url, url };
 }
@@ -470,8 +501,15 @@ export function getContentImageFolder(
   // Both use the contentId as the folder name
   const siblingFolderPath = join(collectionPath, contentId);
 
-  if (existsSync(siblingFolderPath)) {
-    return siblingFolderPath;
+  const resolvedCollectionPath = resolve(collectionPath);
+  const resolvedSiblingFolderPath = resolve(siblingFolderPath);
+
+  if (!isPathInside(resolvedCollectionPath, resolvedSiblingFolderPath)) {
+    return null;
+  }
+
+  if (existsSync(resolvedSiblingFolderPath)) {
+    return resolvedSiblingFolderPath;
   }
 
   return null;
@@ -633,7 +671,7 @@ function calculateRelativePathFromBase(
   basePath: string,
   targetPath: string
 ): string {
-  const relPath = relative(basePath, targetPath);
+  const relPath = toMarkdownPath(relative(basePath, targetPath));
   return `./${relPath}`;
 }
 
@@ -680,7 +718,7 @@ export function calculateRelativePath(
   const contentDir = dirname(contentFilePath);
 
   // Calculate relative path from content directory to image
-  const relPath = relative(contentDir, imagePath);
+  const relPath = toMarkdownPath(relative(contentDir, imagePath));
 
   // Ensure path starts with ./ for relative references
   // The relative() function may return paths without ./ prefix

@@ -3,7 +3,7 @@
  *
  * This page outlines the terms and conditions for using Writenex products:
  * - Writenex Editor: Free, client-side Markdown editor
- * - @writenex/astro: Visual editor integration for Astro content collections
+ * - @imjp/writenex-astro: Visual editor integration for Astro content collections
  *
  * Since both products run locally (browser/filesystem), the terms focus on:
  * - Software provided "as-is"
@@ -16,7 +16,7 @@
 
 import type { Metadata } from "next";
 import { createBreadcrumbSchema } from "@/app/lib/jsonld";
-import { LandingHeader, LandingFooter } from "@/components/landing";
+import { LandingFooter, LandingHeader } from "@/components/landing";
 
 /**
  * Metadata for the Terms of Use page.
@@ -24,14 +24,14 @@ import { LandingHeader, LandingFooter } from "@/components/landing";
 export const metadata: Metadata = {
   title: "Terms of Use",
   description:
-    "Writenex Terms of Use. Understand the terms for using Writenex Editor and @writenex/astro.",
+    "Writenex Terms of Use. Understand the terms for using Writenex Editor and @imjp/writenex-astro.",
   alternates: {
     canonical: "https://writenex.com/terms",
   },
   openGraph: {
     title: "Terms of Use | Writenex",
     description:
-      "Writenex Terms of Use. Understand the terms for using Writenex Editor and @writenex/astro.",
+      "Writenex Terms of Use. Understand the terms for using Writenex Editor and @imjp/writenex-astro.",
     type: "website",
   },
 };
@@ -109,11 +109,11 @@ export default function TermsOfUsePage(): React.ReactElement {
             <li>Use the editor offline after the initial load</li>
           </ul>
 
-          <h3>@writenex/astro</h3>
+          <h3>@imjp/writenex-astro</h3>
 
           <p>
             <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-              @writenex/astro
+              @imjp/writenex-astro
             </code>{" "}
             is an npm package that provides a visual editor for{" "}
             <a
@@ -168,12 +168,12 @@ export default function TermsOfUsePage(): React.ReactElement {
             </li>
           </ul>
 
-          <h3>@writenex/astro</h3>
+          <h3>@imjp/writenex-astro</h3>
 
           <p>
             Content edited through{" "}
             <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-              @writenex/astro
+              @imjp/writenex-astro
             </code>{" "}
             is stored directly in your local project filesystem. By using the
             package, you acknowledge that:
@@ -204,7 +204,7 @@ export default function TermsOfUsePage(): React.ReactElement {
             You may export your data at any time. Writenex Editor provides
             export functionality, and{" "}
             <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-              @writenex/astro
+              @imjp/writenex-astro
             </code>{" "}
             stores content in standard Markdown files within your project.
           </p>
@@ -314,7 +314,7 @@ export default function TermsOfUsePage(): React.ReactElement {
             <li>
               Damages resulting from filesystem modifications performed by
               <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                @writenex/astro
+                @imjp/writenex-astro
               </code>
             </li>
           </ul>
@@ -338,12 +338,12 @@ export default function TermsOfUsePage(): React.ReactElement {
             persistence or recovery.
           </p>
 
-          <h2>10. @writenex/astro Specific Terms</h2>
+          <h2>10. @imjp/writenex-astro Specific Terms</h2>
 
           <p>
             When using{" "}
             <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-              @writenex/astro
+              @imjp/writenex-astro
             </code>
             , you acknowledge and agree that:
           </p>
@@ -389,11 +389,11 @@ export default function TermsOfUsePage(): React.ReactElement {
             If you have questions about these Terms of Use, you can contact us
             through the Writenex GitHub repository at{" "}
             <a
-              href="https://github.com/erlandv/writenex"
+              href="https://github.com/jaainil/writenex"
               target="_blank"
               rel="nofollow noopener noreferrer"
             >
-              https://github.com/erlandv/writenex
+              https://github.com/jaainil/writenex
             </a>
             .
           </p>

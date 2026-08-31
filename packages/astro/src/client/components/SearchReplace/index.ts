@@ -4,4 +4,4 @@
  * @module @writenex/astro/client/components/SearchReplace
  */
 
-export { SearchReplacePanel, type SearchOptions } from "./SearchReplacePanel";
+export { type SearchOptions, SearchReplacePanel } from "./SearchReplacePanel";

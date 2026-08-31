@@ -26,13 +26,13 @@
 
 "use client";
 
-import React, { useCallback, useRef, useEffect, useState } from "react";
-import { Plus, X, FileText, ChevronLeft, ChevronRight } from "lucide-react";
-import { useEditorStore } from "@/lib/store";
-import { createDocument, updateDocument, getDocument } from "@/lib/db";
+import { ChevronLeft, ChevronRight, FileText, Plus, X } from "lucide-react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { createDocument, getDocument, updateDocument } from "@/lib/db";
 import { useSaveBeforeSwitch } from "@/lib/hooks";
-import { cn } from "@/lib/utils";
+import { useEditorStore } from "@/lib/store";
 import { SimpleTooltip } from "@/lib/ui"; // simple-tooltip";
+import { cn } from "@/lib/utils";
 
 /**
  * Props for the DocumentTab component
@@ -239,7 +239,7 @@ export function DocumentTabs(): React.ReactElement {
     updateScrollVisibility();
     window.addEventListener("resize", updateScrollVisibility);
     return () => window.removeEventListener("resize", updateScrollVisibility);
-  }, [updateScrollVisibility, documents]);
+  }, [updateScrollVisibility]);
 
   const handleScroll = useCallback(
     (direction: "left" | "right") => {

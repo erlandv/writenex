@@ -1,5 +1,6 @@
 {
   "buildCommand": "cd ../.. && pnpm --filter writenex build",
+  "outputDirectory": ".next",
   "headers": [
     {
       "source": "/sw.js",

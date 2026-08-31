@@ -31,31 +31,35 @@ export { default, default as writenex } from "./integration";
 // Configuration Utilities (most commonly used)
 // =============================================================================
 
-export { defineConfig, validateConfig, loadConfig } from "@/config";
+export { defineConfig, loadConfig, validateConfig } from "@/config";
+export { collection, fields, singleton } from "@/fields";
 
 // =============================================================================
 // Core Types (essential for consumers)
 // =============================================================================
 
 export type {
-  WritenexConfig,
-  WritenexOptions,
   CollectionConfig,
   CollectionSchema,
-  SchemaField,
-  FieldType,
-  ImageConfig,
-  ImageStrategy,
-  DiscoveryConfig,
-  EditorConfig,
   ContentItem,
   ContentSummary,
   DiscoveredCollection,
+  DiscoveryConfig,
+  EditorConfig,
+  FieldKind,
+  FieldType,
+  ImageConfig,
+  ImageStrategy,
+  RemoteCmsConfig,
+  SchemaField,
+  ValidationOptions,
   VersionHistoryConfig,
+  WritenexConfig,
+  WritenexOptions,
 } from "@/types";
 
 // =============================================================================
 // Error Handling (commonly needed)
 // =============================================================================
 
-export { WritenexError, WritenexErrorCode, isWritenexError } from "@/core";
+export { isWritenexError, WritenexError, WritenexErrorCode } from "@/core";

@@ -7,52 +7,53 @@
  * @module @writenex/astro/types
  */
 
+// API response types
+export type {
+  CollectionsResponse,
+  ContentListResponse,
+  ContentResponse,
+  ImageUploadResponse,
+  MutationResponse,
+} from "./api";
 // Configuration types
 export type {
-  FieldType,
-  SchemaField,
-  CollectionSchema,
-  ImageStrategy,
-  ImageConfig,
   CollectionConfig,
+  CollectionSchema,
   DiscoveryConfig,
   EditorConfig,
+  FieldKind,
+  FieldType,
+  ImageConfig,
+  ImageStrategy,
+  RemoteCmsConfig,
+  ResolvedConfig,
+  ResolvedRemoteCmsConfig,
+  SchemaField,
+  SingletonConfig,
+  ValidationOptions,
   WritenexConfig,
   WritenexOptions,
-  ResolvedConfig,
 } from "./config";
-
 // Content types
 export type {
   ContentItem,
   ContentSummary,
   DiscoveredCollection,
 } from "./content";
-
-// API response types
-export type {
-  CollectionsResponse,
-  ContentListResponse,
-  ContentResponse,
-  MutationResponse,
-  ImageUploadResponse,
-} from "./api";
-
-// Version history types
-export type {
-  VersionEntry,
-  VersionManifest,
-  Version,
-  VersionHistoryConfig,
-  VersionResult,
-  SaveVersionOptions,
-  RestoreVersionOptions,
-  RestoreResult,
-} from "./version";
-
 // Image types
 export type {
   DiscoveredImage,
   ImageDiscoveryOptions,
   ImageDiscoveryResult,
 } from "./image";
+// Version history types
+export type {
+  RestoreResult,
+  RestoreVersionOptions,
+  SaveVersionOptions,
+  Version,
+  VersionEntry,
+  VersionHistoryConfig,
+  VersionManifest,
+  VersionResult,
+} from "./version";

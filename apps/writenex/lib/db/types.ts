@@ -56,6 +56,12 @@ export interface ImageEntry {
  * Settings entry for key-value storage in IndexedDB.
  */
 export interface SettingsEntry {
-  id: string;
+  id: string; // key
   value: string;
+}
+
+export interface WorkingSaveEntry {
+  id: string;
+  content: string;
+  timestamp: Date;
 }

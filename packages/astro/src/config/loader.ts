@@ -13,11 +13,34 @@
  */
 
 import { existsSync } from "node:fs";
-import { pathToFileURL } from "node:url";
 import { join, resolve } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { createJiti } from "jiti";
 import type { WritenexConfig } from "@/types";
-import { validateConfig } from "./schema";
 import { applyConfigDefaults } from "./defaults";
+import { resolveConfigInput, validateConfig } from "./schema";
+
+/**
+ * Normalize a project root path that may have come from URL.pathname.
+ *
+ * On Windows, `config.root.pathname` returns `/C:/Users/...` — a leading slash
+ * before the drive letter that makes every subsequent `path.join` and
+ * `fs.existsSync` call fail silently.  Strip it so downstream code gets a
+ * valid Windows path like `C:\Users\...`.
+ *
+ * On macOS/Linux the path starts with a real `/` so the regex won't match
+ * and the string is returned unchanged.
+ */
+function normalizeProjectRoot(projectRoot: string): string {
+  if (projectRoot.startsWith("file://")) {
+    return fileURLToPath(projectRoot);
+  }
+  let normalized = projectRoot.replace(/^\/([A-Za-z]:)/, "$1");
+  try {
+    normalized = decodeURIComponent(normalized);
+  } catch (_) {}
+  return normalized;
+}
 
 /**
  * Supported configuration file names in order of priority
@@ -50,6 +73,7 @@ export interface LoadConfigResult {
  * @returns Path to the configuration file, or null if not found
  */
 export function findConfigFile(projectRoot: string): string | null {
+  projectRoot = normalizeProjectRoot(projectRoot);
   for (const fileName of CONFIG_FILE_NAMES) {
     const filePath = join(projectRoot, fileName);
     if (existsSync(filePath)) {
@@ -60,28 +84,48 @@ export function findConfigFile(projectRoot: string): string | null {
 }
 
 /**
- * Load configuration from a file
+ * Load configuration from a file.
  *
- * @param configPath - Path to the configuration file
+ * TypeScript config files (.ts / .mts) are loaded via `jiti` so that Node.js
+ * does not need to understand the `.ts` extension natively.  Plain JS / MJS
+ * files are still loaded with a regular dynamic `import()`.
+ *
+ * @param configPath - Absolute path to the configuration file
  * @returns The loaded configuration object
  * @throws Error if the file cannot be loaded or parsed
  */
 async function loadConfigFile(configPath: string): Promise<WritenexConfig> {
+  const absolutePath = resolve(configPath);
+
   try {
-    // Convert to file URL for dynamic import (required for Windows compatibility)
-    const fileUrl = pathToFileURL(resolve(configPath)).href;
+    let mod: unknown;
 
-    // Dynamic import the configuration file
-    const module = await import(fileUrl);
+    if (/\.[mc]?ts$/.test(absolutePath)) {
+      // Use jiti to transpile and load TypeScript config files at runtime.
+      // `createJiti` accepts the "caller" URL so that relative imports inside
+      // the config file resolve correctly.
+      const jiti = createJiti(pathToFileURL(absolutePath).href, {
+        interopDefault: true,
+      });
+      mod = await jiti.import(absolutePath);
+    } else {
+      // Plain .js / .mjs files can be loaded with a standard dynamic import.
+      const fileUrl = pathToFileURL(absolutePath).href;
+      mod = await import(fileUrl);
+    }
 
-    // Support both default export and named export
-    const config = module.default ?? module.config ?? module;
+    // Support both default export (`export default ...`) and
+    // interop-wrapped objects (`{ default: ... }` from jiti).
+    const config =
+      (mod as { default?: WritenexConfig })?.default ??
+      (mod as { config?: WritenexConfig })?.config ??
+      (mod as WritenexConfig);
 
-    return config as WritenexConfig;
+    return config;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     throw new Error(
-      `Failed to load configuration from ${configPath}: ${message}`
+      `Failed to load configuration from ${absolutePath}: ${message}`
     );
   }
 }
@@ -117,6 +161,7 @@ async function loadConfigFile(configPath: string): Promise<WritenexConfig> {
 export async function loadConfig(
   projectRoot: string
 ): Promise<LoadConfigResult> {
+  projectRoot = normalizeProjectRoot(projectRoot);
   const warnings: string[] = [];
   let userConfig: WritenexConfig = {};
   let configPath: string | null = null;
@@ -129,17 +174,21 @@ export async function loadConfig(
     hasConfigFile = true;
 
     try {
-      userConfig = await loadConfigFile(configPath);
+      const rawConfig = await loadConfigFile(configPath);
 
-      // Validate the loaded configuration
-      const validationResult = validateConfig(userConfig);
+      const validationResult = validateConfig(rawConfig);
 
       if (!validationResult.success) {
-        const errors = validationResult.error.errors
+        const errors = validationResult.error.issues
           .map((e) => `${e.path.join(".")}: ${e.message}`)
           .join(", ");
         warnings.push(`Configuration validation warnings: ${errors}`);
       }
+
+      userConfig =
+        typeof rawConfig === "object" && rawConfig !== null
+          ? resolveConfigInput(rawConfig as WritenexConfig)
+          : {};
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       warnings.push(`Failed to load config file: ${message}. Using defaults.`);
@@ -169,6 +218,7 @@ export function contentDirectoryExists(
   projectRoot: string,
   contentPath: string = "src/content"
 ): boolean {
+  projectRoot = normalizeProjectRoot(projectRoot);
   const fullPath = join(projectRoot, contentPath);
   return existsSync(fullPath);
 }

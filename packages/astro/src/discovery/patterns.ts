@@ -29,9 +29,9 @@
  * @module @writenex/astro/discovery/patterns
  */
 
-import { readdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { join, extname, relative } from "node:path";
+import { readdir } from "node:fs/promises";
+import { extname, join, relative } from "node:path";
 import { isContentFile } from "@/filesystem/reader";
 
 /**
@@ -407,7 +407,7 @@ export function generatePathFromPattern(
   let result = pattern;
 
   for (const [key, value] of Object.entries(tokens)) {
-    result = result.replace(`{${key}}`, value);
+    result = result.replaceAll(`{${key}}`, value);
   }
 
   return result;
@@ -646,7 +646,7 @@ export function resolvePatternTokens(
       resolved[tokenName] = slugifyValue(fmValue);
       continue;
     }
-    if (typeof fmValue === "number") {
+    if (typeof fmValue === "number" || typeof fmValue === "boolean") {
       resolved[tokenName] = fmValue.toString();
       continue;
     }

@@ -19,10 +19,10 @@
 
 "use client";
 
-import React from "react";
 import { Minimize2 } from "lucide-react";
-import { SimpleTooltip } from "@/lib/ui"; // simple-tooltip";
+import React from "react";
 import { useEditorStore } from "@/lib/store";
+import { SimpleTooltip } from "@/lib/ui"; // simple-tooltip";
 import { cn } from "@/lib/utils";
 
 /**

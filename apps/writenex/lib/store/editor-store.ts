@@ -9,24 +9,24 @@
  */
 
 import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 import type {
-  ViewMode,
-  SaveStatus,
-  Theme,
-  SyntaxTheme,
   DocumentMeta,
   EditorState,
+  SaveStatus,
+  SyntaxTheme,
+  Theme,
+  ViewMode,
 } from "./types";
 
 // Re-export types for backward compatibility
 export type {
-  ViewMode,
-  SaveStatus,
-  Theme,
-  SyntaxTheme,
   DocumentMeta,
   EditorState,
+  SaveStatus,
+  SyntaxTheme,
+  Theme,
+  ViewMode,
 };
 
 /**

@@ -8,27 +8,27 @@
  * @module @writenex/astro/client/components/ConfigPanel
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  X,
-  Settings,
+  Check,
+  ChevronDown,
+  Copy,
+  ExternalLink,
   Folder,
   Image,
   Info,
-  ExternalLink,
-  Copy,
-  Check,
-  ChevronDown,
+  Settings,
+  X,
 } from "lucide-react";
-import { useFocusTrap } from "../../hooks/useFocusTrap";
-import type { Collection, WritenexClientConfig } from "../../hooks/useApi";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSharedApi } from "../../context/ApiContext";
+import type { Collection, WritenexClientConfig } from "../../hooks/useApi";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 import {
-  openInEditor,
+  type EditorType,
   getAvailableEditors,
   getPreferredEditor,
+  openInEditor,
   setPreferredEditor,
-  type EditorType,
 } from "../../utils/openInEditor";
 import "./ConfigPanel.css";
 
@@ -71,8 +71,9 @@ export function ConfigPanel({
   const [configPath, setConfigPath] = useState<string | null>(null);
   const [hasConfigFile, setHasConfigFile] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [selectedEditor, setSelectedEditor] =
-    useState<EditorType>(getPreferredEditor());
+  const [selectedEditor, setSelectedEditor] = useState<EditorType>(
+    getPreferredEditor()
+  );
   const [showEditorDropdown, setShowEditorDropdown] = useState(false);
 
   // Fetch config path when modal opens

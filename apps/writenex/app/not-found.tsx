@@ -14,9 +14,9 @@
  * @module app/not-found
  */
 
-import Link from "next/link";
-import type { Metadata } from "next";
 import { ArrowLeft, PenLine } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
 
 /**
  * Metadata for the 404 page.

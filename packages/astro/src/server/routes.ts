@@ -5,6 +5,9 @@
  * for content collections.
  *
  * ## API Endpoints:
+ * - POST /api/auth/login - Authenticate and create a session
+ * - POST /api/auth/logout - Clear the session
+ * - GET  /api/auth/session - Check session status
  * - GET /api/collections - List all collections
  * - GET /api/content/:collection - List content in collection
  * - GET /api/content/:collection/:id - Get single content item
@@ -25,55 +28,55 @@
  * @module @writenex/astro/server/routes
  */
 
-import type { IncomingMessage, ServerResponse } from "node:http";
 import { createReadStream, existsSync, statSync } from "node:fs";
-import { join, extname } from "node:path";
-import type { MiddlewareContext } from "./middleware";
-import {
-  sendJson,
-  sendError,
-  sendWritenexError,
-  parseQueryParams,
-  parseJsonBody,
-} from "./middleware";
+import type { IncomingMessage, ServerResponse } from "node:http";
+import { extname, isAbsolute, join, relative, resolve } from "node:path";
 import {
   ApiBadRequestError,
   ApiMethodNotAllowedError,
-  CollectionNotFoundError,
   CollectionDiscoveryError,
+  CollectionNotFoundError,
   ContentNotFoundError,
   ImageInvalidTypeError,
   ImageNotFoundError,
+  isWritenexError,
   PathTraversalError,
   VersionNotFoundError,
-  isWritenexError,
-  wrapError,
   WritenexErrorCode,
+  wrapError,
 } from "@/core/errors";
-import { getCache } from "./cache";
 import { discoverCollections, mergeCollections } from "@/discovery/collections";
+import {
+  discoverContentImages,
+  isValidImageFile,
+  parseMultipartFormData,
+  uploadImage,
+} from "@/filesystem/images";
 import { getCollectionSummaries, readContentFile } from "@/filesystem/reader";
 import {
+  clearVersions,
+  deleteVersion,
+  getVersion,
+  getVersions,
+  restoreVersion,
+  saveVersion,
+} from "@/filesystem/versions";
+import {
   createContent,
-  updateContent,
   deleteContent,
   getContentFilePath,
+  updateContent,
 } from "@/filesystem/writer";
-import {
-  uploadImage,
-  parseMultipartFormData,
-  isValidImageFile,
-  discoverContentImages,
-} from "@/filesystem/images";
-import {
-  getVersions,
-  getVersion,
-  saveVersion,
-  restoreVersion,
-  deleteVersion,
-  clearVersions,
-} from "@/filesystem/versions";
 import type { VersionHistoryConfig } from "@/types";
+import { getCache } from "./cache";
+import type { MiddlewareContext } from "./middleware";
+import {
+  parseJsonBody,
+  parseQueryParams,
+  sendError,
+  sendJson,
+  sendWritenexError,
+} from "./middleware";
 
 /**
  * API route handler function type
@@ -114,6 +117,25 @@ export function createApiRouter(
     // Parse route segments
     const segments = pathWithoutQuery.split("/").filter(Boolean);
     const params: RouteParams = { query };
+
+    // Route: /auth/login | /auth/logout | /auth/session
+    if (segments[0] === "auth") {
+      const action = segments[1];
+
+      if (action === "login" && method === "POST") {
+        return handleLogin(req, res, params, context);
+      }
+      if (action === "logout" && method === "POST") {
+        return handleLogout(req, res, params, context);
+      }
+      if (action === "session" && method === "GET") {
+        return handleGetSession(req, res, params, context);
+      }
+      return sendWritenexError(
+        res,
+        new ApiMethodNotAllowedError(method, ["GET", "POST"])
+      );
+    }
 
     // Route: /collections
     if (segments[0] === "collections") {
@@ -294,6 +316,108 @@ const handleGetConfigPath: RouteHandler = async (
     configPath,
     projectRoot,
     hasConfigFile: configPath !== null,
+  });
+};
+
+/**
+ * POST /api/auth/login - Authenticate and create a session
+ *
+ * Request body:
+ * {
+ *   username: string;
+ *   password: string;
+ * }
+ *
+ * On success sets an HttpOnly session cookie.
+ *
+ * Responses:
+ * - 200: { success: true, username }
+ * - 400: Missing/invalid body or auth not configured
+ * - 401: Invalid credentials
+ * - 429: Too many failed attempts (rate limited)
+ */
+const handleLogin: RouteHandler = async (req, res, _params, context) => {
+  const { auth } = context;
+
+  if (!auth) {
+    return sendWritenexError(
+      res,
+      new ApiBadRequestError("Remote CMS authentication is not configured")
+    );
+  }
+
+  if (auth.isRateLimited(req)) {
+    res.setHeader("Retry-After", String(auth.rateLimitRetryAfter(req)));
+    return sendJson(
+      res,
+      { error: "Too many login attempts. Try again later." },
+      429
+    );
+  }
+
+  const body = await parseJsonBody(req);
+
+  if (
+    !body ||
+    typeof body !== "object" ||
+    typeof (body as Record<string, unknown>).username !== "string" ||
+    typeof (body as Record<string, unknown>).password !== "string"
+  ) {
+    return sendWritenexError(
+      res,
+      new ApiBadRequestError("username and password are required")
+    );
+  }
+
+  const { username, password } = body as {
+    username: string;
+    password: string;
+  };
+
+  if (!auth.verifyCredentials(username, password)) {
+    auth.recordFailedAttempt(req);
+    return sendJson(res, { error: "Invalid username or password" }, 401);
+  }
+
+  auth.resetFailedAttempts(req);
+  auth.setSessionCookie(res, auth.createSessionToken(username), req);
+
+  sendJson(res, { success: true, username });
+};
+
+/**
+ * POST /api/auth/logout - Clear the session cookie
+ */
+const handleLogout: RouteHandler = async (_req, res, _params, context) => {
+  const { auth } = context;
+
+  if (!auth) {
+    return sendWritenexError(
+      res,
+      new ApiBadRequestError("Remote CMS authentication is not configured")
+    );
+  }
+
+  auth.clearSessionCookie(res);
+  sendJson(res, { success: true });
+};
+
+/**
+ * GET /api/auth/session - Check the current session status
+ */
+const handleGetSession: RouteHandler = async (req, res, _params, context) => {
+  const { auth } = context;
+
+  if (!auth) {
+    return sendJson(res, { authenticated: false });
+  }
+
+  const token = auth.extractToken(req);
+  const username = token ? auth.verifySessionToken(token) : null;
+
+  sendJson(res, {
+    authenticated: username !== null,
+    username: username ?? undefined,
   });
 };
 
@@ -908,12 +1032,9 @@ const handleServeImage = async (
     // For flat files (slug.md), images are in a sibling folder with the same name
     let fullImagePath: string;
 
-    if (
-      contentFilePath.endsWith("/index.md") ||
-      contentFilePath.endsWith("/index.mdx")
-    ) {
+    if (/[\/\\]index\.mdx?$/.test(contentFilePath)) {
       // Folder-based: content is at slug/index.md, images are at slug/imagePath
-      const contentFolder = contentFilePath.replace(/\/index\.mdx?$/, "");
+      const contentFolder = contentFilePath.replace(/[\/\\]index\.mdx?$/, "");
       fullImagePath = join(contentFolder, imagePath);
     } else {
       // Flat file: content is at slug.md, images are at slug/imagePath
@@ -921,8 +1042,13 @@ const handleServeImage = async (
     }
 
     // Security check: ensure the path is within the content folder
-    const normalizedPath = join(fullImagePath);
-    if (!normalizedPath.startsWith(collectionPath)) {
+    const normalizedPath = resolve(fullImagePath);
+    const normalizedCollectionPath = resolve(collectionPath);
+    const relativeImagePath = relative(
+      normalizedCollectionPath,
+      normalizedPath
+    );
+    if (relativeImagePath.startsWith("..") || isAbsolute(relativeImagePath)) {
       return sendWritenexError(
         res,
         new PathTraversalError(imagePath, collectionPath)
@@ -930,12 +1056,12 @@ const handleServeImage = async (
     }
 
     // Check if file exists
-    if (!existsSync(fullImagePath)) {
+    if (!existsSync(normalizedPath)) {
       return sendWritenexError(res, new ImageNotFoundError(imagePath));
     }
 
     // Get file stats
-    const stats = statSync(fullImagePath);
+    const stats = statSync(normalizedPath);
     if (!stats.isFile()) {
       return sendWritenexError(
         res,
@@ -944,7 +1070,7 @@ const handleServeImage = async (
     }
 
     // Determine MIME type
-    const ext = extname(fullImagePath).toLowerCase();
+    const ext = extname(normalizedPath).toLowerCase();
     const mimeType = IMAGE_MIME_TYPES[ext] ?? "application/octet-stream";
 
     // Set headers
@@ -953,7 +1079,7 @@ const handleServeImage = async (
     res.setHeader("Cache-Control", "public, max-age=3600");
 
     // Stream the file
-    const stream = createReadStream(fullImagePath);
+    const stream = createReadStream(normalizedPath);
     stream.pipe(res);
   } catch (error) {
     const wrappedError = isWritenexError(error)

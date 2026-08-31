@@ -5,8 +5,9 @@
 
 "use client";
 
-import React, { useRef, useEffect } from "react";
 import { Trash2 } from "lucide-react";
+import React, { useEffect, useRef } from "react";
+import { Button } from "./button";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +16,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "./dialog";
-import { Button } from "./button";
 
 interface DestructiveActionDialogProps {
   open: boolean;

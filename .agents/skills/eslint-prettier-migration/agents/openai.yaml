@@ -1,0 +1,4 @@
+interface:
+  display_name: "ESLint/Prettier Migration"
+  short_description: "Migrate and stabilize ESLint/Prettier to BiomeJS."
+  default_prompt: "Use this skill to migrate from ESLint and/or Prettier to BiomeJS, choose migration flags (`--include-inspired`, `--include-nursery`), review config overwrite effects, validate parity, and stabilize post-migration diagnostics/CI."

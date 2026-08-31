@@ -18,10 +18,12 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useStorageQuota, formatBytes } from "@/lib/hooks";
-import { requestPersistentStorage } from "@/lib/utils";
-import { LS_STORAGE_WARNING_DISMISSED } from "@/lib/utils";
+import React, { useEffect, useState } from "react";
+import { formatBytes, useStorageQuota } from "@/lib/hooks";
+import {
+  LS_STORAGE_WARNING_DISMISSED,
+  requestPersistentStorage,
+} from "@/lib/utils";
 
 /**
  * Get initial dismissed threshold from localStorage.

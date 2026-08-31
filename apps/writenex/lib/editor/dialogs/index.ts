@@ -8,9 +8,11 @@
  */
 
 export { ClearEditorDialog } from "./ClearEditorDialog";
+export { CommandPalette } from "./CommandPalette";
 export { DeleteDocumentDialog } from "./DeleteDocumentDialog";
 export { DeleteVersionDialog } from "./DeleteVersionDialog";
 export { ImageDialog } from "./ImageDialog";
 export { KeyboardShortcutsModal } from "./KeyboardShortcutsModal";
 export { LinkDialog } from "./LinkDialog";
+export { SettingsModal } from "./SettingsModal";
 export { WelcomeTourModal } from "./WelcomeTourModal";

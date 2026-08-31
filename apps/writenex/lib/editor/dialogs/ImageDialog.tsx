@@ -21,19 +21,25 @@
  * @see {@link MarkdownEditor} - Configures imagePlugin with this dialog
  */
 
-import React, { useState, useRef } from "react";
-import { usePublisher, useCellValue } from "@mdxeditor/editor";
 import {
-  insertImage$,
   closeImageDialog$,
   imageDialogState$,
+  insertImage$,
   saveImage$,
+  useCellValue,
+  usePublisher,
 } from "@mdxeditor/editor";
-import { Button } from "@/lib/ui"; // button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/lib/ui"; // dialog";
-import { Input } from "@/lib/ui"; // input";
-import { cn, isValidUrl } from "@/lib/utils";
 import { Image as ImageIcon, Link as LinkIcon, Upload } from "lucide-react";
+import React, { useRef, useState } from "react";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Input,
+} from "@/lib/ui"; // input";
+import { cn, isValidUrl } from "@/lib/utils";
 
 /**
  * Image dialog component for MDXEditor.
@@ -159,7 +165,10 @@ export function ImageDialog() {
         if (!open) closeImageDialog();
       }}
     >
-      <DialogContent className="sm:max-w-[400px]" aria-describedby={undefined}>
+      <DialogContent
+        className="sm:max-w-[400px]"
+        description="Insert or edit an image in your document"
+      >
         <DialogHeader>
           <DialogTitle>
             {state.type === "editing" ? "Edit Image" : "Insert Image"}

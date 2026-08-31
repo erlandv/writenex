@@ -3,4 +3,4 @@
  * @module @writenex/astro/client/components/Editor
  */
 
-export { Editor, EditorLoading, EditorEmpty } from "./Editor";
+export { Editor, EditorEmpty, EditorLoading } from "./Editor";

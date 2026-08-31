@@ -8,8 +8,8 @@
  * @module @writenex/astro/client/components/CreateContentModal
  */
 
+import { FileText, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { X, FileText } from "lucide-react";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import "./CreateContentModal.css";
 

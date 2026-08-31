@@ -8,9 +8,9 @@
 import * as React from "react";
 import {
   Tooltip,
-  TooltipTrigger,
   TooltipContent,
   TooltipProvider,
+  TooltipTrigger,
 } from "./tooltip";
 
 export interface SimpleTooltipProps {

@@ -17,16 +17,17 @@
  * @module @writenex/astro/client/components/Editor/LinkDialog
  */
 
-import { useState, useCallback, useEffect, useRef } from "react";
-import { usePublisher, useCellValue } from "@mdxeditor/editor";
 import {
-  linkDialogState$,
   cancelLinkEdit$,
-  updateLink$,
-  switchFromPreviewToLinkEdit$,
+  linkDialogState$,
   removeLink$,
+  switchFromPreviewToLinkEdit$,
+  updateLink$,
+  useCellValue,
+  usePublisher,
 } from "@mdxeditor/editor";
-import { Link as LinkIcon, Trash2, Edit2, Copy, X } from "lucide-react";
+import { Copy, Edit2, Link as LinkIcon, Trash2, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import "./LinkDialog.css";
 

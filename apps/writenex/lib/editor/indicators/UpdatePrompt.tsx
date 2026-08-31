@@ -24,8 +24,8 @@
 
 "use client";
 
-import React, { useState } from "react";
 import { RefreshCw, X } from "lucide-react";
+import React, { useState } from "react";
 import { useServiceWorker } from "@/lib/hooks";
 
 /**

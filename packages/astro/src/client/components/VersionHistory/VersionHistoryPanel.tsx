@@ -7,26 +7,26 @@
  * @module @writenex/astro/client/components/VersionHistory/VersionHistoryPanel
  */
 
-import { useEffect, useState, useRef } from "react";
 import {
-  X,
-  History,
-  Clock,
-  Tag,
-  RefreshCw,
-  Loader2,
-  Trash2,
   AlertTriangle,
+  Clock,
+  History,
+  Loader2,
+  RefreshCw,
+  Tag,
+  Trash2,
+  X,
 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import type { VersionEntry } from "../../../types";
-import {
-  useVersionHistory,
-  type DiffData,
-} from "../../hooks/useVersionHistory";
 import { useSharedVersionApi } from "../../context/ApiContext";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
-import { VersionActions } from "./VersionActions";
+import {
+  type DiffData,
+  useVersionHistory,
+} from "../../hooks/useVersionHistory";
 import { DiffViewer } from "./DiffViewer";
+import { VersionActions } from "./VersionActions";
 import "./VersionHistoryPanel.css";
 
 /**

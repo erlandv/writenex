@@ -3,13 +3,12 @@
  * @module lib/store
  */
 
+export { getActiveDocument, useEditorStore } from "./editor-store";
 export type {
-  ViewMode,
-  SaveStatus,
-  Theme,
-  SyntaxTheme,
   DocumentMeta,
   EditorState,
+  SaveStatus,
+  SyntaxTheme,
+  Theme,
+  ViewMode,
 } from "./types";
-
-export { useEditorStore, getActiveDocument } from "./editor-store";

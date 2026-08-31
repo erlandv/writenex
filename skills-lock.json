@@ -1,0 +1,65 @@
+{
+  "version": 1,
+  "skills": {
+    "biome-developer": {
+      "source": "biomejs/biome",
+      "sourceType": "github",
+      "computedHash": "16d5f8f88f361989861c75861289b60ead30ef5548bf1abac23a10785fbdcd8c"
+    },
+    "biomejs": {
+      "source": "aiko-atami/biomejs-skill",
+      "sourceType": "github",
+      "computedHash": "61ec6892179fdf17f07004ce3188e246a99b2531de1604ea27c1677c2ff50b62"
+    },
+    "diagnostics-development": {
+      "source": "biomejs/biome",
+      "sourceType": "github",
+      "computedHash": "ad5058eb27cd651db077694e112298a2393ab1dd63030f4c7e01f29ee7cb816f"
+    },
+    "eslint-prettier-migration": {
+      "source": "aiko-atami/biomejs-skill",
+      "sourceType": "github",
+      "computedHash": "23e5961b9a36b911379c8632fe59e28ca9379340039696997c51f9591dda0b96"
+    },
+    "formatter-development": {
+      "source": "biomejs/biome",
+      "sourceType": "github",
+      "computedHash": "34cda20e3d29bd7313797560e0207ff41eb2b52337b47d5a6db18f7104229ad4"
+    },
+    "github-action": {
+      "source": "letta-ai/letta-code-action",
+      "sourceType": "github",
+      "computedHash": "2ee3fa188647b08c8d6980b9f9346ac37fec395d6c8eb522d883ea7ce63ab0bf"
+    },
+    "lint-rule-development": {
+      "source": "biomejs/biome",
+      "sourceType": "github",
+      "computedHash": "f07804b477108ea2cff8360e0385664e0b1464d1b9814a9f5238fe6aa76faaaa"
+    },
+    "next-best-practices": {
+      "source": "vercel-labs/next-skills",
+      "sourceType": "github",
+      "computedHash": "c31ddd68ba5798a79a516c619b1e1fc4408cc4876ad600fefa4f5add4425719d"
+    },
+    "parser-development": {
+      "source": "biomejs/biome",
+      "sourceType": "github",
+      "computedHash": "109578ff5be08e84b3efac023b9c9fb8c6de9ddff06ac4b0931ad64a8fa9aa58"
+    },
+    "prettier-compare": {
+      "source": "biomejs/biome",
+      "sourceType": "github",
+      "computedHash": "84a100e3faa37e5a4dfaa72fb00ae101ea021ea66a6bc3567e180db44215b191"
+    },
+    "testing-codegen": {
+      "source": "biomejs/biome",
+      "sourceType": "github",
+      "computedHash": "b6b14f406b51ed0b36eba91ba4a0109b0aa81ed61da01efe2318f0d4b1120016"
+    },
+    "type-inference": {
+      "source": "biomejs/biome",
+      "sourceType": "github",
+      "computedHash": "9a5925380f9dcc2e75a5a4642d0baaa49e7e43d06414d2ad614d5033b6168f66"
+    }
+  }
+}

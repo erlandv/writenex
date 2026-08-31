@@ -32,7 +32,7 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { LS_OFFLINE_START, OFFLINE_MIN_DURATION } from "@/lib/utils";
 
 /**

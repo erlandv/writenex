@@ -8,18 +8,18 @@
  * @module @writenex/astro/client/components/VersionHistory/VersionActions
  */
 
-import { useState, useEffect, useRef } from "react";
 import {
-  RotateCcw,
-  GitCompare,
-  Download,
-  Trash2,
-  Loader2,
   AlertTriangle,
+  Download,
+  GitCompare,
+  Loader2,
+  RotateCcw,
+  Trash2,
   X,
 } from "lucide-react";
-import { useFocusTrap } from "../../hooks/useFocusTrap";
+import { useEffect, useRef, useState } from "react";
 import type { VersionEntry } from "../../../types";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 import "./VersionActions.css";
 
 /**

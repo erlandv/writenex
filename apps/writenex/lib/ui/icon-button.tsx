@@ -6,8 +6,8 @@
 "use client";
 
 import * as React from "react";
-import { SimpleTooltip } from "./simple-tooltip";
 import { cn } from "@/lib/utils";
+import { SimpleTooltip } from "./simple-tooltip";
 
 export interface IconButtonProps {
   icon: React.ReactNode;

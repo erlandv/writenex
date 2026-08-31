@@ -17,8 +17,8 @@
  * @module components/landing/LandingHeader
  */
 
-import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 /**
  * Fixed header component with logo, navigation, and CTA.
@@ -63,7 +63,7 @@ export function LandingHeader(): React.ReactElement {
               href="/astro"
               className="hidden text-sm text-zinc-600 transition-colors hover:text-zinc-900 sm:block dark:text-zinc-400 dark:hover:text-zinc-100"
             >
-              @writenex/astro
+              @imjp/writenex-astro
             </Link>
 
             {/* CTA */}

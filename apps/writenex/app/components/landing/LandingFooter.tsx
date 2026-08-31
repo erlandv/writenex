@@ -56,7 +56,7 @@ export function LandingFooter(): React.ReactElement {
             Terms
           </Link>
           <a
-            href="https://github.com/erlandv/writenex"
+            href="https://github.com/jaainil/writenex"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"

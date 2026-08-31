@@ -25,9 +25,9 @@
 
 "use client";
 
-import { useState, useCallback } from "react";
 import dynamic from "next/dynamic";
-import { Header, FocusModeOverlay, UpdatePrompt } from "@/lib/editor";
+import { useCallback, useState } from "react";
+import { FocusModeOverlay, Header, UpdatePrompt } from "@/lib/editor";
 import { useEditorStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 

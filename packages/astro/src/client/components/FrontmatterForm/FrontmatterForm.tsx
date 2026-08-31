@@ -8,9 +8,11 @@
  * @module @writenex/astro/client/components/FrontmatterForm
  */
 
-import { useCallback, useState } from "react";
-import { X, Info, AlertCircle } from "lucide-react";
+import { AlertCircle, Info, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
 import type { CollectionSchema, SchemaField } from "../../../types";
+import { useSharedApi } from "../../context/ApiContext";
+import type { ContentSummary } from "../../hooks/useApi";
 import "./FrontmatterForm.css";
 
 /**
@@ -413,35 +415,49 @@ function DynamicField({
 }): React.ReactElement {
   const fieldId = `fm-${name}`;
   const label = formatFieldLabel(name);
-  const enumOptions = parseEnumFromDescription(field.description);
 
   switch (field.type) {
     case "boolean":
+    case "checkbox":
       return (
         <BooleanField
           id={fieldId}
           label={label}
-          value={Boolean(value ?? field.default)}
+          value={normalizeBool(value ?? field.default)}
           onChange={onChange}
           disabled={disabled}
         />
       );
 
     case "number":
+    case "integer":
       return (
         <NumberField
           id={fieldId}
           label={label}
-          value={value as number | undefined}
+          value={value as number | string | undefined}
           onChange={onChange}
           disabled={disabled}
           required={field.required}
+          step={field.type === "integer" ? 1 : "any"}
         />
       );
 
     case "date":
       return (
         <DateField
+          id={fieldId}
+          label={label}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          required={field.required}
+        />
+      );
+
+    case "datetime":
+      return (
+        <DatetimeField
           id={fieldId}
           label={label}
           value={value}
@@ -458,6 +474,36 @@ function DynamicField({
           label={label}
           value={value as unknown[] | undefined}
           itemType={field.items}
+          itemField={field.itemField}
+          onChange={onChange}
+          disabled={disabled}
+          required={field.required}
+          onImageUpload={onImageUpload}
+          collection={collection}
+          contentId={contentId}
+        />
+      );
+
+    case "multiselect":
+      return (
+        <MultiselectField
+          id={fieldId}
+          label={label}
+          value={value as string[] | undefined}
+          options={field.options || []}
+          onChange={onChange}
+          disabled={disabled}
+          required={field.required}
+        />
+      );
+
+    case "select":
+      return (
+        <SelectField
+          id={fieldId}
+          label={label}
+          value={String(value ?? "")}
+          options={field.options || []}
           onChange={onChange}
           disabled={disabled}
           required={field.required}
@@ -481,24 +527,192 @@ function DynamicField({
         />
       );
 
+    case "file":
+      return (
+        <FileField
+          id={fieldId}
+          label={label}
+          value={value as string | undefined}
+          onChange={onChange}
+          disabled={disabled}
+          required={field.required}
+        />
+      );
+
+    case "slug":
+      return (
+        <SlugField
+          id={fieldId}
+          label={label}
+          value={String(value ?? "")}
+          onChange={onChange}
+          disabled={disabled}
+          required={field.required}
+        />
+      );
+
+    case "url":
+      return (
+        <UrlField
+          id={fieldId}
+          label={label}
+          value={String(value ?? "")}
+          onChange={onChange}
+          disabled={disabled}
+          required={field.required}
+        />
+      );
+
+    case "object":
+      return (
+        <ObjectField
+          id={fieldId}
+          label={label}
+          value={value as Record<string, unknown> | undefined}
+          fields={field.fields}
+          onChange={onChange}
+          disabled={disabled}
+          required={field.required}
+          onImageUpload={onImageUpload}
+          collection={collection}
+          contentId={contentId}
+        />
+      );
+
+    case "relationship":
+      return (
+        <RelationshipField
+          id={fieldId}
+          label={label}
+          value={value as string | string[] | undefined}
+          collection={field.collection}
+          onChange={onChange}
+          disabled={disabled}
+          required={field.required}
+        />
+      );
+
+    case "markdoc":
+    case "mdx":
+      return (
+        <RichTextField
+          id={fieldId}
+          label={label}
+          value={String(value ?? "")}
+          onChange={onChange}
+          disabled={disabled}
+          required={field.required}
+        />
+      );
+
+    // cloud-image: treat as regular image field
+    case "cloud-image":
+      return (
+        <ImageField
+          id={fieldId}
+          label={label}
+          value={value as string | undefined}
+          onChange={onChange}
+          disabled={disabled}
+          required={field.required}
+          onUpload={
+            onImageUpload ? (file) => onImageUpload(file, name) : undefined
+          }
+          collection={collection}
+          contentId={contentId}
+        />
+      );
+
+    // path-reference: plain text input for a file path
+    case "path-reference":
+      return (
+        <StringField
+          id={fieldId}
+          label={label}
+          value={String(value ?? "")}
+          onChange={onChange}
+          disabled={disabled}
+          required={field.required}
+          multiline={false}
+        />
+      );
+
+    // conditional: evaluating the condition requires the parent frontmatter object
+    // (to read matchField from a sibling field), which DynamicField doesn't receive.
+    // Always render showField so the value remains editable.
+    case "conditional": {
+      if (!field.showField) return <></>;
+      return (
+        <DynamicField
+          name={name}
+          field={field.showField}
+          value={value}
+          onChange={onChange}
+          disabled={disabled}
+          onImageUpload={onImageUpload}
+          collection={collection}
+          contentId={contentId}
+        />
+      );
+    }
+
+    // blocks: render each block as a collapsible object using its blockType schema
+    case "blocks": {
+      const blockItems = Array.isArray(value)
+        ? (value as Record<string, unknown>[])
+        : [];
+      const blockTypes = field.blockTypes ?? {};
+      return (
+        <div className="wn-frontmatter-field">
+          <label className="wn-frontmatter-label">
+            {label}
+            {field.required && (
+              <span className="wn-frontmatter-required">*</span>
+            )}
+          </label>
+          {blockItems.length === 0 && (
+            <span className="wn-frontmatter-hint">No blocks</span>
+          )}
+          {blockItems.map((block, index) => {
+            const blockType = String(block._type ?? block.type ?? "");
+            const blockSchema = blockTypes[blockType];
+            return (
+              <ObjectField
+                key={index}
+                id={`${fieldId}-${index}`}
+                label={blockType || `Block ${index + 1}`}
+                value={block}
+                fields={blockSchema?.fields}
+                onChange={(updated) => {
+                  const next = [...blockItems];
+                  next[index] = updated as Record<string, unknown>;
+                  onChange(next);
+                }}
+                disabled={disabled}
+                onImageUpload={onImageUpload}
+                collection={collection}
+                contentId={contentId}
+              />
+            );
+          })}
+        </div>
+      );
+    }
+
+    case "ignored":
+    case "empty":
+    case "empty-content":
+    case "empty-document":
+    case "child":
+      return <></>;
+
     case "string":
     default:
-      if (enumOptions.length > 0) {
-        return (
-          <SelectField
-            id={fieldId}
-            label={label}
-            value={String(value ?? "")}
-            options={enumOptions}
-            onChange={onChange}
-            disabled={disabled}
-            required={field.required}
-          />
-        );
-      }
-
       const isMultiline =
-        name === "description" || name === "excerpt" || name === "summary";
+        field.multiline ||
+        name === "description" ||
+        name === "excerpt" ||
+        name === "summary";
 
       return (
         <StringField
@@ -574,10 +788,22 @@ function NumberField({
   onChange,
   disabled,
   required,
+  step,
 }: BaseFieldProps & {
-  value: number | undefined;
+  value: number | string | undefined;
   onChange: (value: number | undefined) => void;
+  step?: string | number;
 }): React.ReactElement {
+  // Normalize string-typed numbers that may come from YAML round-trips
+  const numericValue =
+    value === undefined || value === ""
+      ? undefined
+      : typeof value === "string"
+        ? isNaN(Number(value))
+          ? undefined
+          : Number(value)
+        : value;
+
   return (
     <div className="wn-frontmatter-field">
       <label htmlFor={id} className="wn-frontmatter-label">
@@ -587,7 +813,8 @@ function NumberField({
       <input
         id={id}
         type="number"
-        value={value ?? ""}
+        value={numericValue ?? ""}
+        step={step ?? "any"}
         onChange={(e) => {
           const val = e.target.value;
           onChange(val === "" ? undefined : Number(val));
@@ -669,7 +896,7 @@ function SelectField({
 }: BaseFieldProps & {
   value: string;
   options: string[];
-  onChange: (value: string) => void;
+  onChange: (value: string | undefined) => void;
 }): React.ReactElement {
   return (
     <div className="wn-frontmatter-field">
@@ -680,7 +907,7 @@ function SelectField({
       <select
         id={id}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => onChange(e.target.value || undefined)}
         disabled={disabled}
         className="wn-frontmatter-select"
       >
@@ -700,21 +927,41 @@ function ArrayField({
   label,
   value,
   itemType,
+  itemField,
   onChange,
   disabled,
   required,
+  onImageUpload,
+  collection,
+  contentId,
 }: BaseFieldProps & {
   value: unknown[] | undefined;
   itemType?: string;
+  itemField?: SchemaField;
   onChange: (value: unknown[]) => void;
+  onImageUpload?: (file: File, fieldName: string) => Promise<string | null>;
+  collection?: string;
+  contentId?: string;
 }): React.ReactElement {
   const [inputValue, setInputValue] = useState("");
   const items = Array.isArray(value) ? value : [];
 
+  // If itemField is a structured schema (object, relationship, etc.),
+  // render each item as a full DynamicField rather than a tag input.
+  const isStructured =
+    itemField &&
+    itemField.type !== "string" &&
+    itemField.type !== "number" &&
+    itemField.type !== "integer";
+
   const handleAdd = () => {
     if (!inputValue.trim()) return;
     let newItem: unknown = inputValue.trim();
-    if (itemType === "number") {
+    if (
+      itemType === "number" ||
+      itemField?.type === "number" ||
+      itemField?.type === "integer"
+    ) {
       newItem = Number(newItem);
     }
     onChange([...items, newItem]);
@@ -732,6 +979,62 @@ function ArrayField({
     }
   };
 
+  // Structured items: render each as a DynamicField with a remove button
+  if (isStructured && itemField) {
+    return (
+      <div className="wn-frontmatter-field">
+        <label className="wn-frontmatter-label">
+          {label}
+          {required && <span className="wn-frontmatter-required">*</span>}
+        </label>
+        {items.map((item, index) => (
+          <div key={index} className="wn-frontmatter-array-item">
+            <DynamicField
+              name={`${id}-${index}`}
+              field={itemField}
+              value={item}
+              onChange={(updated) => {
+                const next = [...items];
+                next[index] = updated;
+                onChange(next);
+              }}
+              disabled={disabled}
+              onImageUpload={onImageUpload}
+              collection={collection}
+              contentId={contentId}
+            />
+            <button
+              type="button"
+              onClick={() => handleRemove(index)}
+              disabled={disabled}
+              className="wn-frontmatter-tag-remove"
+            >
+              <X size={10} />
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            onChange([
+              ...items,
+              itemField.type === "object"
+                ? {}
+                : itemField.type === "boolean" || itemField.type === "checkbox"
+                  ? false
+                  : undefined,
+            ])
+          }
+          disabled={disabled}
+          className="wn-frontmatter-add-btn"
+        >
+          + Add item
+        </button>
+      </div>
+    );
+  }
+
+  // Primitive items: tag-input style
   return (
     <div className="wn-frontmatter-field">
       <label htmlFor={id} className="wn-frontmatter-label">
@@ -745,7 +1048,11 @@ function ArrayField({
               {String(item)}
               <button
                 type="button"
-                onClick={() => handleRemove(index)}
+                onMouseDown={(e) => {
+                  // Prevent the input's onBlur from firing before this click
+                  e.preventDefault();
+                  handleRemove(index);
+                }}
                 disabled={disabled}
                 className="wn-frontmatter-tag-remove"
               >
@@ -757,7 +1064,13 @@ function ArrayField({
       )}
       <input
         id={id}
-        type={itemType === "number" ? "number" : "text"}
+        type={
+          itemType === "number" ||
+          itemField?.type === "number" ||
+          itemField?.type === "integer"
+            ? "number"
+            : "text"
+        }
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -869,14 +1182,403 @@ function ImageField({
   );
 }
 
+function DatetimeField({
+  id,
+  label,
+  value,
+  onChange,
+  disabled,
+  required,
+}: BaseFieldProps & {
+  value: unknown;
+  onChange: (value: string | undefined) => void;
+}): React.ReactElement {
+  const datetimeValue = formatDatetimeForInput(value);
+
+  return (
+    <div className="wn-frontmatter-field">
+      <label htmlFor={id} className="wn-frontmatter-label">
+        {label}
+        {required && <span className="wn-frontmatter-required">*</span>}
+      </label>
+      <input
+        id={id}
+        type="datetime-local"
+        value={datetimeValue}
+        onChange={(e) => onChange(e.target.value || undefined)}
+        disabled={disabled}
+        className="wn-frontmatter-input"
+      />
+    </div>
+  );
+}
+
+function MultiselectField({
+  id,
+  label,
+  value,
+  options,
+  onChange,
+  disabled,
+  required,
+}: BaseFieldProps & {
+  value: string[] | undefined;
+  options: string[];
+  onChange: (value: string[]) => void;
+}): React.ReactElement {
+  const selectedValues = value || [];
+
+  const handleToggle = (option: string) => {
+    if (selectedValues.includes(option)) {
+      onChange(selectedValues.filter((v) => v !== option));
+    } else {
+      onChange([...selectedValues, option]);
+    }
+  };
+
+  return (
+    <div className="wn-frontmatter-field">
+      <label className="wn-frontmatter-label">
+        {label}
+        {required && <span className="wn-frontmatter-required">*</span>}
+      </label>
+      <div className="wn-frontmatter-checkbox-group">
+        {options.map((option) => (
+          <label key={option} className="wn-frontmatter-checkbox-label">
+            <input
+              type="checkbox"
+              checked={selectedValues.includes(option)}
+              onChange={() => handleToggle(option)}
+              disabled={disabled}
+              className="wn-frontmatter-checkbox"
+            />
+            <span>{option}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FileField({
+  id,
+  label,
+  value,
+  onChange,
+  disabled,
+  required,
+}: BaseFieldProps & {
+  value: string | undefined;
+  onChange: (value: string | undefined) => void;
+}): React.ReactElement {
+  return (
+    <div className="wn-frontmatter-field">
+      <label htmlFor={id} className="wn-frontmatter-label">
+        {label}
+        {required && <span className="wn-frontmatter-required">*</span>}
+      </label>
+      <input
+        id={id}
+        type="text"
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value || undefined)}
+        disabled={disabled}
+        placeholder="./files/document.pdf"
+        className="wn-frontmatter-input"
+      />
+    </div>
+  );
+}
+
+function SlugField({
+  id,
+  label,
+  value,
+  onChange,
+  disabled,
+  required,
+}: BaseFieldProps & {
+  value: string;
+  onChange: (value: string) => void;
+}): React.ReactElement {
+  return (
+    <div className="wn-frontmatter-field">
+      <label htmlFor={id} className="wn-frontmatter-label">
+        {label}
+        {required && <span className="wn-frontmatter-required">*</span>}
+      </label>
+      <input
+        id={id}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        placeholder="enter-slug-here"
+        className="wn-frontmatter-input"
+      />
+    </div>
+  );
+}
+
+function UrlField({
+  id,
+  label,
+  value,
+  onChange,
+  disabled,
+  required,
+}: BaseFieldProps & {
+  value: string;
+  onChange: (value: string) => void;
+}): React.ReactElement {
+  return (
+    <div className="wn-frontmatter-field">
+      <label htmlFor={id} className="wn-frontmatter-label">
+        {label}
+        {required && <span className="wn-frontmatter-required">*</span>}
+      </label>
+      <input
+        id={id}
+        type="url"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        placeholder="https://example.com"
+        className="wn-frontmatter-input"
+      />
+    </div>
+  );
+}
+
+function ObjectField({
+  id,
+  label,
+  value,
+  fields,
+  onChange,
+  disabled,
+  required,
+  onImageUpload,
+  collection,
+  contentId,
+}: BaseFieldProps & {
+  value: Record<string, unknown> | undefined;
+  fields?: Record<string, SchemaField>;
+  onChange: (value: Record<string, unknown>) => void;
+  onImageUpload?: (file: File, fieldName: string) => Promise<string | null>;
+  collection?: string;
+  contentId?: string;
+}): React.ReactElement {
+  const objectValue = value || {};
+  const [isExpanded, setIsExpanded] = useState(true);
+
+  const handleFieldChange = (fieldName: string, fieldValue: unknown) => {
+    onChange({ ...objectValue, [fieldName]: fieldValue });
+  };
+
+  if (!fields || Object.keys(fields).length === 0) {
+    return (
+      <div className="wn-frontmatter-field">
+        <label className="wn-frontmatter-label">
+          {label}
+          {required && <span className="wn-frontmatter-required">*</span>}
+        </label>
+        <span className="wn-frontmatter-hint">No sub-fields defined</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="wn-frontmatter-field-group">
+      <button
+        type="button"
+        className="wn-frontmatter-group-toggle"
+        onClick={() => setIsExpanded(!isExpanded)}
+        disabled={disabled}
+      >
+        <span className="wn-frontmatter-label">
+          {label}
+          {required && <span className="wn-frontmatter-required">*</span>}
+        </span>
+        <span>{isExpanded ? "[-]" : "[+]"}</span>
+      </button>
+      {isExpanded && (
+        <div className="wn-frontmatter-group-content">
+          {Object.entries(fields).map(([fieldName, fieldDef]) => (
+            <DynamicField
+              key={fieldName}
+              name={fieldName}
+              field={fieldDef}
+              value={objectValue[fieldName]}
+              onChange={(fieldValue) =>
+                handleFieldChange(fieldName, fieldValue)
+              }
+              disabled={disabled}
+              onImageUpload={onImageUpload}
+              collection={collection}
+              contentId={contentId}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function RelationshipField({
+  id,
+  label,
+  value,
+  collection,
+  onChange,
+  disabled,
+  required,
+}: BaseFieldProps & {
+  value: string | string[] | undefined;
+  collection?: string;
+  onChange: (value: string) => void;
+}): React.ReactElement {
+  const api = useSharedApi();
+  const [items, setItems] = useState<ContentSummary[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!collection) return;
+    setLoading(true);
+    setFetchError(null);
+    api
+      .getContentList(collection, { includeDrafts: true })
+      .then((data) => setItems(data))
+      .catch((err: unknown) =>
+        setFetchError(
+          err instanceof Error ? err.message : "Failed to load items"
+        )
+      )
+      .finally(() => setLoading(false));
+  }, [api, collection]);
+
+  // Normalise to a single string ID (relationship fields store one reference)
+  const currentValue = Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
+
+  return (
+    <div className="wn-frontmatter-field">
+      <label htmlFor={id} className="wn-frontmatter-label">
+        {label}
+        {required && <span className="wn-frontmatter-required">*</span>}
+      </label>
+      {loading ? (
+        <select id={id} className="wn-frontmatter-select" disabled>
+          <option>Loading {collection}…</option>
+        </select>
+      ) : fetchError ? (
+        <select id={id} className="wn-frontmatter-select" disabled>
+          <option>Error: {fetchError}</option>
+        </select>
+      ) : (
+        <select
+          id={id}
+          value={currentValue}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={disabled}
+          className="wn-frontmatter-select"
+        >
+          <option value="">
+            {collection ? `Select from ${collection}…` : "Select…"}
+          </option>
+          {items.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.title || item.id}
+            </option>
+          ))}
+        </select>
+      )}
+      {collection && !fetchError && (
+        <span className="wn-frontmatter-hint">Collection: {collection}</span>
+      )}
+    </div>
+  );
+}
+
+function RichTextField({
+  id,
+  label,
+  value,
+  onChange,
+  disabled,
+  required,
+}: BaseFieldProps & {
+  value: string;
+  onChange: (value: string) => void;
+}): React.ReactElement {
+  return (
+    <div className="wn-frontmatter-field wn-frontmatter-field--full">
+      <label htmlFor={id} className="wn-frontmatter-label">
+        {label}
+        {required && <span className="wn-frontmatter-required">*</span>}
+      </label>
+      <textarea
+        id={id}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        placeholder={`Enter ${label.toLowerCase()}`}
+        rows={8}
+        className="wn-frontmatter-textarea wn-frontmatter-textarea--rich"
+      />
+    </div>
+  );
+}
+
+function formatDatetimeForInput(value: unknown): string {
+  if (!value) return "";
+
+  if (typeof value === "string") {
+    if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
+      return value.slice(0, 16);
+    }
+    try {
+      const date = new Date(value);
+      if (!isNaN(date.getTime())) {
+        return date.toISOString().slice(0, 16) ?? "";
+      }
+    } catch {
+      return "";
+    }
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString().slice(0, 16) ?? "";
+  }
+
+  return "";
+}
+
 // Utilities
 
+/**
+ * Safely coerce an unknown value to boolean.
+ * Avoids Boolean("false") === true by checking string representations explicitly.
+ */
+function normalizeBool(value: unknown): boolean {
+  if (typeof value === "boolean") return value;
+  if (value === "true" || value === 1) return true;
+  if (value === "false" || value === 0 || value === null || value === undefined)
+    return false;
+  return Boolean(value);
+}
+
 function formatFieldLabel(name: string): string {
-  return name
-    .replace(/([A-Z])/g, " $1")
-    .replace(/[_-]/g, " ")
-    .replace(/^\w/, (c) => c.toUpperCase())
-    .trim();
+  return (
+    name
+      // Insert space before a capital letter that follows a lowercase letter
+      // (avoids splitting consecutive caps like "URL" → "U R L")
+      .replace(/([a-z])([A-Z])/g, "$1 $2")
+      .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
+      .replace(/[_-]/g, " ")
+      .replace(/^\w/, (c) => c.toUpperCase())
+      .trim()
+  );
 }
 
 function formatDateForInput(value: unknown): string {
@@ -901,14 +1603,4 @@ function formatDateForInput(value: unknown): string {
   }
 
   return "";
-}
-
-function parseEnumFromDescription(description?: string): string[] {
-  if (!description) return [];
-  const match = description.match(/^Options:\s*(.+)$/i);
-  if (!match || !match[1]) return [];
-  return match[1]
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
 }

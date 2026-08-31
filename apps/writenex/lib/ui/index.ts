@@ -3,19 +3,9 @@
  * @module lib/ui
  */
 
-export { Button, buttonVariants } from "./button";
 export type { ButtonProps } from "./button";
-
-export {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./tooltip";
-
-export { SimpleTooltip } from "./simple-tooltip";
-export type { SimpleTooltipProps } from "./simple-tooltip";
-
+export { Button, buttonVariants } from "./button";
+export { DestructiveActionDialog } from "./destructive-action-dialog";
 export {
   Dialog,
   DialogClose,
@@ -28,7 +18,6 @@ export {
   DialogTitle,
   DialogTrigger,
 } from "./dialog";
-
 export {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -46,10 +35,15 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
+export type { IconButtonProps } from "./icon-button";
+export { IconButton } from "./icon-button";
 
 export { Input } from "./input";
-
-export { IconButton } from "./icon-button";
-export type { IconButtonProps } from "./icon-button";
-
-export { DestructiveActionDialog } from "./destructive-action-dialog";
+export type { SimpleTooltipProps } from "./simple-tooltip";
+export { SimpleTooltip } from "./simple-tooltip";
+export {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./tooltip";

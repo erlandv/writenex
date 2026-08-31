@@ -25,15 +25,15 @@
 
 "use client";
 
-import React, { useCallback } from "react";
 import { List, X } from "lucide-react";
-import { useEditorStore } from "@/lib/store";
+import React, { useCallback } from "react";
 import {
-  useTableOfContents,
-  useActiveHeading,
   scrollToHeading,
   type TocHeading,
+  useActiveHeading,
+  useTableOfContents,
 } from "@/lib/hooks";
+import { useEditorStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
 // =============================================================================

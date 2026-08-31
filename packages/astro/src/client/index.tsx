@@ -10,8 +10,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
-import { ThemeProvider } from "./context/ThemeContext";
 import { ApiProvider } from "./context/ApiContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 /**
  * Configuration injected by the server

@@ -7,17 +7,17 @@
  * @module @writenex/astro/client/components/SearchReplace
  */
 
-import { useState, useCallback, useEffect, useRef } from "react";
 import {
-  X,
-  ChevronUp,
-  ChevronDown,
   CaseSensitive,
-  WholeWord,
+  ChevronDown,
+  ChevronUp,
   Regex,
   Replace,
   ReplaceAll,
+  WholeWord,
+  X,
 } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./SearchReplacePanel.css";
 
 /**

@@ -25,20 +25,19 @@
 
 "use client";
 
-import React, { useState, useCallback, useEffect, useRef } from "react";
 import {
-  X,
-  ChevronUp,
-  ChevronDown,
   CaseSensitive,
-  WholeWord,
+  ChevronDown,
+  ChevronUp,
   Regex,
   Replace,
   ReplaceAll,
+  WholeWord,
+  X,
 } from "lucide-react";
-import { Button } from "@/lib/ui"; // button";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/lib/ui"; // tooltip";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useEditorStore } from "@/lib/store";
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from "@/lib/ui"; // tooltip";
 import { cn } from "@/lib/utils";
 
 /**

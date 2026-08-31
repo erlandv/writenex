@@ -1,0 +1,4 @@
+interface:
+  display_name: "BiomeJS"
+  short_description: "Install and configure BiomeJS."
+  default_prompt: "Use this skill to install BiomeJS, configure biome.json, and enforce checks in CI."

@@ -14,12 +14,12 @@
  * @module @writenex/astro/discovery/collections
  */
 
-import { readdir, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
+import { readdir, stat } from "node:fs/promises";
 import { join } from "node:path";
-import type { DiscoveredCollection, CollectionConfig } from "@/types";
-import { getCollectionCount } from "@/filesystem/reader";
 import { DEFAULT_FILE_PATTERN } from "@/config/defaults";
+import { getCollectionCount } from "@/filesystem/reader";
+import type { CollectionConfig, DiscoveredCollection } from "@/types";
 import { detectFilePattern as detectPattern } from "./patterns";
 import { detectSchema } from "./schema";
 
@@ -144,10 +144,14 @@ export function mergeCollections(
   // Add configured collections first (they take precedence)
   for (const config of configured) {
     const discoveredMatch = discovered.find((d) => d.name === config.name);
+    const path =
+      config.path ??
+      discoveredMatch?.path ??
+      join(DEFAULT_CONTENT_DIR, config.name);
 
     result.push({
       name: config.name,
-      path: config.path,
+      path,
       filePattern:
         config.filePattern ??
         discoveredMatch?.filePattern ??

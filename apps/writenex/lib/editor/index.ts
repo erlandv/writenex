@@ -3,20 +3,6 @@
  * @module lib/editor
  */
 
-// Core editor components (root level)
-export { EditorShortcuts } from "./EditorShortcuts";
-export { MarkdownEditor } from "./MarkdownEditor";
-
-// Export utilities
-export {
-  stripFrontmatter,
-  markdownToHtmlFragment,
-  markdownToHtmlPage,
-  copyHtmlToClipboard,
-  downloadHtml,
-  sanitizeFilename,
-} from "./exportHtml";
-
 // Dialog components
 export {
   ClearEditorDialog,
@@ -27,18 +13,18 @@ export {
   LinkDialog,
   WelcomeTourModal,
 } from "./dialogs";
+// Core editor components (root level)
+export { EditorShortcuts } from "./EditorShortcuts";
 
-// Panel components
+// Export utilities
 export {
-  SearchReplacePanel,
-  TocPanel,
-  VersionHistoryPanel,
-  type SearchOptions,
-} from "./panels";
-
-// Toolbar components
-export { DocumentTabs, Header, StatusBar } from "./toolbar";
-
+  copyHtmlToClipboard,
+  downloadHtml,
+  markdownToHtmlFragment,
+  markdownToHtmlPage,
+  sanitizeFilename,
+  stripFrontmatter,
+} from "./exportHtml";
 // Indicator components
 export {
   BackupReminder,
@@ -47,3 +33,13 @@ export {
   StorageWarning,
   UpdatePrompt,
 } from "./indicators";
+export { MarkdownEditor } from "./MarkdownEditor";
+// Panel components
+export {
+  type SearchOptions,
+  SearchReplacePanel,
+  TocPanel,
+  VersionHistoryPanel,
+} from "./panels";
+// Toolbar components
+export { DocumentTabs, Header, StatusBar } from "./toolbar";

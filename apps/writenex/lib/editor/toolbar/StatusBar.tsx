@@ -23,11 +23,10 @@
 
 "use client";
 
+import { AlertCircle, Loader2, Lock, Save } from "lucide-react";
 import React, { useMemo } from "react";
-import { Lock, Save, AlertCircle, Loader2 } from "lucide-react";
 import { useEditorStore } from "@/lib/store";
-import { calculateStats, formatTime } from "@/lib/utils";
-import { WORDS_PER_MINUTE } from "@/lib/utils";
+import { calculateStats, formatTime, WORDS_PER_MINUTE } from "@/lib/utils";
 import { OfflineIndicator } from "../indicators";
 
 /**

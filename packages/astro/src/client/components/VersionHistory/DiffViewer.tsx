@@ -8,8 +8,8 @@
  * @module @writenex/astro/client/components/VersionHistory/DiffViewer
  */
 
-import { useState, useMemo, useEffect, useRef } from "react";
-import { X, Columns, AlignLeft } from "lucide-react";
+import { AlignLeft, Columns, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import "./DiffViewer.css";
 
@@ -56,16 +56,20 @@ function computeDiff(oldText: string, newText: string): DiffLine[] {
   // Build LCS table
   const m = oldLines.length;
   const n = newLines.length;
-  const dp: number[][] = Array(m + 1)
-    .fill(null)
-    .map(() => Array(n + 1).fill(0));
+  const dp: number[][] = Array.from(
+    { length: m + 1 },
+    () => Array(n + 1).fill(0) as number[]
+  ) as number[][];
 
   for (let i = 1; i <= m; i++) {
     for (let j = 1; j <= n; j++) {
+      const prevDiag = (dp[i - 1]?.[j - 1] ?? 0) as number;
+      const prevUp = (dp[i - 1]?.[j] ?? 0) as number;
+      const prevLeft = (dp[i]?.[j - 1] ?? 0) as number;
       if (oldLines[i - 1] === newLines[j - 1]) {
-        dp[i][j] = dp[i - 1][j - 1] + 1;
+        dp[i]![j] = prevDiag + 1;
       } else {
-        dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+        dp[i]![j] = Math.max(prevUp, prevLeft);
       }
     }
   }
@@ -79,23 +83,26 @@ function computeDiff(oldText: string, newText: string): DiffLine[] {
     if (i > 0 && j > 0 && oldLines[i - 1] === newLines[j - 1]) {
       stack.push({
         type: "unchanged",
-        content: oldLines[i - 1],
+        content: oldLines[i - 1] ?? "",
         oldLineNum: i,
         newLineNum: j,
       });
       i--;
       j--;
-    } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+    } else if (
+      j > 0 &&
+      (i === 0 || (dp[i]?.[j - 1] ?? 0) >= (dp[i - 1]?.[j] ?? 0))
+    ) {
       stack.push({
         type: "added",
-        content: newLines[j - 1],
+        content: newLines[j - 1] ?? "",
         newLineNum: j,
       });
       j--;
     } else if (i > 0) {
       stack.push({
         type: "removed",
-        content: oldLines[i - 1],
+        content: oldLines[i - 1] ?? "",
         oldLineNum: i,
       });
       i--;

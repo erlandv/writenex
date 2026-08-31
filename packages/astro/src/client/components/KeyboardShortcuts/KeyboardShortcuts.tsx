@@ -8,8 +8,8 @@
  * @module @writenex/astro/client/components/KeyboardShortcuts
  */
 
-import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import {
   formatShortcut,

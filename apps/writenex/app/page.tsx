@@ -27,30 +27,30 @@
  * @see {@link FAQAccordion} - Client-side FAQ component
  */
 
-import Link from "next/link";
-import type { Metadata } from "next";
 import {
-  Eye,
-  History,
-  Download,
   ArrowRight,
+  Download,
+  Eye,
   FileText,
-  Sparkles,
+  History,
   Keyboard,
-  Zap,
   MousePointer,
   PenLine,
   Share2,
+  Sparkles,
+  Zap,
 } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
 import {
-  softwareApplicationSchema,
   createBreadcrumbSchema,
   faqSchema,
+  softwareApplicationSchema,
 } from "@/app/lib/jsonld";
 import {
   FAQAccordion,
-  LandingHeader,
   LandingFooter,
+  LandingHeader,
 } from "@/components/landing";
 
 // =============================================================================

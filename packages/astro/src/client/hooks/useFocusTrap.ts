@@ -19,8 +19,8 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import {
-  getFocusableElements,
   getFirstFocusable,
+  getFocusableElements,
   getLastFocusable,
 } from "../utils/focus";
 

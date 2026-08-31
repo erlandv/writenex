@@ -8,9 +8,9 @@
  * @module @writenex/astro/filesystem/watcher
  */
 
-import { watch, type FSWatcher } from "chokidar";
 import { stat } from "node:fs/promises";
-import { join } from "node:path";
+import { join, relative } from "node:path";
+import { type FSWatcher, watch } from "chokidar";
 
 /**
  * File change event types
@@ -141,11 +141,9 @@ export class ContentWatcher {
       return;
     }
 
-    // Extract collection name from path
+    // Extract collection name from path using cross-platform relative path
     const contentPath = join(this.projectRoot, this.contentDir);
-    const relativePath = filePath
-      .replace(contentPath, "")
-      .replace(/^[/\\]/, "");
+    const relativePath = relative(contentPath, filePath);
     const parts = relativePath.split(/[/\\]/);
     const collection = parts[0] ?? "";
 

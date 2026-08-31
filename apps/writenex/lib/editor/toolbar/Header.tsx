@@ -26,44 +26,46 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Link from "next/link";
 import {
-  FileText,
-  Upload,
-  Search,
-  History,
-  Keyboard,
-  Lock,
-  Unlock,
-  Trash2,
-  Sun,
-  Moon,
-  Monitor,
-  Maximize2,
   Clipboard,
   Code,
   FileDown,
+  FileText,
   Globe,
-  List,
   HelpCircle,
+  History,
+  Keyboard,
+  List,
+  Lock,
+  Maximize2,
+  Monitor,
+  Moon,
+  Search,
+  Settings,
+  Sun,
+  Trash2,
+  Unlock,
+  Upload,
 } from "lucide-react";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import { exportWorkspace, importWorkspace } from "@/lib/backup";
+import { createDocument, getImage, saveSetting } from "@/lib/db";
+import { getActiveDocument, useEditorStore } from "@/lib/store";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/lib/ui"; // dropdown-menu";
-import { SimpleTooltip } from "@/lib/ui"; // simple-tooltip";
-import { IconButton } from "@/lib/ui"; // icon-button";
-import { useEditorStore, getActiveDocument } from "@/lib/store";
+  IconButton,
+  SimpleTooltip,
+} from "@/lib/ui"; // icon-button";
 import { cn } from "@/lib/utils";
-import { getImage, saveSetting } from "@/lib/db";
 import {
-  markdownToHtmlFragment,
-  markdownToHtmlPage,
   copyHtmlToClipboard,
   downloadHtml,
+  markdownToHtmlFragment,
+  markdownToHtmlPage,
   sanitizeFilename,
 } from "../exportHtml";
 
@@ -196,7 +198,11 @@ export function Header(): React.ReactElement {
     setTocPanelOpen,
     setShortcutsOpen,
     setClearDialogOpen,
+    setSettingsOpen,
     openOnboarding,
+    addDocument,
+    setActiveDocumentId,
+    confirmClearEditor,
   } = store;
 
   // Get active document for filename
@@ -254,24 +260,69 @@ export function Header(): React.ReactElement {
     }
   };
 
-  const handleImport = (): void => {
+  const handleImportFiles = async (files: FileList | null, asNew: boolean) => {
+    if (!files || files.length === 0) return;
+
+    if (asNew) {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (!file.name.match(/\.(md|markdown|txt)$/i)) continue;
+        const text = await file.text();
+        const title = file.name.replace(/\.(md|markdown|txt)$/i, "");
+        const doc = await createDocument(title, text);
+        addDocument({ id: doc.id, title: doc.title, updatedAt: doc.updatedAt });
+        setActiveDocumentId(doc.id);
+        setContent(text);
+      }
+    } else {
+      const file = files[0];
+      const text = await file.text();
+      setContent(text);
+    }
+  };
+
+  const triggerFileInput = (asNew: boolean, folder: boolean) => {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".md,.markdown,.txt";
-    input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const text = await file.text();
-        setContent(text);
-      }
+    if (asNew) input.multiple = true;
+    if (folder) {
+      input.setAttribute("webkitdirectory", "true");
+      input.setAttribute("directory", "true");
+    }
+    input.onchange = (e) => {
+      const files = (e.target as HTMLInputElement).files;
+      handleImportFiles(files, asNew);
     };
     input.click();
   };
 
+  const handleImportReplace = () => triggerFileInput(false, false);
+  const handleImportNew = () => triggerFileInput(true, false);
+  const handleImportFolder = () => triggerFileInput(true, true);
+
   const handleClear = (): void => {
     if (!isReadOnly && content.length > 0) {
-      setClearDialogOpen(true);
+      if (confirmClearEditor) {
+        setClearDialogOpen(true);
+      } else {
+        setContent("");
+      }
     }
+  };
+
+  const handleRestoreWorkspace = (): void => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".zip";
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        await importWorkspace(file);
+        window.location.reload();
+      }
+    };
+    input.click();
   };
 
   // Track the resolved theme (actual light/dark being displayed)
@@ -346,9 +397,23 @@ export function Header(): React.ReactElement {
             </DropdownMenuTrigger>
           </SimpleTooltip>
           <DropdownMenuContent align="end" className="flex flex-col gap-1">
-            <DropdownMenuItem onClick={handleImport} disabled={isReadOnly}>
+            <DropdownMenuItem
+              onClick={handleImportReplace}
+              disabled={isReadOnly}
+            >
               <Upload className="mr-2 h-4 w-4" />
-              Import Markdown
+              Import (Replace current)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleImportNew} disabled={isReadOnly}>
+              <Upload className="mr-2 h-4 w-4" />
+              Import (As new docs)
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={handleImportFolder}
+              disabled={isReadOnly}
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              Import Folder (As new docs)
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleCopyMarkdown}>
               <Clipboard className="mr-2 h-4 w-4" />
@@ -365,6 +430,34 @@ export function Header(): React.ReactElement {
             <DropdownMenuItem onClick={handleExportHtml}>
               <Globe className="mr-2 h-4 w-4" />
               Download as .html
+            </DropdownMenuItem>
+            <div className="my-1 h-px bg-zinc-200 dark:bg-zinc-700" />
+            <DropdownMenuItem onClick={exportWorkspace}>
+              <FileDown className="mr-2 h-4 w-4" />
+              Backup Workspace (ZIP)
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleRestoreWorkspace}>
+              <Upload className="mr-2 h-4 w-4" />
+              Restore Workspace (ZIP)
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                const input = document.createElement("input");
+                input.type = "file";
+                input.accept = ".zip";
+                input.onchange = async (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (file) {
+                    await importWorkspace(file);
+                    window.location.reload();
+                  }
+                };
+                input.click();
+              }}
+              disabled={isReadOnly}
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              Restore Workspace (ZIP)
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -452,6 +545,12 @@ export function Header(): React.ReactElement {
           icon={<Keyboard className="h-4 w-4" />}
           label="Keyboard Shortcuts (Ctrl+/)"
           onClick={() => setShortcutsOpen(true)}
+        />
+
+        <IconButton
+          icon={<Settings className="h-4 w-4" />}
+          label="Settings"
+          onClick={() => setSettingsOpen(true)}
         />
 
         <HeaderSeparator />

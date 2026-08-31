@@ -1,7 +1,7 @@
 {
-  "name": "@writenex/astro",
-  "version": "0.3.1",
-  "description": "Visual editor for Astro content collections - WYSIWYG editing for your Astro site",
+  "name": "@imjp/writenex-astro",
+  "version": "1.11.2",
+  "description": "Visual editor for Astro content collections - WYSIWYG editing for your Astro site.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -29,6 +29,10 @@
     "./server": {
       "types": "./dist/server/index.d.ts",
       "import": "./dist/server/index.js"
+    },
+    "./fields": {
+      "types": "./dist/fields/index.d.ts",
+      "import": "./dist/fields/index.js"
     }
   },
   "files": [
@@ -40,7 +44,7 @@
     "build": "tsup",
     "prepublishOnly": "pnpm build",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src/"
+    "lint": "biome lint src/"
   },
   "keywords": [
     "astro",
@@ -53,39 +57,42 @@
     "mdx",
     "visual-editor"
   ],
-  "author": "Erland <hello@erland.me>",
+  "author": "Jainil <jaainil@users.noreply.github.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/erlandv/writenex.git",
+    "url": "https://github.com/jaainil/writenex.git",
     "directory": "packages/astro"
   },
-  "homepage": "https://writenex.com/astro",
+  "homepage": "https://github.com/jaainil/writenex",
   "bugs": {
-    "url": "https://github.com/erlandv/writenex/issues"
+    "url": "https://github.com/jaainil/writenex/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "dependencies": {
-    "@mdxeditor/editor": "^3.52.1",
-    "chokidar": "^4.0.3",
+    "@mdxeditor/editor": "^4.2.3",
+    "chokidar": "^5.0.0",
     "gray-matter": "^4.0.3",
-    "lucide-react": "^0.561.0",
-    "slugify": "^1.6.6",
-    "zod": "^3.24.0"
+    "jiti": "^2.7.0",
+    "lucide-react": "^1.38.0",
+    "slugify": "^1.6.9",
+    "zod": "^4.5.4"
   },
   "peerDependencies": {
-    "astro": "^4.0.0 || ^5.0.0",
+    "astro": "^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0",
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.19.1",
-    "@types/react": "^19.1.8",
-    "@types/react-dom": "^19.1.6",
-    "@writenex/eslint-config": "workspace:*",
+    "@types/node": "^26.4.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
     "@writenex/tsconfig": "workspace:*",
-    "astro": "^5.16.5",
-    "tsup": "^8.5.0",
-    "typescript": "^5.8.3",
-    "vite": "^6.4.1"
+    "astro": "^7.2.9",
+    "tsup": "^8.5.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2"
   }
 }

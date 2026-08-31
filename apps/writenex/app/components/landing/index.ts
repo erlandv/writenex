@@ -5,5 +5,5 @@
  */
 
 export { FAQAccordion } from "./FAQAccordion";
-export { LandingHeader } from "./LandingHeader";
 export { LandingFooter } from "./LandingFooter";
+export { LandingHeader } from "./LandingHeader";

@@ -17,9 +17,9 @@
  * @module @writenex/astro/tsup.config
  */
 
-import { defineConfig } from "tsup";
 import { copyFileSync, mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { defineConfig } from "tsup";
 
 /**
  * Base path for source files
@@ -87,6 +87,7 @@ export default defineConfig([
       "discovery/index": "src/discovery/index.ts",
       "filesystem/index": "src/filesystem/index.ts",
       "server/index": "src/server/index.ts",
+      "fields/index": "src/fields/index.ts",
     },
     outDir: "dist",
     format: ["esm"],

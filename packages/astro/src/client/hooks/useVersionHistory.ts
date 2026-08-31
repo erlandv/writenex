@@ -7,8 +7,8 @@
  * @module @writenex/astro/client/hooks/useVersionHistory
  */
 
-import { useState, useCallback, useMemo } from "react";
-import type { VersionEntry, Version } from "../../types";
+import { useCallback, useMemo, useState } from "react";
+import type { Version, VersionEntry } from "../../types";
 
 /**
  * Version history API client configuration

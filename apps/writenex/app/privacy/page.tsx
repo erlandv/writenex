@@ -2,7 +2,7 @@
  * @fileoverview Privacy Policy page for Writenex
  *
  * This page explains Writenex's privacy practices in clear, simple terms.
- * Covers both Writenex Editor and @writenex/astro package.
+ * Covers both Writenex Editor and @imjp/writenex-astro package.
  *
  * ## Key Points:
  * - No data collection - everything stays local (browser/filesystem)
@@ -16,7 +16,7 @@
 
 import type { Metadata } from "next";
 import { createBreadcrumbSchema } from "@/app/lib/jsonld";
-import { LandingHeader, LandingFooter } from "@/components/landing";
+import { LandingFooter, LandingHeader } from "@/components/landing";
 
 /**
  * Metadata for the Privacy Policy page.
@@ -101,7 +101,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
               <strong>Your content stays local.</strong> Writenex Editor stores
               data in your browser.{" "}
               <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                @writenex/astro
+                @imjp/writenex-astro
               </code>{" "}
               stores data in your project files.
             </li>
@@ -143,11 +143,11 @@ export default function PrivacyPolicyPage(): React.ReactElement {
             access to it, and it is never transmitted to any Writenex server.
           </p>
 
-          <h3>@writenex/astro</h3>
+          <h3>@imjp/writenex-astro</h3>
 
           <p>
-            @writenex/astro is an npm package that runs entirely on your local
-            machine. It stores:
+            @imjp/writenex-astro is an npm package that runs entirely on your
+            local machine. It stores:
           </p>
 
           <ul>
@@ -193,8 +193,8 @@ export default function PrivacyPolicyPage(): React.ReactElement {
               browser settings
             </li>
             <li>
-              <strong>@writenex/astro:</strong> Delete files from your project
-              directory or remove the{" "}
+              <strong>@imjp/writenex-astro:</strong> Delete files from your
+              project directory or remove the{" "}
               <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
                 .writenex
               </code>{" "}
@@ -240,7 +240,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
 
           <p>
             <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-              @writenex/astro
+              @imjp/writenex-astro
             </code>{" "}
             is distributed via npm. When installing or using the package:
           </p>
@@ -309,7 +309,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
             permissions you grant to them.
           </p>
 
-          <h3>@writenex/astro</h3>
+          <h3>@imjp/writenex-astro</h3>
 
           <p>Security considerations for the npm package include:</p>
 
@@ -332,7 +332,7 @@ export default function PrivacyPolicyPage(): React.ReactElement {
           <p>
             <strong>Important:</strong> Do not enable{" "}
             <code className="rounded bg-zinc-100 px-2 py-1 font-mono text-sm text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-              @writenex/astro
+              @imjp/writenex-astro
             </code>{" "}
             in production environments without proper authentication, as it
             provides write access to your filesystem.
@@ -369,11 +369,11 @@ export default function PrivacyPolicyPage(): React.ReactElement {
             privacy practices, you can contact us through the Writenex GitHub
             repository at{" "}
             <a
-              href="https://github.com/erlandv/writenex"
+              href="https://github.com/jaainil/writenex"
               target="_blank"
               rel="nofollow noopener noreferrer"
             >
-              https://github.com/erlandv/writenex
+              https://github.com/jaainil/writenex
             </a>
             .
           </p>

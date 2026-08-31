@@ -21,7 +21,7 @@
  */
 
 import type { Metadata, Viewport } from "next";
-import { webApplicationSchema, createBreadcrumbSchema } from "@/app/lib/jsonld";
+import { createBreadcrumbSchema, webApplicationSchema } from "@/app/lib/jsonld";
 
 /**
  * Viewport configuration for theme-aware status bar colors.

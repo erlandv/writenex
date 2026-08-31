@@ -15,8 +15,8 @@
  */
 
 import type {
-  DiscoveredCollection,
   ContentSummary,
+  DiscoveredCollection,
   DiscoveredImage,
 } from "@/types";
 

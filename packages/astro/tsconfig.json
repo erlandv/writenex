@@ -3,6 +3,7 @@
   "extends": "@writenex/tsconfig/react-library.json",
   "compilerOptions": {
     "baseUrl": "./src",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./*"],
       "@/types": ["./types/index.ts"],

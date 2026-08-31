@@ -25,18 +25,18 @@
 
 "use client";
 
-import React, { useState, useCallback, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Lightbulb } from "lucide-react";
+import React, { useCallback, useEffect, useState } from "react";
+import { useEditorStore } from "@/lib/store";
 import {
+  Button,
   Dialog,
   DialogContent,
-  DialogTitle,
   DialogDescription,
-} from "@/lib/ui"; // dialog";
-import { Button } from "@/lib/ui"; // button";
-import { ChevronLeft, ChevronRight, Lightbulb } from "lucide-react";
-import { useEditorStore } from "@/lib/store";
-import { ONBOARDING_SLIDES, TOTAL_SLIDES } from "../onboarding";
+  DialogTitle,
+} from "@/lib/ui"; // button";
 import { cn } from "@/lib/utils";
+import { ONBOARDING_SLIDES, TOTAL_SLIDES } from "../onboarding";
 
 // =============================================================================
 // SUBCOMPONENTS

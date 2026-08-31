@@ -11,24 +11,24 @@
  * @see {@link getVersions} - Core list function
  */
 
-import type {
-  VersionHistoryConfig,
-  VersionEntry,
-  Version,
-  VersionResult,
-  SaveVersionOptions,
-  RestoreVersionOptions,
-  RestoreResult,
-} from "@/types";
 import { DEFAULT_VERSION_HISTORY_CONFIG } from "@/config/defaults";
+import type {
+  RestoreResult,
+  RestoreVersionOptions,
+  SaveVersionOptions,
+  Version,
+  VersionEntry,
+  VersionHistoryConfig,
+  VersionResult,
+} from "@/types";
 import {
-  saveVersion as coreSaveVersion,
-  getVersions as coreGetVersions,
-  getVersion as coreGetVersion,
-  deleteVersion as coreDeleteVersion,
   clearVersions as coreClearVersions,
+  deleteVersion as coreDeleteVersion,
+  getVersion as coreGetVersion,
+  getVersions as coreGetVersions,
   pruneVersions as corePruneVersions,
   restoreVersion as coreRestoreVersion,
+  saveVersion as coreSaveVersion,
 } from "./versions";
 
 // =============================================================================

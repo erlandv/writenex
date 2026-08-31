@@ -7,5 +7,5 @@
  * @module @writenex/astro/core
  */
 
-export * from "./errors";
 export * from "./constants";
+export * from "./errors";

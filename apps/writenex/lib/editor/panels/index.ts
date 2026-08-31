@@ -7,6 +7,6 @@
  * @module components/editor/panels
  */
 
-export { SearchReplacePanel, type SearchOptions } from "./SearchReplacePanel";
+export { type SearchOptions, SearchReplacePanel } from "./SearchReplacePanel";
 export { TocPanel } from "./TocPanel";
 export { VersionHistoryPanel } from "./VersionHistoryPanel";

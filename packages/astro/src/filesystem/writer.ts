@@ -15,19 +15,19 @@
  * @module @writenex/astro/filesystem/writer
  */
 
-import { writeFile, unlink, mkdir, readFile, stat } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { join, dirname, basename } from "node:path";
+import { mkdir, readFile, stat, unlink, writeFile } from "node:fs/promises";
+import { basename, dirname, join } from "node:path";
 import slugify from "slugify";
-import { readContentFile } from "./reader";
-import { saveVersion } from "./versions";
+import { ContentConflictError } from "@/core/errors";
 import {
   generatePathFromPattern,
-  resolvePatternTokens,
   isValidPattern,
+  resolvePatternTokens,
 } from "@/discovery/patterns";
 import type { VersionHistoryConfig } from "@/types";
-import { ContentConflictError } from "@/core/errors";
+import { readContentFile } from "./reader";
+import { saveVersion } from "./versions";
 
 /**
  * Options for creating content
@@ -156,18 +156,34 @@ export async function generateUniqueSlug(
 function frontmatterToYaml(frontmatter: Record<string, unknown>): string {
   const lines: string[] = [];
 
+  const serializeString = (key: string, value: string, indent = ""): void => {
+    if (value.includes("\n")) {
+      const indented = value
+        .split("\n")
+        .map((line) => `${indent}  ${line}`)
+        .join("\n");
+      lines.push(`${indent}${key}: |`);
+      lines.push(indented);
+      return;
+    }
+
+    // Quote strings that are empty or contain YAML-significant characters.
+    if (/^$|[:#\[\]{},&*?!|>'"%@`]|^[-?]\s|\s$/.test(value)) {
+      const escaped = value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+      lines.push(`${indent}${key}: "${escaped}"`);
+      return;
+    }
+
+    lines.push(`${indent}${key}: ${value}`);
+  };
+
   for (const [key, value] of Object.entries(frontmatter)) {
     if (value === undefined || value === null) {
       continue;
     }
 
     if (typeof value === "string") {
-      // Quote strings that contain special characters
-      if (value.includes(":") || value.includes("#") || value.includes("\n")) {
-        lines.push(`${key}: "${value.replace(/"/g, '\\"')}"`);
-      } else {
-        lines.push(`${key}: ${value}`);
-      }
+      serializeString(key, value);
     } else if (typeof value === "number" || typeof value === "boolean") {
       lines.push(`${key}: ${value}`);
     } else if (value instanceof Date) {
@@ -185,7 +201,11 @@ function frontmatterToYaml(frontmatter: Record<string, unknown>): string {
       // Simple object serialization
       lines.push(`${key}:`);
       for (const [subKey, subValue] of Object.entries(value)) {
-        lines.push(`  ${subKey}: ${subValue}`);
+        if (typeof subValue === "string") {
+          serializeString(subKey, subValue, "  ");
+        } else {
+          lines.push(`  ${subKey}: ${subValue}`);
+        }
       }
     }
   }

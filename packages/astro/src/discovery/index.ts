@@ -9,25 +9,23 @@
 
 // Collection discovery
 export {
-  discoverCollections,
-  mergeCollections,
-  getCollection,
   collectionExists,
+  discoverCollections,
+  getCollection,
+  mergeCollections,
 } from "./collections";
-
+export type { PatternDetectionResult, ResolveTokensOptions } from "./patterns";
 // Pattern detection
 export {
   detectFilePattern,
   generatePathFromPattern,
-  parsePatternTokens,
-  validatePattern,
   getPatternExtension,
-  resolvePatternTokens,
-  isValidPattern,
   getSupportedTokens,
+  isValidPattern,
+  parsePatternTokens,
+  resolvePatternTokens,
+  validatePattern,
 } from "./patterns";
-export type { PatternDetectionResult, ResolveTokensOptions } from "./patterns";
-
-// Schema detection
-export { detectSchema, mergeSchema, describeSchema } from "./schema";
 export type { SchemaDetectionResult } from "./schema";
+// Schema detection
+export { describeSchema, detectSchema, mergeSchema } from "./schema";

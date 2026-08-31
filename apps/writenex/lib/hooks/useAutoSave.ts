@@ -23,9 +23,15 @@
  * @see {@link db} - Database persistence layer
  */
 
-import { useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import {
+  clearWorkingDraft,
+  getLastVersionTimestamp,
+  saveVersion,
+  saveWorkingDraft,
+  updateDocument,
+} from "@/lib/db";
 import { useEditorStore } from "@/lib/store";
-import { saveVersion, getLastVersionTimestamp, updateDocument } from "@/lib/db";
 import {
   AUTO_SAVE_DEBOUNCE,
   IDLE_THRESHOLD,
@@ -63,6 +69,7 @@ export function useAutoSave(): void {
     setLastVersionSnapshot,
     activeDocumentId,
     triggerVersionHistoryRefresh,
+    autoSaveInterval,
   } = useEditorStore();
 
   // ==========================================================================
@@ -120,6 +127,7 @@ export function useAutoSave(): void {
     try {
       setSaveStatus("saving");
       await updateDocument(docId, { content: currentContent });
+      await clearWorkingDraft(docId);
       lastSavedContentRef.current = currentContent;
       setLastSaved(new Date());
       setSaveStatus("saved");
@@ -220,7 +228,7 @@ export function useAutoSave(): void {
   }, [activeDocumentId, content, setLastVersionSnapshot]);
 
   // ==========================================================================
-  // AUTO-SAVE EFFECT (Debounced 3s)
+  // AUTO-SAVE EFFECT (Debounced, respects autoSaveInterval setting)
   // ==========================================================================
 
   useEffect(() => {
@@ -239,17 +247,29 @@ export function useAutoSave(): void {
     // Check if there are unsaved changes
     if (content === lastSavedContentRef.current) return;
 
-    // Set debounced save
+    // Immediately persist a working draft (crash recovery — no debounce)
+    saveWorkingDraft(activeDocumentId, content).catch((err) =>
+      console.error("Working draft save failed:", err)
+    );
+
+    // Set debounced save using the user-configured interval
     autoSaveTimerRef.current = setTimeout(() => {
       saveToDocument();
-    }, AUTO_SAVE_DEBOUNCE);
+    }, autoSaveInterval ?? AUTO_SAVE_DEBOUNCE);
 
     return () => {
       if (autoSaveTimerRef.current) {
         clearTimeout(autoSaveTimerRef.current);
       }
     };
-  }, [content, isReadOnly, activeDocumentId, saveToDocument, setSaveStatus]);
+  }, [
+    content,
+    isReadOnly,
+    activeDocumentId,
+    autoSaveInterval,
+    saveToDocument,
+    setSaveStatus,
+  ]);
 
   // ==========================================================================
   // IDLE DETECTION & AUTO VERSION SNAPSHOT

@@ -6,7 +6,7 @@
  * @module @writenex/astro/client/hooks/useSearch
  */
 
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import type { SearchOptions } from "../components/SearchReplace";
 
 /**

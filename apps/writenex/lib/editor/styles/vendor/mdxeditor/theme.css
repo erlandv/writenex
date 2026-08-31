@@ -1,17 +1,17 @@
 /**
  * MDXEditor Theme Customizations
- * 
+ *
  * Complete theme overrides for MDXEditor components including:
  * - Custom fonts (Plus Jakarta Sans, Agave Nerd Font)
  * - Light mode adjustments
  * - Dark mode theme
- * 
+ *
  * This file MUST be imported AFTER @mdxeditor/editor/style.css
  * to ensure our customizations take precedence.
- * 
+ *
  * All colors are defined as CSS variables for easy maintenance.
  * To change colors, modify the variables in sections 0-1.
- * 
+ *
  * Sections:
  * 0. Fonts & Toolbar Pointer Cursor
  * 1. Light Mode - CSS Variables & Base
@@ -47,14 +47,8 @@
 /* Ensure the content editable area uses our font */
 .mdxeditor [data-lexical-editor="true"] {
   font-family:
-    var(--font-plus-jakarta),
-    system-ui,
-    -apple-system,
-    "Segoe UI",
-    Roboto,
-    "Helvetica Neue",
-    Arial,
-    sans-serif !important;
+    var(--font-plus-jakarta), system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif !important;
 }
 
 /* Inline code must use mono font */

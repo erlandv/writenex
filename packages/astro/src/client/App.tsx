@@ -7,41 +7,41 @@
  * @module @writenex/astro/client/App
  */
 
+import { CheckCircle, ExternalLink, FileEdit, Save } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Sidebar } from "./components/Sidebar";
+import type { CollectionSchema } from "../types";
+import { ConfigPanel } from "./components/ConfigPanel/ConfigPanel";
+import { CreateContentModal } from "./components/CreateContentModal";
+import { FrontmatterForm } from "./components/FrontmatterForm";
+import { Header } from "./components/Header";
+import { ShortcutsHelpModal } from "./components/KeyboardShortcuts";
 import {
   LazyEditor as Editor,
   EditorEmpty,
   EditorLoading,
 } from "./components/LazyEditor";
-import { ConfigPanel } from "./components/ConfigPanel/ConfigPanel";
-import { CreateContentModal } from "./components/CreateContentModal";
+import { LiveRegion } from "./components/LiveRegion";
+import { SearchReplacePanel } from "./components/SearchReplace";
 import { SelectCollectionModal } from "./components/SelectCollectionModal";
+import { Sidebar } from "./components/Sidebar";
+import { SkipLink } from "./components/SkipLink";
 import { UnsavedChangesModal } from "./components/UnsavedChangesModal";
-import { Header } from "./components/Header";
-import { FrontmatterForm } from "./components/FrontmatterForm";
-import { Save, FileEdit, CheckCircle, ExternalLink } from "lucide-react";
-import type { CollectionSchema } from "../types";
-import {
-  useCollections,
-  useContentList,
-  useConfig,
-  type ContentItem,
-} from "./hooks/useApi";
+import { VersionHistoryPanel } from "./components/VersionHistory";
 import { useSharedApi } from "./context/ApiContext";
+import { useAnnounce } from "./hooks/useAnnounce";
 import {
-  useAutosave,
-  formatLastSaved,
+  type ContentItem,
+  useCollections,
+  useConfig,
+  useContentList,
+} from "./hooks/useApi";
+import {
   type AutosaveStatus,
+  formatLastSaved,
+  useAutosave,
 } from "./hooks/useAutosave";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
-import { ShortcutsHelpModal } from "./components/KeyboardShortcuts";
-import { SearchReplacePanel } from "./components/SearchReplace";
 import { useSearch } from "./hooks/useSearch";
-import { VersionHistoryPanel } from "./components/VersionHistory";
-import { SkipLink } from "./components/SkipLink";
-import { LiveRegion } from "./components/LiveRegion";
-import { useAnnounce } from "./hooks/useAnnounce";
 
 function generatePreviewUrl(
   pattern: string,
@@ -199,6 +199,32 @@ export function App(): React.ReactElement {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isFrontmatterOpen, setIsFrontmatterOpen] = useState(true);
   const [isVersionHistoryOpen, setIsVersionHistoryOpen] = useState(false);
+
+  // Remote CMS session state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .getSession()
+      .then((session) => {
+        if (!cancelled) setIsAuthenticated(session.authenticated);
+      })
+      .catch(() => {
+        if (!cancelled) setIsAuthenticated(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [api]);
+
+  const handleLogout = useCallback(async () => {
+    try {
+      await api.logout();
+    } finally {
+      window.location.href = api.basePath;
+    }
+  }, [api]);
 
   // Unsaved changes modal state
   const [showUnsavedModal, setShowUnsavedModal] = useState(false);
@@ -729,6 +755,8 @@ export function App(): React.ReactElement {
         onKeyboardShortcuts={toggleHelp}
         onSettings={() => setShowConfigPanel(true)}
         onNewContent={handleNewContentShortcut}
+        isAuthenticated={isAuthenticated}
+        onLogout={handleLogout}
       />
 
       {/* Secondary Header - Content Actions Bar */}

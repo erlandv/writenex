@@ -9,8 +9,8 @@
  * @module @writenex/astro/client/components/UnsavedChangesModal
  */
 
+import { AlertTriangle, X } from "lucide-react";
 import { useCallback, useEffect, useRef } from "react";
-import { X, AlertTriangle } from "lucide-react";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import "./UnsavedChangesModal.css";
 

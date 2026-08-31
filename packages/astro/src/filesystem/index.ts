@@ -8,100 +8,95 @@
  * @module @writenex/astro/filesystem
  */
 
+export type {
+  ContentStructure,
+  ContentStructureResult,
+  ImageUploadOptions,
+  ImageUploadResult,
+} from "./images";
+// Image functions and types
+export {
+  calculateRelativePath,
+  DEFAULT_IMAGE_CONFIG,
+  detectContentStructure,
+  discoverContentImages,
+  getContentImageFolder,
+  isValidImageFile,
+  parseMultipartFormData,
+  scanDirectoryForImages,
+  uploadImage,
+} from "./images";
+export type { ReadContentOptions, ReadFileResult } from "./reader";
 // Reader functions and types
 export {
-  readContentFile,
-  readCollection,
-  getCollectionSummaries,
-  getCollectionCount,
   checkCollection,
-  getFileStats,
-  isContentFile,
   extractSlug,
   generateExcerpt,
-  toContentSummary,
+  getCollectionCount,
+  getCollectionSummaries,
   getContentFilePath,
+  getFileStats,
+  isContentFile,
+  readCollection,
+  readContentFile,
+  toContentSummary,
 } from "./reader";
-export type { ReadContentOptions, ReadFileResult } from "./reader";
-
-// Writer functions and types
+// Version config helpers
 export {
-  createContent,
-  updateContent,
-  deleteContent,
-  generateSlug,
-  generateUniqueSlug,
-} from "./writer";
+  clearVersionsWithConfig,
+  deleteVersionWithConfig,
+  getVersionsWithConfig,
+  getVersionWithConfig,
+  isVersionHistoryEnabled,
+  pruneVersionsWithConfig,
+  resolveVersionConfig,
+  restoreVersionWithConfig,
+  saveVersionWithConfig,
+} from "./version-config";
+// Version history functions
+export {
+  clearVersions,
+  createEmptyManifest,
+  deleteVersion,
+  ensureGitignore,
+  ensureStorageDirectory,
+  generatePreview,
+  generateVersionId,
+  getManifestPath,
+  getOrRecoverManifest,
+  getVersion,
+  getVersionFilePath,
+  getVersionStoragePath,
+  getVersions,
+  parseVersionId,
+  pruneVersions,
+  readManifest,
+  recoverManifest,
+  restoreVersion,
+  saveVersion,
+  writeManifest,
+} from "./versions";
+export type {
+  FileChangeEvent,
+  FileChangeType,
+  WatcherOptions,
+} from "./watcher";
+// Watcher functions and types
+export {
+  ContentWatcher,
+  createContentWatcher,
+  FileModificationTracker,
+} from "./watcher";
 export type {
   CreateContentOptions,
   UpdateContentOptions,
   WriteResult,
 } from "./writer";
-
-// Watcher functions and types
+// Writer functions and types
 export {
-  ContentWatcher,
-  FileModificationTracker,
-  createContentWatcher,
-} from "./watcher";
-export type {
-  FileChangeType,
-  FileChangeEvent,
-  WatcherOptions,
-} from "./watcher";
-
-// Version history functions
-export {
-  saveVersion,
-  getVersions,
-  getVersion,
-  deleteVersion,
-  clearVersions,
-  pruneVersions,
-  restoreVersion,
-  generateVersionId,
-  parseVersionId,
-  getVersionStoragePath,
-  getVersionFilePath,
-  getManifestPath,
-  generatePreview,
-  readManifest,
-  writeManifest,
-  createEmptyManifest,
-  recoverManifest,
-  getOrRecoverManifest,
-  ensureGitignore,
-  ensureStorageDirectory,
-} from "./versions";
-
-// Version config helpers
-export {
-  resolveVersionConfig,
-  isVersionHistoryEnabled,
-  saveVersionWithConfig,
-  getVersionsWithConfig,
-  getVersionWithConfig,
-  deleteVersionWithConfig,
-  clearVersionsWithConfig,
-  pruneVersionsWithConfig,
-  restoreVersionWithConfig,
-} from "./version-config";
-
-// Image functions and types
-export {
-  uploadImage,
-  parseMultipartFormData,
-  isValidImageFile,
-  discoverContentImages,
-  getContentImageFolder,
-  detectContentStructure,
-  calculateRelativePath,
-  scanDirectoryForImages,
-  DEFAULT_IMAGE_CONFIG,
-} from "./images";
-export type {
-  ImageUploadResult,
-  ImageUploadOptions,
-  ContentStructure,
-  ContentStructureResult,
-} from "./images";
+  createContent,
+  deleteContent,
+  generateSlug,
+  generateUniqueSlug,
+  updateContent,
+} from "./writer";

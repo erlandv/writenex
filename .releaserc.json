@@ -1,0 +1,32 @@
+{
+  "branches": ["main"],
+  "tagFormat": "@imjp/writenex-astro@${version}",
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    [
+      "@semantic-release/changelog",
+      {
+        "changelogFile": "packages/astro/CHANGELOG.md"
+      }
+    ],
+    [
+      "@semantic-release/npm",
+      {
+        "npmPublish": true,
+        "pkgRoot": "./packages/astro"
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": [
+          "packages/astro/package.json",
+          "packages/astro/CHANGELOG.md"
+        ],
+        "message": "chore(release): @imjp/writenex-astro@${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ],
+    "@semantic-release/github"
+  ]
+}

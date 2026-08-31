@@ -1,40 +1,48 @@
 /**
- * @fileoverview Landing page for @writenex/astro integration
+ * @fileoverview Landing page for @imjp/writenex-astro integration
  *
  * Comprehensive documentation and marketing page for the Astro visual editor integration.
- * Showcases features, installation, configuration, and usage examples.
+ * Showcases features, installation, configuration, Fields API, and usage examples.
  *
  * @module app/astro/page
  */
 
-import Link from "next/link";
-import type { Metadata } from "next";
 import {
   ArrowRight,
-  Rocket,
-  FolderOpen,
-  Image,
-  Settings,
-  History,
-  Search,
-  Keyboard,
-  Eye,
-  Save,
-  FileText,
-  Terminal,
+  Calendar,
+  CheckCircle,
+  Code,
+  Database,
   ExternalLink,
+  Eye,
+  FileText,
+  FolderOpen,
+  Globe,
+  Hash,
+  History,
+  Image,
+  Keyboard,
+  List,
+  Plus,
+  Rocket,
+  Save,
+  Search,
+  Settings,
+  SwitchCamera,
+  Terminal,
+  Type,
+  Upload,
 } from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
 import { codeToHtml } from "shiki";
+import { LandingFooter, LandingHeader } from "@/app/components/landing";
 import { createBreadcrumbSchema } from "@/app/lib/jsonld";
-import { LandingHeader, LandingFooter } from "@/components/landing";
 
-/**
- * Page-specific metadata for SEO optimization.
- */
 export const metadata: Metadata = {
-  title: "@writenex/astro - Visual Editor for Astro Content Collections",
+  title: "@imjp/writenex-astro - Visual Editor for Astro Content Collections",
   description:
-    "WYSIWYG editor for Astro content collections. Zero config, auto-discovery, image upload, version history. Edit your markdown visually from the dev server.",
+    "WYSIWYG editor for Astro content collections with Fields API. 25+ field types, zero config, auto-discovery, image upload, version history.",
   keywords: [
     "astro content editor",
     "astro content collections",
@@ -42,14 +50,15 @@ export const metadata: Metadata = {
     "astro wysiwyg",
     "astro integration",
     "astro visual editor",
+    "fields api",
   ],
   alternates: {
     canonical: "https://writenex.com/astro",
   },
   openGraph: {
-    title: "@writenex/astro - Visual Editor for Astro Content Collections",
+    title: "@imjp/writenex-astro - Visual Editor for Astro Content Collections",
     description:
-      "WYSIWYG editor for Astro content collections. Zero config, auto-discovery, image upload, version history.",
+      "WYSIWYG editor for Astro content collections with Fields API. 25+ field types, zero config, auto-discovery.",
     type: "website",
   },
 };
@@ -58,21 +67,18 @@ export const metadata: Metadata = {
 // DATA
 // =============================================================================
 
-/**
- * Detailed features for the features grid.
- */
 const features = [
   {
     icon: Rocket,
-    title: "Zero Config",
+    title: "Fields API",
     description:
-      "Auto-detects your content collections from the src/content folder. Just install and start editing with no setup required.",
+      "TypeScript-first builder pattern with 25+ field types. Get full autocomplete and type safety for your content schema.",
   },
   {
     icon: FolderOpen,
-    title: "Filesystem-based",
+    title: "Zero Config",
     description:
-      "Reads and writes directly to your content files. No database or sync layer. Everything stays inside your repository.",
+      "Auto-detects your content collections from the src/content folder. Just install and start editing with no setup required.",
   },
   {
     icon: Settings,
@@ -93,46 +99,84 @@ const features = [
       "Creates automatic shadow copies on save. Restore any earlier version with one click and keep your work protected.",
   },
   {
-    icon: Save,
-    title: "Autosave",
+    icon: Database,
+    title: "Validation",
     description:
-      "Saves your work automatically at a configurable interval. Every change is stored instantly so progress is never lost.",
-  },
-  {
-    icon: Search,
-    title: "Search and Filter",
-    description:
-      "Locate content quickly with built-in search and draft filters. Navigate large collections with confidence and ease.",
-  },
-  {
-    icon: Eye,
-    title: "Preview Links",
-    description:
-      "Open a live preview of your content in the browser. Check how updates look without leaving your editing flow.",
-  },
-  {
-    icon: Keyboard,
-    title: "Keyboard Shortcuts",
-    description:
-      "Speed up your workflow with keyboard shortcuts. Press Ctrl+S to save, Alt+N to create new content, and more.",
+      "Built-in validation rules for required fields, min/max values, string lengths, and regex patterns.",
   },
 ];
 
-/**
- * Schema field types for the configuration section.
- */
-const schemaTypes = [
-  { type: "string", component: "Text input", example: '"Hello World"' },
-  { type: "number", component: "Number input", example: "42" },
-  { type: "boolean", component: "Toggle switch", example: "true" },
-  { type: "date", component: "Date picker", example: '"2024-01-15"' },
-  { type: "array", component: "Tag input", example: '["astro", "tutorial"]' },
-  { type: "image", component: "Image uploader", example: '"./hero.jpg"' },
+const fieldCategories = [
+  {
+    name: "Text Fields",
+    fields: [
+      { name: "text", description: "Single or multi-line text input" },
+      { name: "slug", description: "URL-friendly slug with auto-generation" },
+      { name: "url", description: "URL input with validation" },
+    ],
+  },
+  {
+    name: "Number Fields",
+    fields: [
+      { name: "number", description: "Numeric input for decimals" },
+      { name: "integer", description: "Whole number input" },
+    ],
+  },
+  {
+    name: "Selection Fields",
+    fields: [
+      { name: "select", description: "Dropdown selection from options" },
+      { name: "multiselect", description: "Multi-select with checkboxes" },
+      { name: "checkbox", description: "Boolean toggle" },
+    ],
+  },
+  {
+    name: "Date & Time",
+    fields: [
+      { name: "date", description: "Date picker" },
+      { name: "datetime", description: "Date and time picker" },
+    ],
+  },
+  {
+    name: "File & Media",
+    fields: [
+      { name: "image", description: "Image upload with preview" },
+      { name: "file", description: "File upload for documents" },
+    ],
+  },
+  {
+    name: "Structured",
+    fields: [
+      { name: "object", description: "Nested group of fields" },
+      { name: "array", description: "List of items with same schema" },
+      { name: "blocks", description: "List of items with different types" },
+    ],
+  },
+  {
+    name: "Reference",
+    fields: [
+      { name: "relationship", description: "Reference to another collection" },
+      { name: "pathReference", description: "Reference to a file path" },
+    ],
+  },
+  {
+    name: "Content",
+    fields: [
+      { name: "markdoc", description: "Markdoc rich content" },
+      { name: "mdx", description: "MDX content with components" },
+      { name: "child", description: "Child document content" },
+    ],
+  },
+  {
+    name: "Advanced",
+    fields: [
+      { name: "conditional", description: "Conditional field display" },
+      { name: "cloudImage", description: "Cloud-hosted image (future)" },
+      { name: "ignored", description: "Skip field from forms" },
+    ],
+  },
 ];
 
-/**
- * Keyboard shortcuts for the shortcuts section.
- */
 const shortcuts = [
   { keys: "Alt + N", action: "New content" },
   { keys: "Ctrl/Cmd + S", action: "Save" },
@@ -142,9 +186,6 @@ const shortcuts = [
   { keys: "Escape", action: "Close modal" },
 ];
 
-/**
- * Image strategies for the image strategies section.
- */
 const imageStrategies = [
   {
     name: "Colocated",
@@ -171,61 +212,19 @@ const imageStrategies = [
   },
 ];
 
-/**
- * File patterns for the file patterns section.
- */
-const filePatterns = [
-  { pattern: "{slug}.md", example: "my-post.md", useCase: "Simple (default)" },
-  {
-    pattern: "{slug}/index.md",
-    example: "my-post/index.md",
-    useCase: "Folder-based",
-  },
-  {
-    pattern: "{date}-{slug}.md",
-    example: "2024-01-15-my-post.md",
-    useCase: "Date-prefixed",
-  },
-  {
-    pattern: "{year}/{slug}.md",
-    example: "2024/my-post.md",
-    useCase: "Year folders",
-  },
-  {
-    pattern: "{year}/{month}/{slug}.md",
-    example: "2024/06/my-post.md",
-    useCase: "Year/month folders",
-  },
-  {
-    pattern: "{lang}/{slug}.md",
-    example: "en/my-post.md",
-    useCase: "Multi-language",
-  },
-  {
-    pattern: "{category}/{slug}.md",
-    example: "tutorials/my-post.md",
-    useCase: "Category folders",
-  },
-];
-
 // =============================================================================
 // COMPONENTS
 // =============================================================================
 
-/**
- * Hero section with main headline and quick start.
- */
 function HeroSection(): React.ReactElement {
   return (
     <section className="px-4 pt-32 pb-20 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-4xl text-center">
-        {/* Badge */}
         <div className="bg-brand-500/10 text-brand-600 dark:bg-brand-500/20 dark:text-brand-400 mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium">
           <Terminal className="h-4 w-4" />
           Astro Integration
         </div>
 
-        {/* Headline */}
         <h1 className="mb-6 text-4xl leading-tight font-bold text-zinc-900 sm:text-5xl lg:text-6xl dark:text-zinc-100">
           Visual Editor for
           <br />
@@ -234,21 +233,28 @@ function HeroSection(): React.ReactElement {
           </span>
         </h1>
 
-        {/* Subheadline */}
         <p className="mx-auto mb-8 max-w-2xl text-lg leading-relaxed text-zinc-600 sm:text-xl dark:text-zinc-400">
-          Write markdown visually, manage frontmatter with smart auto-generated
-          forms, and edit content straight from your dev server.
+          TypeScript-first Fields API with 25+ field types. Zero config,
+          auto-discovery, WYSIWYG editing, and version history.
         </p>
 
-        {/* CTAs */}
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <a
-            href="https://www.npmjs.com/package/@writenex/astro"
+            href="https://www.npmjs.com/package/@imjp/writenex-astro"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-brand-500 hover:bg-brand-600 inline-flex items-center gap-2 rounded-lg px-5 py-3 text-lg font-normal text-white transition-colors"
           >
             View on npm
+            <ExternalLink className="h-5 w-5" />
+          </a>
+          <a
+            href="https://github.com/jaainil/writenex/wiki"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-300 px-5 py-3 text-lg font-normal text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+          >
+            GitHub
             <ExternalLink className="h-5 w-5" />
           </a>
         </div>
@@ -257,9 +263,6 @@ function HeroSection(): React.ReactElement {
   );
 }
 
-/**
- * Quick start section with installation steps.
- */
 function QuickStartSection(): React.ReactElement {
   return (
     <section className="bg-zinc-50 px-4 py-20 sm:px-6 lg:px-8 dark:bg-zinc-800/50">
@@ -273,7 +276,6 @@ function QuickStartSection(): React.ReactElement {
           </p>
         </div>
 
-        {/* Terminal style code block */}
         <div className="overflow-hidden rounded-xl border border-zinc-200 bg-zinc-900 dark:border-zinc-700">
           <div className="flex items-center gap-2 border-b border-zinc-700 px-4 py-3">
             <div className="h-3 w-3 rounded-full bg-red-500" />
@@ -288,7 +290,7 @@ function QuickStartSection(): React.ReactElement {
               <span className="text-zinc-500"># Install the integration</span>
               {"\n"}
               <span className="text-green-400">npx</span> astro add
-              @writenex/astro{"\n\n"}
+              @imjp/writenex-astro{"\n\n"}
               <span className="text-zinc-500"># Start your dev server</span>
               {"\n"}
               <span className="text-green-400">astro</span> dev{"\n\n"}
@@ -310,9 +312,6 @@ function QuickStartSection(): React.ReactElement {
   );
 }
 
-/**
- * Features grid section.
- */
 function FeaturesSection(): React.ReactElement {
   return (
     <section className="px-4 py-20 sm:px-6 lg:px-8">
@@ -349,125 +348,735 @@ function FeaturesSection(): React.ReactElement {
   );
 }
 
-/**
- * Configuration code example for Shiki highlighting.
- */
-const configCode = `import { defineConfig } from "@writenex/astro";
+// =============================================================================
+// FIELDS API SECTIONS
+// =============================================================================
+
+function FieldsAPIHeroSection(): React.ReactElement {
+  return (
+    <section className="bg-gradient-to-b from-brand-500/5 to-transparent px-4 py-20 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl text-center">
+        <h2 className="mb-4 text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-zinc-100">
+          Fields API
+        </h2>
+        <p className="mx-auto mb-8 max-w-2xl text-lg text-zinc-600 dark:text-zinc-400">
+          TypeScript-first builder pattern for defining content schema fields.
+          Full autocomplete, type safety, and 25+ field types.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function FieldsAPIIntroSection(): React.ReactElement {
+  return (
+    <section className="px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl">
+        <h3 className="mb-6 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+          Imports
+        </h3>
+        <p className="mb-6 text-zinc-600 dark:text-zinc-400">
+          Import the Fields API from the config module:
+        </p>
+        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-zinc-900 dark:border-zinc-700">
+          <div className="flex items-center gap-2 border-b border-zinc-700 px-4 py-3">
+            <Code className="h-4 w-4 text-zinc-400" />
+            <span className="font-mono text-sm text-zinc-400">typescript</span>
+          </div>
+          <pre className="overflow-x-auto p-4 font-mono text-sm text-zinc-100">
+            <code>
+              <span className="text-zinc-500">
+                // Import from the config module
+              </span>
+              {"\n"}
+              <span className="text-blue-400">import</span> {"{"} defineConfig,
+              collection, singleton, fields {"}"}{" "}
+              <span className="text-blue-400">from</span>{" "}
+              <span className="text-green-400">
+                "@imjp/writenex-astro/config"
+              </span>
+              ;{"\n\n"}
+              <span className="text-zinc-500">
+                // Or use the @imjp namespace
+              </span>
+              {"\n"}
+              <span className="text-blue-400">import</span> {"{"} defineConfig,
+              collection, singleton, fields {"}"}{" "}
+              <span className="text-blue-400">from</span>{" "}
+              <span className="text-green-400">
+                "@imjp/writenex-astro/config"
+              </span>
+              ;
+            </code>
+          </pre>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function FieldsAPIExampleSection(): Promise<React.ReactElement> {
+  const basicExample = `import { defineConfig, collection, fields } from "@imjp/writenex-astro/config";
 
 export default defineConfig({
   collections: [
-    {
+    collection({
       name: "blog",
       path: "src/content/blog",
       filePattern: "{slug}.md",
       previewUrl: "/blog/{slug}",
       schema: {
-        title: { type: "string", required: true },
-        description: { type: "string" },
-        pubDate: { type: "date", required: true },
-        heroImage: { type: "image" },
-        tags: { type: "array", items: "string" },
-        draft: { type: "boolean", default: false },
+        title: fields.text({ label: "Title", validation: { isRequired: true } }),
+        slug: fields.slug({ name: { label: "Slug" } }),
+        description: fields.text({ label: "Description", multiline: true }),
+        publishedAt: fields.date({ label: "Published Date" }),
+        heroImage: fields.image({ label: "Hero Image" }),
+        tags: fields.multiselect({ 
+          label: "Tags", 
+          options: ["javascript", "typescript", "react", "astro"] 
+        }),
+        draft: fields.checkbox({ label: "Draft", defaultValue: true }),
+        body: fields.mdx({ label: "Content", validation: { isRequired: true } }),
       },
-    },
+    }),
   ],
-  images: {
-    strategy: "colocated", // or "public"
-  },
 });`;
 
-/**
- * Props for CodeBlock component.
- */
-interface CodeBlockProps {
-  /** Pre-highlighted HTML from Shiki */
-  html: string;
-}
-
-/**
- * Server-rendered code block with Shiki syntax highlighting.
- * Uses suppressHydrationWarning to prevent mismatch errors from Shiki output.
- */
-function CodeBlock({ html }: CodeBlockProps): React.ReactElement {
-  return (
-    <div
-      className="overflow-x-auto text-sm [&>pre]:p-4"
-      suppressHydrationWarning
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  );
-}
-
-/**
- * Configuration section with code examples.
- */
-async function ConfigurationSection(): Promise<React.ReactElement> {
-  const highlightedCode = await codeToHtml(configCode, {
+  const highlightedCode = await codeToHtml(basicExample, {
     lang: "typescript",
     theme: "github-dark",
   });
 
   return (
-    <section className="bg-zinc-50 px-4 py-20 sm:px-6 lg:px-8 dark:bg-zinc-800/50">
+    <section className="bg-zinc-50 px-4 py-16 sm:px-6 lg:px-8 dark:bg-zinc-800/50">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-zinc-100">
-            Configuration
-          </h2>
-          <p className="text-lg text-zinc-600 dark:text-zinc-400">
-            Zero config by default, fully customizable when needed.
-          </p>
-        </div>
-
-        {/* Config example with Shiki syntax highlighting */}
-        <div className="mb-8 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
+        <h3 className="mb-6 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+          Basic Example
+        </h3>
+        <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700">
           <div className="flex items-center gap-2 border-b border-zinc-700 bg-[#24292e] px-4 py-3">
             <FileText className="h-4 w-4 text-zinc-400" />
             <span className="font-mono text-sm text-zinc-400">
               writenex.config.ts
             </span>
           </div>
-          <CodeBlock html={highlightedCode} />
+          <div
+            className="overflow-x-auto text-sm [&>pre]:p-4"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: highlightedCode }}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function CollectionVsSingletonSection(): React.ReactElement {
+  return (
+    <section className="px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl">
+        <h3 className="mb-4 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+          collection() vs singleton()
+        </h3>
+
+        <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
+          Both patterns below work —{" "}
+          <code className="rounded bg-zinc-100 px-1 font-mono dark:bg-zinc-800">
+            defineConfig
+          </code>{" "}
+          auto-resolves{" "}
+          <code className="rounded bg-zinc-100 px-1 font-mono dark:bg-zinc-800">
+            fields.*()
+          </code>{" "}
+          objects in either case. Using{" "}
+          <code className="rounded bg-zinc-100 px-1 font-mono dark:bg-zinc-800">
+            collection()
+          </code>{" "}
+          is recommended for better TypeScript inference.
+        </p>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+            <div className="mb-3 flex items-center gap-2">
+              <Database className="h-5 w-5 text-brand-500" />
+              <h4 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                collection()
+              </h4>
+            </div>
+            <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+              For multi-item content like blog posts, documentation pages, or
+              products.
+            </p>
+            <div className="rounded-lg bg-zinc-100 p-3 font-mono text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              collection({"{"}
+              <br />
+              &nbsp;&nbsp;name: "blog",
+              <br />
+              &nbsp;&nbsp;path: "src/content/blog",
+              <br />
+              &nbsp;&nbsp;schema: {"{ /* fields */ }"}
+              <br />
+              {"}"})
+            </div>
+          </div>
+          <div className="rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+            <div className="mb-3 flex items-center gap-2">
+              <FileText className="h-5 w-5 text-brand-500" />
+              <h4 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                singleton()
+              </h4>
+            </div>
+            <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+              For single-item content like site settings, about page, or global
+              configuration.
+            </p>
+            <div className="rounded-lg bg-zinc-100 p-3 font-mono text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+              singleton({"{"}
+              <br />
+              &nbsp;&nbsp;name: "settings",
+              <br />
+              &nbsp;&nbsp;path: "src/content/settings.json",
+              <br />
+              &nbsp;&nbsp;schema: {"{ /* fields */ }"}
+              <br />
+              {"}"})
+            </div>
+          </div>
         </div>
 
-        {/* Schema types table */}
-        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
-          <div className="border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
-            <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
-              Schema Field Types
+        {/* Both patterns block */}
+        <div className="mt-6 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+          <h4 className="mb-4 text-base font-semibold text-zinc-900 dark:text-zinc-100">
+            Both patterns are valid
+          </h4>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+                Pattern A — raw object
+              </p>
+              <div className="rounded-lg bg-zinc-100 p-3 font-mono text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                defineConfig({"{"}
+                <br />
+                &nbsp;&nbsp;collections: [{"{"}
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;name: "blog",
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;schema: {"{"}
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title: fields.text(...),{" "}
+                <span className="text-green-400">{"// ✅"}</span>
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;{"}"},<br />
+                &nbsp;&nbsp;{"}"}],
+                <br />
+                {"}"})
+              </div>
+            </div>
+            <div>
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-brand-500">
+                Pattern B — collection() (recommended)
+              </p>
+              <div className="rounded-lg bg-zinc-100 p-3 font-mono text-xs text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                defineConfig({"{"}
+                <br />
+                &nbsp;&nbsp;collections: [<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;collection({"{"}
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;name: "blog",
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;schema: {"{"}
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title:
+                fields.text(...),{" "}
+                <span className="text-green-400">{"// ✅"}</span>
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{"}"}
+                <br />
+                &nbsp;&nbsp;&nbsp;&nbsp;{"}"}),
+                <br />
+                &nbsp;&nbsp;],
+                <br />
+                {"}"})
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FieldTypesGridSection(): React.ReactElement {
+  return (
+    <section className="bg-zinc-50 px-4 py-16 sm:px-6 lg:px-8 dark:bg-zinc-800/50">
+      <div className="mx-auto max-w-4xl">
+        <h3 className="mb-6 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+          25+ Field Types
+        </h3>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {fieldCategories.map((category) => (
+            <div
+              key={category.name}
+              className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900"
+            >
+              <h4 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                {category.name}
+              </h4>
+              <div className="space-y-2">
+                {category.fields.map((field) => (
+                  <div key={field.name} className="flex items-start gap-2">
+                    <Code className="mt-0.5 h-3 w-3 shrink-0 text-brand-500" />
+                    <div>
+                      <code className="text-xs font-mibold text-brand-500">
+                        {field.name}
+                      </code>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                        {field.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function TextFieldsSection(): Promise<React.ReactElement> {
+  const textCode = `fields.text({ label: "Title" })
+fields.text({ label: "Description", multiline: true })
+fields.text({ 
+  label: "Bio",
+  multiline: true,
+  placeholder: "Tell us about yourself...",
+  validation: { 
+    isRequired: true,
+    minLength: 10,
+    maxLength: 500 
+  }
+})`;
+
+  const slugCode = `fields.slug({ label: "URL Slug" })
+fields.slug({ 
+  name: { label: "Name Slug", placeholder: "my-page" },
+  pathname: { label: "URL Path", placeholder: "/pages/" }
+})`;
+
+  const urlCode = `fields.url({ label: "Website" })
+fields.url({ 
+  label: "GitHub Profile",
+  placeholder: "https://github.com/username",
+  validation: { isRequired: true }
+})`;
+
+  const highlightedText = await codeToHtml(textCode, {
+    lang: "typescript",
+    theme: "github-dark",
+  });
+
+  const highlightedSlug = await codeToHtml(slugCode, {
+    lang: "typescript",
+    theme: "github-dark",
+  });
+
+  const highlightedUrl = await codeToHtml(urlCode, {
+    lang: "typescript",
+    theme: "github-dark",
+  });
+
+  return (
+    <section className="px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl space-y-12">
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <Type className="h-5 w-5 text-brand-500" />
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+              Text Fields
             </h3>
+          </div>
+
+          <div className="space-y-8">
+            <div>
+              <h4 className="mb-2 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                fields.text()
+              </h4>
+              <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400">
+                Single or multi-line text input with validation support.
+              </p>
+              <div
+                className="overflow-hidden rounded-xl border border-zinc-200 text-sm dark:border-zinc-700 [&>pre]:p-4"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: highlightedText }}
+              />
+            </div>
+
+            <div>
+              <h4 className="mb-2 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                fields.slug()
+              </h4>
+              <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400">
+                URL-friendly slug with auto-generation from title.
+              </p>
+              <div
+                className="overflow-hidden rounded-xl border border-zinc-200 text-sm dark:border-zinc-700 [&>pre]:p-4"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: highlightedSlug }}
+              />
+            </div>
+
+            <div>
+              <h4 className="mb-2 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                fields.url()
+              </h4>
+              <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400">
+                URL input with validation.
+              </p>
+              <div
+                className="overflow-hidden rounded-xl border border-zinc-200 text-sm dark:border-zinc-700 [&>pre]:p-4"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: highlightedUrl }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function SelectionFieldsSection(): Promise<React.ReactElement> {
+  const selectCode = `fields.select({ 
+  label: "Status",
+  options: ["draft", "published", "archived"],
+  defaultValue: "draft"
+})`;
+
+  const multiselectCode = `fields.multiselect({ 
+  label: "Tags",
+  options: ["javascript", "typescript", "react", "node"],
+  defaultValue: ["javascript"]
+})`;
+
+  const checkboxCode = `fields.checkbox({ label: "Published" })
+fields.checkbox({ 
+  label: "Featured",
+  defaultValue: false
+})`;
+
+  const highlightedSelect = await codeToHtml(selectCode, {
+    lang: "typescript",
+    theme: "github-dark",
+  });
+
+  const highlightedMultiselect = await codeToHtml(multiselectCode, {
+    lang: "typescript",
+    theme: "github-dark",
+  });
+
+  const highlightedCheckbox = await codeToHtml(checkboxCode, {
+    lang: "typescript",
+    theme: "github-dark",
+  });
+
+  return (
+    <section className="bg-zinc-50 px-4 py-16 sm:px-6 lg:px-8 dark:bg-zinc-800/50">
+      <div className="mx-auto max-w-4xl space-y-12">
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <List className="h-5 w-5 text-brand-500" />
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+              Selection Fields
+            </h3>
+          </div>
+
+          <div className="space-y-8">
+            <div>
+              <h4 className="mb-2 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                fields.select()
+              </h4>
+              <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400">
+                Dropdown selection from predefined options.
+              </p>
+              <div
+                className="overflow-hidden rounded-xl border border-zinc-200 text-sm dark:border-zinc-700 [&>pre]:p-4"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: highlightedSelect }}
+              />
+            </div>
+
+            <div>
+              <h4 className="mb-2 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                fields.multiselect()
+              </h4>
+              <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400">
+                Multi-select with checkboxes or multi-select UI.
+              </p>
+              <div
+                className="overflow-hidden rounded-xl border border-zinc-200 text-sm dark:border-zinc-700 [&>pre]:p-4"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: highlightedMultiselect }}
+              />
+            </div>
+
+            <div>
+              <h4 className="mb-2 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                fields.checkbox()
+              </h4>
+              <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400">
+                Boolean toggle switch.
+              </p>
+              <div
+                className="overflow-hidden rounded-xl border border-zinc-200 text-sm dark:border-zinc-700 [&>pre]:p-4"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: highlightedCheckbox }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function StructuredFieldsSection(): Promise<React.ReactElement> {
+  const objectCode = `fields.object({
+  label: "Author",
+  fields: {
+    name: fields.text({ label: "Name" }),
+    email: fields.url({ label: "Email" }),
+    bio: fields.text({ label: "Bio", multiline: true }),
+  }
+})`;
+
+  const arrayCode = `fields.array({
+  label: "Tags",
+  itemField: fields.text({ label: "Tag" }),
+  itemLabel: "Tag"
+})
+
+fields.array({
+  label: "Links",
+  itemField: fields.object({
+    fields: {
+      title: fields.text({ label: "Title" }),
+      url: fields.url({ label: "URL" }),
+    }
+  }),
+  itemLabel: "Link"
+})`;
+
+  const blocksCode = `fields.blocks({
+  label: "Content Blocks",
+  blockTypes: {
+    paragraph: {
+      label: "Paragraph",
+      fields: {
+        text: fields.text({ label: "Text", multiline: true })
+      }
+    },
+    quote: {
+      label: "Quote",
+      fields: {
+        text: fields.text({ label: "Quote" }),
+        attribution: fields.text({ label: "Attribution" })
+      }
+    },
+    image: {
+      label: "Image",
+      fields: {
+        src: fields.image({ label: "Image" }),
+        caption: fields.text({ label: "Caption" })
+      }
+    }
+  },
+  itemLabel: "Block"
+})`;
+
+  const highlightedObject = await codeToHtml(objectCode, {
+    lang: "typescript",
+    theme: "github-dark",
+  });
+
+  const highlightedArray = await codeToHtml(arrayCode, {
+    lang: "typescript",
+    theme: "github-dark",
+  });
+
+  const highlightedBlocks = await codeToHtml(blocksCode, {
+    lang: "typescript",
+    theme: "github-dark",
+  });
+
+  return (
+    <section className="px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl space-y-12">
+        <div>
+          <div className="mb-3 flex items-center gap-2">
+            <FolderOpen className="h-5 w-5 text-brand-500" />
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+              Structured Fields
+            </h3>
+          </div>
+
+          <div className="space-y-8">
+            <div>
+              <h4 className="mb-2 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                fields.object()
+              </h4>
+              <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400">
+                Nested group of fields for complex data structures.
+              </p>
+              <div
+                className="overflow-hidden rounded-xl border border-zinc-200 text-sm dark:border-zinc-700 [&>pre]:p-4"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: highlightedObject }}
+              />
+            </div>
+
+            <div>
+              <h4 className="mb-2 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                fields.array()
+              </h4>
+              <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400">
+                List of items with the same schema.
+              </p>
+              <div
+                className="overflow-hidden rounded-xl border border-zinc-200 text-sm dark:border-zinc-700 [&>pre]:p-4"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: highlightedArray }}
+              />
+            </div>
+
+            <div>
+              <h4 className="mb-2 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+                fields.blocks()
+              </h4>
+              <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400">
+                List of items with different block types (paragraphs, quotes,
+                images, etc.).
+              </p>
+              <div
+                className="overflow-hidden rounded-xl border border-zinc-200 text-sm dark:border-zinc-700 [&>pre]:p-4"
+                suppressHydrationWarning
+                dangerouslySetInnerHTML={{ __html: highlightedBlocks }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+async function ValidationSection(): Promise<React.ReactElement> {
+  const validationCode = `fields.text({
+  label: "Title",
+  validation: {
+    isRequired: true,
+    minLength: 3,
+    maxLength: 100,
+    pattern: "^[A-Za-z]",
+    patternDescription: "Must start with a letter"
+  }
+})
+
+fields.number({
+  label: "Price",
+  validation: {
+    isRequired: true,
+    min: 0,
+    max: 10000
+  }
+})
+
+fields.integer({
+  label: "Year",
+  validation: { min: 1900, max: 2100 }
+})`;
+
+  const highlightedCode = await codeToHtml(validationCode, {
+    lang: "typescript",
+    theme: "github-dark",
+  });
+
+  return (
+    <section className="bg-zinc-50 px-4 py-16 sm:px-6 lg:px-8 dark:bg-zinc-800/50">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-3 flex items-center gap-2">
+          <CheckCircle className="h-5 w-5 text-brand-500" />
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+            Validation
+          </h3>
+        </div>
+        <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
+          All fields support validation options for data integrity.
+        </p>
+        <div
+          className="overflow-hidden rounded-xl border border-zinc-200 text-sm dark:border-zinc-700 [&>pre]:p-4"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: highlightedCode }}
+        />
+
+        <div className="mt-8 overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
+            <h4 className="font-semibold text-zinc-900 dark:text-zinc-100">
+              Validation Options
+            </h4>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm">
               <thead className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800">
                 <tr>
                   <th className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
+                    Option
+                  </th>
+                  <th className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
                     Type
                   </th>
                   <th className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
-                    Form Component
-                  </th>
-                  <th className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
-                    Example Value
+                    Applies To
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
-                {schemaTypes.map((item) => (
-                  <tr key={item.type}>
-                    <td className="px-4 py-3">
-                      <code className="text-info-500 dark:text-info-400 rounded bg-zinc-100 px-1.5 py-0.5 font-mono dark:bg-zinc-800">
-                        {item.type}
-                      </code>
-                    </td>
-                    <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
-                      {item.component}
-                    </td>
-                    <td className="px-4 py-3 font-mono text-zinc-600 dark:text-zinc-400">
-                      {item.example}
-                    </td>
-                  </tr>
-                ))}
+                <tr>
+                  <td className="px-4 py-3">isRequired</td>
+                  <td className="px-4 py-3">boolean</td>
+                  <td className="px-4 py-3">All fields</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3">min</td>
+                  <td className="px-4 py-3">number</td>
+                  <td className="px-4 py-3">number, integer</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3">max</td>
+                  <td className="px-4 py-3">number</td>
+                  <td className="px-4 py-3">number, integer</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3">minLength</td>
+                  <td className="px-4 py-3">number</td>
+                  <td className="px-4 py-3">text, url</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3">maxLength</td>
+                  <td className="px-4 py-3">number</td>
+                  <td className="px-4 py-3">text, url</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3">pattern</td>
+                  <td className="px-4 py-3">string</td>
+                  <td className="px-4 py-3">text, slug</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3">patternDescription</td>
+                  <td className="px-4 py-3">string</td>
+                  <td className="px-4 py-3">text, slug</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -477,12 +1086,155 @@ async function ConfigurationSection(): Promise<React.ReactElement> {
   );
 }
 
-/**
- * Image strategies section.
- */
+async function MigrationSection(): Promise<React.ReactElement> {
+  const beforeCode = `export default defineConfig({
+  collections: [
+    {
+      name: "blog",
+      path: "src/content/blog",
+      schema: {
+        title: { type: "string", required: true },
+        description: { type: "string" },
+        pubDate: { type: "date", required: true },
+        draft: { type: "boolean", default: false },
+        tags: { type: "array", items: "string" },
+        heroImage: { type: "image" },
+      },
+    },
+  ],
+});`;
+
+  const afterCode = `import { defineConfig, collection, fields } from "@imjp/writenex-astro/config";
+
+export default defineConfig({
+  collections: [
+    collection({
+      name: "blog",
+      path: "src/content/blog",
+      schema: {
+        title: fields.text({ label: "Title", validation: { isRequired: true } }),
+        description: fields.text({ label: "Description" }),
+        pubDate: fields.date({ label: "Published Date", validation: { isRequired: true } }),
+        draft: fields.checkbox({ label: "Draft", defaultValue: false }),
+        tags: fields.array({ label: "Tags", itemField: fields.text({ label: "Tag" }) }),
+        heroImage: fields.image({ label: "Hero Image" }),
+      },
+    }),
+  ],
+});`;
+
+  const highlightedBefore = await codeToHtml(beforeCode, {
+    lang: "typescript",
+    theme: "github-dark",
+  });
+
+  const highlightedAfter = await codeToHtml(afterCode, {
+    lang: "typescript",
+    theme: "github-dark",
+  });
+
+  return (
+    <section className="px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-3 flex items-center gap-2">
+          <ArrowRight className="h-5 w-5 text-brand-500" />
+          <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+            Migration from Plain Schema
+          </h3>
+        </div>
+        <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
+          Upgrade your existing plain schema config to the Fields API.
+        </p>
+
+        <div className="mb-8">
+          <h4 className="mb-3 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+            Before (Plain Schema)
+          </h4>
+          <div
+            className="overflow-hidden rounded-xl border border-zinc-200 text-sm dark:border-zinc-700 [&>pre]:p-4"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: highlightedBefore }}
+          />
+        </div>
+
+        <div className="mb-8">
+          <h4 className="mb-3 text-lg font-semibold text-zinc-800 dark:text-zinc-200">
+            After (Fields API)
+          </h4>
+          <div
+            className="overflow-hidden rounded-xl border border-zinc-200 text-sm dark:border-zinc-700 [&>pre]:p-4"
+            suppressHydrationWarning
+            dangerouslySetInnerHTML={{ __html: highlightedAfter }}
+          />
+        </div>
+
+        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="border-b border-zinc-200 px-4 py-3 dark:border-zinc-700">
+            <h4 className="font-semibold text-zinc-900 dark:text-zinc-100">
+              Type Mapping
+            </h4>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800">
+                <tr>
+                  <th className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
+                    Plain Schema
+                  </th>
+                  <th className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
+                    Fields API
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
+                <tr>
+                  <td className="px-4 py-3">type: "string"</td>
+                  <td className="px-4 py-3">fields.text()</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3">type: "number"</td>
+                  <td className="px-4 py-3">fields.number()</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3">type: "boolean"</td>
+                  <td className="px-4 py-3">fields.checkbox()</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3">type: "date"</td>
+                  <td className="px-4 py-3">fields.date()</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3">type: "array"</td>
+                  <td className="px-4 py-3">
+                    fields.array({"{ itemField: ... }"})
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3">type: "object"</td>
+                  <td className="px-4 py-3">
+                    fields.object({"{ fields: ... }"})
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-3">type: "image"</td>
+                  <td className="px-4 py-3">fields.image()</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// =============================================================================
+// LEGACY SECTIONS (Kept for backward compatibility)
+// =============================================================================
+
 function ImageStrategiesSection(): React.ReactElement {
   return (
-    <section className="px-4 py-20 sm:px-6 lg:px-8">
+    <section className="bg-zinc-50 px-4 py-20 sm:px-6 lg:px-8 dark:bg-zinc-800/50">
       <div className="mx-auto max-w-4xl">
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-zinc-100">
@@ -531,71 +1283,6 @@ function ImageStrategiesSection(): React.ReactElement {
   );
 }
 
-/**
- * File patterns section.
- */
-function FilePatternsSection(): React.ReactElement {
-  return (
-    <section className="bg-zinc-50 px-4 py-20 sm:px-6 lg:px-8 dark:bg-zinc-800/50">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-zinc-100">
-            File Patterns
-          </h2>
-          <p className="text-lg text-zinc-600 dark:text-zinc-400">
-            Flexible file naming with automatic token resolution.
-          </p>
-        </div>
-
-        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800">
-                <tr>
-                  <th className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
-                    Pattern
-                  </th>
-                  <th className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
-                    Example Output
-                  </th>
-                  <th className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">
-                    Use Case
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-700">
-                {filePatterns.map((item) => (
-                  <tr key={item.pattern}>
-                    <td className="px-4 py-3">
-                      <code className="text-info-500 dark:text-info-400 rounded bg-zinc-100 px-1.5 py-0.5 font-mono dark:bg-zinc-800">
-                        {item.pattern}
-                      </code>
-                    </td>
-                    <td className="px-4 py-3 font-mono text-zinc-600 dark:text-zinc-400">
-                      {item.example}
-                    </td>
-                    <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">
-                      {item.useCase}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <p className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-500">
-          Patterns are auto-detected from existing content or can be configured
-          explicitly.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-/**
- * Keyboard shortcuts section.
- */
 function ShortcutsSection(): React.ReactElement {
   return (
     <section className="px-4 py-20 sm:px-6 lg:px-8">
@@ -629,9 +1316,6 @@ function ShortcutsSection(): React.ReactElement {
   );
 }
 
-/**
- * Security section.
- */
 function SecuritySection(): React.ReactElement {
   return (
     <section className="bg-zinc-50 px-4 py-20 sm:px-6 lg:px-8 dark:bg-zinc-800/50">
@@ -641,9 +1325,9 @@ function SecuritySection(): React.ReactElement {
             Production Safe
           </h2>
           <p className="mb-4 text-amber-800 dark:text-amber-300">
-            @writenex/astro is disabled by default in production builds. The
-            editor only runs during development to prevent accidental exposure
-            of filesystem write access.
+            @imjp/writenex-astro is disabled by default in production builds.
+            The editor only runs during development to prevent accidental
+            exposure of filesystem write access.
           </p>
           <p className="text-sm text-amber-700 dark:text-amber-400">
             If you need to enable it for staging environments, use the{" "}
@@ -658,9 +1342,6 @@ function SecuritySection(): React.ReactElement {
   );
 }
 
-/**
- * CTA section.
- */
 function CTASection(): React.ReactElement {
   return (
     <section className="px-4 py-20 sm:px-6 lg:px-8">
@@ -669,11 +1350,11 @@ function CTASection(): React.ReactElement {
           Ready to Get Started?
         </h2>
         <p className="mb-8 text-lg text-zinc-600 dark:text-zinc-400">
-          Add @writenex/astro to your project and start editing visually.
+          Add @imjp/writenex-astro to your project and start editing visually.
         </p>
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <a
-            href="https://github.com/erlandv/writenex/tree/main/packages/astro#readme"
+            href="https://github.com/jaainil/writenex/wiki"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-brand-500 hover:bg-brand-600 inline-flex items-center gap-2 rounded-lg px-5 py-3 text-lg font-normal text-white transition-colors"
@@ -687,9 +1368,6 @@ function CTASection(): React.ReactElement {
   );
 }
 
-/**
- * Related section linking to Writenex Editor.
- */
 function RelatedSection(): React.ReactElement {
   return (
     <section className="bg-zinc-50 px-4 py-20 sm:px-6 lg:px-8 dark:bg-zinc-800/50">
@@ -723,22 +1401,21 @@ function RelatedSection(): React.ReactElement {
 // PAGE
 // =============================================================================
 
-/**
- * @writenex/astro landing page component.
- *
- * @returns The complete Astro integration landing page
- */
 export default async function AstroPage(): Promise<React.ReactElement> {
   const breadcrumbSchema = createBreadcrumbSchema([
     { name: "Home", url: "https://writenex.com" },
-    { name: "@writenex/astro", url: "https://writenex.com/astro" },
+    { name: "@imjp/writenex-astro", url: "https://writenex.com/astro" },
   ]);
 
-  const configSection = await ConfigurationSection();
+  const fieldsApiExample = await FieldsAPIExampleSection();
+  const textFields = await TextFieldsSection();
+  const selectionFields = await SelectionFieldsSection();
+  const structuredFields = await StructuredFieldsSection();
+  const validation = await ValidationSection();
+  const migration = await MigrationSection();
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-900">
-      {/* JSON-LD Structured Data */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -751,9 +1428,21 @@ export default async function AstroPage(): Promise<React.ReactElement> {
         <HeroSection />
         <QuickStartSection />
         <FeaturesSection />
-        {configSection}
+
+        {/* Fields API Documentation */}
+        <FieldsAPIHeroSection />
+        <FieldsAPIIntroSection />
+        {fieldsApiExample}
+        <CollectionVsSingletonSection />
+        <FieldTypesGridSection />
+        {textFields}
+        {selectionFields}
+        {structuredFields}
+        {validation}
+        {migration}
+
+        {/* Legacy Sections */}
         <ImageStrategiesSection />
-        <FilePatternsSection />
         <ShortcutsSection />
         <SecuritySection />
         <CTASection />

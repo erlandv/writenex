@@ -13,13 +13,13 @@
  */
 
 import {
-  Shield,
+  Eye,
   Files,
   History,
-  Sparkles,
   Keyboard,
-  Eye,
   type LucideIcon,
+  Shield,
+  Sparkles,
 } from "lucide-react";
 
 // =============================================================================

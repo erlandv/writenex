@@ -21,26 +21,26 @@
  * @see {@link VersionManifest} - Manifest structure type
  */
 
+import { existsSync } from "node:fs";
 import {
-  readFile,
-  writeFile,
   mkdir,
   readdir,
+  readFile,
   stat,
   unlink,
+  writeFile,
 } from "node:fs/promises";
-import { existsSync } from "node:fs";
-import { join, basename } from "node:path";
+import { basename, join } from "node:path";
 import matter from "gray-matter";
 import type {
-  VersionEntry,
-  VersionManifest,
-  VersionHistoryConfig,
-  Version,
-  VersionResult,
-  SaveVersionOptions,
-  RestoreVersionOptions,
   RestoreResult,
+  RestoreVersionOptions,
+  SaveVersionOptions,
+  Version,
+  VersionEntry,
+  VersionHistoryConfig,
+  VersionManifest,
+  VersionResult,
 } from "@/types";
 
 // =============================================================================
@@ -729,9 +729,7 @@ export async function saveVersion(
       }
 
       // Generate version ID and create version file
-      // Use the same timestamp for both id and timestamp to ensure consistency
-      const now = new Date();
-      const versionId = now.toISOString().replace(/:/g, "-");
+      const versionId = generateVersionId();
       const versionPath = getVersionFilePath(storagePath, versionId);
 
       // If label is provided, inject it into content for recovery purposes
@@ -744,11 +742,14 @@ export async function saveVersion(
 
       // Get file stats for size
       const stats = await stat(versionPath);
+      const parsedDate = parseVersionId(versionId);
 
       // Create version entry
       const entry: VersionEntry = {
         id: versionId,
-        timestamp: now.toISOString(),
+        timestamp: parsedDate
+          ? parsedDate.toISOString()
+          : new Date().toISOString(),
         preview: generatePreview(content),
         size: stats.size,
         ...(label ? { label } : {}),

@@ -25,10 +25,10 @@
  * @see {@link EditorShortcuts} - MDXEditor-specific formatting shortcuts
  */
 
-import { useEffect, useCallback } from "react";
 import type { MDXEditorMethods } from "@mdxeditor/editor";
+import { useCallback, useEffect } from "react";
+import { createDocument, getDocument, updateDocument } from "@/lib/db";
 import { useEditorStore } from "@/lib/store";
-import { updateDocument, getDocument, createDocument } from "@/lib/db";
 
 /**
  * Options for the useKeyboardShortcuts hook.

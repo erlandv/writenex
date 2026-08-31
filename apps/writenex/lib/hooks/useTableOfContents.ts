@@ -20,7 +20,7 @@
  * @see {@link TocPanel} - Component that displays the ToC
  */
 
-import { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useEditorStore } from "@/lib/store";
 
 // =============================================================================

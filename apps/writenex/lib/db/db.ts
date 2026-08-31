@@ -11,12 +11,19 @@ import Dexie, { type EntityTable, type Transaction } from "dexie";
 import { DEFAULT_DOCUMENT_TITLE } from "@/lib/utils";
 import type {
   DocumentEntry,
-  VersionEntry,
   ImageEntry,
   SettingsEntry,
+  VersionEntry,
+  WorkingSaveEntry,
 } from "./types";
 
-export type { DocumentEntry, VersionEntry, ImageEntry, SettingsEntry };
+export type {
+  DocumentEntry,
+  ImageEntry,
+  SettingsEntry,
+  VersionEntry,
+  WorkingSaveEntry,
+};
 
 /**
  * Dexie database class for the Writenex Markdown editor.
@@ -26,6 +33,7 @@ class MarkdownEditorDB extends Dexie {
   versions!: EntityTable<VersionEntry, "id">;
   images!: EntityTable<ImageEntry, "id">;
   settings!: EntityTable<SettingsEntry, "id">;
+  workingSaves!: EntityTable<WorkingSaveEntry, "id">;
 
   constructor() {
     super("MarkdownEditorDB");
@@ -161,12 +169,11 @@ export async function getDocumentCount(): Promise<number> {
 export async function getLastVersionTimestamp(
   documentId: string
 ): Promise<Date | null> {
-  const lastVersion = await db.versions
+  const versions = await db.versions
     .where("documentId")
     .equals(documentId)
-    .reverse()
-    .sortBy("timestamp")
-    .then((versions) => versions[0]);
+    .sortBy("timestamp");
+  const lastVersion = versions.at(-1);
   return lastVersion?.timestamp ?? null;
 }
 
@@ -203,11 +210,11 @@ export async function saveVersion(
 }
 
 export async function getVersions(documentId: string): Promise<VersionEntry[]> {
-  return db.versions
+  const versions = await db.versions
     .where("documentId")
     .equals(documentId)
-    .reverse()
     .sortBy("timestamp");
+  return versions.reverse();
 }
 
 export async function getVersion(
@@ -248,4 +255,25 @@ export async function saveSetting(key: string, value: string): Promise<void> {
 export async function getSetting(key: string): Promise<string | undefined> {
   const entry = await db.settings.get(key);
   return entry?.value;
+}
+
+// =============================================================================
+// WORKING DRAFT FUNCTIONS (CRASH RECOVERY)
+// =============================================================================
+
+export async function saveWorkingDraft(
+  id: string,
+  content: string
+): Promise<void> {
+  await db.workingSaves.put({ id, content, timestamp: new Date() });
+}
+
+export async function getWorkingDraft(
+  id: string
+): Promise<WorkingSaveEntry | undefined> {
+  return db.workingSaves.get(id);
+}
+
+export async function clearWorkingDraft(id: string): Promise<void> {
+  await db.workingSaves.delete(id);
 }

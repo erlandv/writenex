@@ -38,7 +38,7 @@ export const organizationSchema = {
   name: SITE_NAME,
   url: SITE_URL,
   logo: `${SITE_URL}/icon.svg`,
-  sameAs: ["https://github.com/erlandv/writenex"],
+  sameAs: ["https://github.com/jaainil/writenex"],
 };
 
 /**

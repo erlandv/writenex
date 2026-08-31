@@ -17,20 +17,26 @@
  * @see {@link MarkdownEditor} - Configures linkDialogPlugin with this dialog
  */
 
-import React, { useState, useCallback } from "react";
-import { usePublisher, useCellValue } from "@mdxeditor/editor";
 import {
-  linkDialogState$,
   cancelLinkEdit$,
-  updateLink$,
-  switchFromPreviewToLinkEdit$,
+  linkDialogState$,
   removeLink$,
+  switchFromPreviewToLinkEdit$,
+  updateLink$,
+  useCellValue,
+  usePublisher,
 } from "@mdxeditor/editor";
-import { Button } from "@/lib/ui"; // button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/lib/ui"; // dialog";
-import { Input } from "@/lib/ui"; // input";
-import { SimpleTooltip } from "@/lib/ui"; // simple-tooltip";
-import { Link as LinkIcon, Trash2, Edit2, Copy } from "lucide-react";
+import { Copy, Edit2, Link as LinkIcon, Trash2 } from "lucide-react";
+import React, { useCallback, useState } from "react";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  SimpleTooltip,
+} from "@/lib/ui"; // simple-tooltip";
 import { cn, isValidUrl } from "@/lib/utils";
 
 /**
@@ -206,7 +212,10 @@ export function LinkDialog(): React.ReactElement {
   // EDIT MODE: Render as a Modal Dialog
   return (
     <Dialog open={state.type === "edit"} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[400px]" aria-describedby={undefined}>
+      <DialogContent
+        className="sm:max-w-[400px]"
+        description="Enter the URL for your link"
+      >
         <DialogHeader>
           <DialogTitle>{isEditMode ? "Edit Link" : "Insert Link"}</DialogTitle>
         </DialogHeader>

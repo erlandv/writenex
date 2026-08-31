@@ -8,7 +8,7 @@
  * @module @writenex/astro/client/components/LazyEditor
  */
 
-import { lazy, Suspense, memo } from "react";
+import { lazy, memo, Suspense } from "react";
 import { EditorLoading } from "./Editor/Editor";
 
 /**

@@ -7,10 +7,10 @@
  * @module @writenex/astro/client/components/SelectCollectionModal
  */
 
+import { ChevronRight, Folder, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { X, Folder, ChevronRight } from "lucide-react";
-import { useFocusTrap } from "../../hooks/useFocusTrap";
 import type { Collection } from "../../hooks/useApi";
+import { useFocusTrap } from "../../hooks/useFocusTrap";
 import "./SelectCollectionModal.css";
 
 /**

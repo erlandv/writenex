@@ -26,16 +26,17 @@
  * @see {@link createDocument} - IndexedDB document creation
  */
 
-import { useEffect, useRef, useCallback } from "react";
-import { useEditorStore } from "@/lib/store";
-import { DEFAULT_DOCUMENT_CONTENT, DEFAULT_DOCUMENT_TITLE } from "@/lib/utils";
+import { useCallback, useEffect, useRef } from "react";
 import {
+  createDocument,
   getAllDocuments,
   getDocument,
-  createDocument,
   getSetting,
+  getWorkingDraft,
   saveSetting,
 } from "@/lib/db";
+import { useEditorStore } from "@/lib/store";
+import { DEFAULT_DOCUMENT_CONTENT, DEFAULT_DOCUMENT_TITLE } from "@/lib/utils";
 
 /**
  * Custom hook for initializing documents on application startup.
@@ -136,13 +137,36 @@ export function useDocumentInit(
         }
       }
 
+      // Load user settings
+      const { setAutoSaveInterval, setShowLineNumbers, setConfirmClearEditor } =
+        useEditorStore.getState();
+      const savedAutoSaveInterval = await getSetting("autoSaveInterval");
+      if (savedAutoSaveInterval)
+        setAutoSaveInterval(parseInt(savedAutoSaveInterval, 10));
+
+      const savedShowLineNumbers = await getSetting("showLineNumbers");
+      if (savedShowLineNumbers !== undefined)
+        setShowLineNumbers(savedShowLineNumbers === "true");
+
+      const savedConfirmClearEditor = await getSetting("confirmClearEditor");
+      if (savedConfirmClearEditor !== undefined)
+        setConfirmClearEditor(savedConfirmClearEditor === "true");
+
       // Load the active document
       if (activeDocId) {
         const activeDoc = await getDocument(activeDocId);
         if (activeDoc) {
           setActiveDocumentId(activeDocId);
-          setContent(activeDoc.content);
-          onContentLoaded(activeDoc.content);
+
+          // Crash recovery: prefer a newer working draft over the last saved content
+          const workingDraft = await getWorkingDraft(activeDocId);
+          const restoreContent =
+            workingDraft && workingDraft.timestamp > activeDoc.updatedAt
+              ? workingDraft.content
+              : activeDoc.content;
+
+          setContent(restoreContent);
+          onContentLoaded(restoreContent);
 
           // Save this as the last active document
           await saveSetting("lastActiveDocumentId", activeDocId);

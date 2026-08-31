@@ -22,8 +22,8 @@
  * @module @writenex/astro/discovery/schema
  */
 
-import type { CollectionSchema, FieldType, SchemaField } from "@/types";
 import { readCollection } from "@/filesystem/reader";
+import type { CollectionSchema, FieldType, SchemaField } from "@/types";
 
 /**
  * Maximum number of files to sample for schema detection
@@ -61,6 +61,69 @@ const IMAGE_EXTENSIONS = [
 ];
 
 /**
+ * URL pattern detection
+ */
+const URL_PATTERN = /^https?:\/\//;
+
+/**
+ * Slug pattern detection (lowercase, hyphenated)
+ */
+const SLUG_PATTERN = /^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/;
+
+/**
+ * Datetime pattern detection (ISO datetime)
+ */
+const DATETIME_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
+
+/**
+ * Check if a string looks like a URL
+ */
+function isUrlValue(value: unknown): boolean {
+  if (typeof value !== "string") return false;
+  return URL_PATTERN.test(value);
+}
+
+/**
+ * Check if a string looks like a slug
+ */
+function isSlugValue(value: unknown): boolean {
+  if (typeof value !== "string") return false;
+  if (value.length < 2 || value.length > 100) return false;
+  return SLUG_PATTERN.test(value);
+}
+
+/**
+ * Check if a string looks like a datetime
+ */
+function isDatetimeValue(value: unknown): boolean {
+  if (typeof value !== "string") return false;
+  return DATETIME_PATTERN.test(value);
+}
+
+/**
+ * Check if a string looks like a file path (non-image)
+ */
+function isFilePath(value: unknown): boolean {
+  if (typeof value !== "string") return false;
+  if (isImagePath(value)) return false;
+  return /\.\w{2,5}$/.test(value);
+}
+
+/**
+ * Check if an array looks like a multiselect (array of strings from a small set)
+ */
+function isMultiselectArray(values: unknown[]): boolean {
+  if (values.length === 0) return false;
+  const allStrings = values.every((v) => typeof v === "string" && v.length > 0);
+  if (!allStrings) return false;
+  const uniqueValues = [...new Set(values)];
+  return (
+    uniqueValues.length <= ENUM_MAX_VALUES &&
+    values.length > uniqueValues.length
+  );
+}
+
+/**
  * Field analysis data collected from samples
  */
 interface FieldAnalysis {
@@ -74,6 +137,18 @@ interface FieldAnalysis {
   hasImagePaths: boolean;
   /** Whether values look like dates */
   hasDateValues: boolean;
+  /** Whether values look like URLs */
+  hasUrlValues: boolean;
+  /** Whether values look like slugs */
+  hasSlugValues: boolean;
+  /** Whether values look like datetimes */
+  hasDatetimeValues: boolean;
+  /** Whether values look like file paths */
+  hasFilePaths: boolean;
+  /** Whether all number values are integers */
+  allIntegers: boolean;
+  /** Whether array looks like multiselect */
+  isMultiselect: boolean;
   /** For arrays, analysis of item types */
   arrayItemTypes: Set<string>;
 }
@@ -153,8 +228,28 @@ function inferFieldType(analysis: FieldAnalysis): FieldType {
   // If it has image paths, it's an image field
   if (analysis.hasImagePaths) return "image";
 
+  // If it has datetime values, it's a datetime field
+  if (analysis.hasDatetimeValues) return "datetime";
+
   // If it has date values, it's a date field
   if (analysis.hasDateValues) return "date";
+
+  // If it has file paths, it's a file field
+  if (analysis.hasFilePaths) return "file";
+
+  // If it has URL values, it's a url field
+  if (analysis.hasUrlValues) return "url";
+
+  // If it has slug values and is a single string type
+  if (analysis.hasSlugValues && analysis.types.size === 1) {
+    const typesArr = [...analysis.types];
+    if (typesArr.length === 1 && typesArr[0] === "string") {
+      return "slug";
+    }
+  }
+
+  // Check for multiselect arrays
+  if (analysis.isMultiselect) return "multiselect";
 
   // Check detected types (excluding null)
   const nonNullTypes = new Set([...analysis.types].filter((t) => t !== "null"));
@@ -166,7 +261,7 @@ function inferFieldType(analysis: FieldAnalysis): FieldType {
       case "boolean":
         return "boolean";
       case "number":
-        return "number";
+        return analysis.allIntegers ? "integer" : "number";
       case "array":
         return "array";
       case "object":
@@ -206,9 +301,11 @@ function detectEnum(
   // Check if it's a good candidate for enum
   if (uniqueValues.length > ENUM_MAX_VALUES) return undefined;
 
-  // Check ratio of unique to total
-  const ratio = uniqueValues.length / totalSamples;
-  if (ratio > ENUM_RATIO_THRESHOLD) return undefined;
+  // The uniqueness-ratio heuristic is only reliable with enough samples.
+  if (totalSamples >= 10) {
+    const ratio = uniqueValues.length / totalSamples;
+    if (ratio > ENUM_RATIO_THRESHOLD) return undefined;
+  }
 
   // Must have at least 2 unique values and appear multiple times
   if (uniqueValues.length < 2) return undefined;
@@ -290,6 +387,12 @@ export async function detectSchema(
           values: [],
           hasImagePaths: false,
           hasDateValues: false,
+          hasUrlValues: false,
+          hasSlugValues: false,
+          hasDatetimeValues: false,
+          hasFilePaths: false,
+          allIntegers: true,
+          isMultiselect: false,
           arrayItemTypes: new Set(),
         };
         fieldAnalyses.set(fieldName, analysis);
@@ -307,11 +410,29 @@ export async function detectSchema(
       if (isDateValue(value)) {
         analysis.hasDateValues = true;
       }
+      if (isUrlValue(value)) {
+        analysis.hasUrlValues = true;
+      }
+      if (isSlugValue(value)) {
+        analysis.hasSlugValues = true;
+      }
+      if (isDatetimeValue(value)) {
+        analysis.hasDatetimeValues = true;
+      }
+      if (isFilePath(value)) {
+        analysis.hasFilePaths = true;
+      }
+      if (typeof value === "number" && !Number.isInteger(value)) {
+        analysis.allIntegers = false;
+      }
 
       // Analyze array items
       if (Array.isArray(value)) {
         for (const item of value) {
           analysis.arrayItemTypes.add(detectValueType(item));
+        }
+        if (isMultiselectArray(value)) {
+          analysis.isMultiselect = true;
         }
       }
     }

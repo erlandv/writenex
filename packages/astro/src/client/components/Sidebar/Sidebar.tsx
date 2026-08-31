@@ -13,19 +13,19 @@
  * @module @writenex/astro/client/components/Sidebar
  */
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
-  X,
+  CheckCircle,
   FileEdit,
   Folder,
   Plus,
-  CheckCircle,
   RefreshCw,
   Search,
+  X,
 } from "lucide-react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useAnnounce } from "../../hooks/useAnnounce";
 import type { Collection, ContentSummary } from "../../hooks/useApi";
 import { useArrowNavigation } from "../../hooks/useArrowNavigation";
-import { useAnnounce } from "../../hooks/useAnnounce";
 import "./Sidebar.css";
 
 /**
@@ -233,7 +233,7 @@ export function Sidebar({
 
   useEffect(() => {
     setSearchQuery("");
-  }, [selectedCollection]);
+  }, []);
 
   const draftCount = useMemo(
     () => contentItems.filter((item) => item.draft).length,
@@ -344,7 +344,7 @@ export function Sidebar({
   // Reset content focus index when filtered items change
   useEffect(() => {
     setContentFocusIndex(0);
-  }, [filteredItems.length]);
+  }, []);
 
   // Announce search results when they change
   useEffect(() => {

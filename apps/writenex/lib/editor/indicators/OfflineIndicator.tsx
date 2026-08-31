@@ -22,9 +22,9 @@
 
 "use client";
 
+import { Wifi, WifiOff } from "lucide-react";
 import React, { useEffect } from "react";
-import { WifiOff, Wifi } from "lucide-react";
-import { useOnlineStatus, formatOfflineDuration } from "@/lib/hooks";
+import { formatOfflineDuration, useOnlineStatus } from "@/lib/hooks";
 import {
   RECONNECT_AUTO_DISMISS,
   RECONNECT_SHOW_DURATION_THRESHOLD,
