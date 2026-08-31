@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/jaainil/writenex/compare/@imjp/writenex-astro@1.10.0...@imjp/writenex-astro@1.11.0) (2026-08-31)
+
+
+### Features
+
+* add Remote CMS documentation and enhance README with optional features ([706677b](https://github.com/jaainil/writenex/commit/706677b0dcdb9c4b7f2ef976e06722f2bb8bd06b))
+
 # [1.10.0](https://github.com/jaainil/writenex/compare/@imjp/writenex-astro@1.9.1...@imjp/writenex-astro@1.10.0) (2026-08-31)
 
 
