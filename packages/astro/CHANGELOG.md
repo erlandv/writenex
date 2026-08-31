@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/jaainil/writenex/compare/@imjp/writenex-astro@1.9.1...@imjp/writenex-astro@1.10.0) (2026-08-31)
+
+
+### Features
+
+* implement authentication and session management for remote CMS ([c844a18](https://github.com/jaainil/writenex/commit/c844a18e1cd6377ca4baaa2eddd3834f9a3fcd6f))
+
 ## [1.9.1](https://github.com/jaainil/writenex/compare/@imjp/writenex-astro@1.9.0...@imjp/writenex-astro@1.9.1) (2026-07-06)
 
 
