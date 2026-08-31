@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/jaainil/writenex/compare/@imjp/writenex-astro@1.11.0...@imjp/writenex-astro@1.11.1) (2026-08-31)
+
+
+### Bug Fixes
+
+* improve handling of remote CMS configuration merging and precedence ([5665be4](https://github.com/jaainil/writenex/commit/5665be4b0ee42ea35f904c89ce5337dee2365a68))
+
 # [1.11.0](https://github.com/jaainil/writenex/compare/@imjp/writenex-astro@1.10.0...@imjp/writenex-astro@1.11.0) (2026-08-31)
 
 
