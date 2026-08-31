@@ -249,7 +249,7 @@ function HeroSection(): React.ReactElement {
             <ExternalLink className="h-5 w-5" />
           </a>
           <a
-            href="https://github.com/jaainil/writenex/tree/main/packages/astro#readme"
+            href="https://github.com/jaainil/writenex/wiki"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-lg border border-zinc-300 px-5 py-3 text-lg font-normal text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
@@ -1354,7 +1354,7 @@ function CTASection(): React.ReactElement {
         </p>
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
           <a
-            href="https://github.com/jaainil/writenex/tree/main/packages/astro#readme"
+            href="https://github.com/jaainil/writenex/wiki"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-brand-500 hover:bg-brand-600 inline-flex items-center gap-2 rounded-lg px-5 py-3 text-lg font-normal text-white transition-colors"
