@@ -76,9 +76,11 @@ export const REMOTE_CMS_ENV_VARS = {
 /**
  * Apply defaults to the remote CMS configuration
  *
- * Explicit config values take precedence over environment variables.
- * Credentials not set in either place resolve to empty strings; the
- * integration treats those as "not configured" and fails closed.
+ * Explicit non-empty config values take precedence over environment
+ * variables. Empty strings are treated as "not set" so they don't shadow
+ * environment variables when merging pre-resolved configs. Credentials
+ * not set in either place resolve to empty strings; the integration
+ * treats those as "not configured" and fails closed.
  */
 export function applyRemoteCmsDefaults(
   remoteCms: RemoteCmsConfig | undefined
@@ -86,9 +88,9 @@ export function applyRemoteCmsDefaults(
   const base = remoteCms ?? DEFAULT_REMOTE_CMS_CONFIG;
   return {
     enabled: base.enabled ?? DEFAULT_REMOTE_CMS_CONFIG.enabled,
-    username: base.username ?? process.env[REMOTE_CMS_ENV_VARS.username] ?? "",
-    password: base.password ?? process.env[REMOTE_CMS_ENV_VARS.password] ?? "",
-    secret: base.secret ?? process.env[REMOTE_CMS_ENV_VARS.secret] ?? "",
+    username: base.username || process.env[REMOTE_CMS_ENV_VARS.username] || "",
+    password: base.password || process.env[REMOTE_CMS_ENV_VARS.password] || "",
+    secret: base.secret || process.env[REMOTE_CMS_ENV_VARS.secret] || "",
     sessionTtl: base.sessionTtl ?? DEFAULT_REMOTE_CMS_CONFIG.sessionTtl,
   };
 }
